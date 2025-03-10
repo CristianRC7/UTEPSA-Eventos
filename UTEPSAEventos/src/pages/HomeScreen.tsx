@@ -125,9 +125,9 @@ const HomeScreen = ({ route }: any) => {
             transform: [{ translateY: moveAnim }]
           }
         ]}>
-          <Text style={styles.welcomeChip}>
-            {userData?.rol === 'interno' ? 'Usuario Interno' : 'Usuario Externo'}
-          </Text>
+            <Text style={styles.welcomeChip}>
+                {userData?.rol === 'interno' ? 'Usuario Interno' : 'Usuario Externo'}
+            </Text>
           <Text style={styles.headerTitle}>Bienvenido</Text>
           <Text style={styles.headerSubtitle}>
             {userData?.nombre} {userData?.apellidos}

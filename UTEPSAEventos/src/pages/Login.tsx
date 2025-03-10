@@ -13,6 +13,7 @@ import {
   TouchableWithoutFeedback,
   Platform,
 } from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const { width } = Dimensions.get('window');
 
@@ -21,11 +22,13 @@ const Login = ({ navigation }: any) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   // Animations
   const fadeAnim = useState(new Animated.Value(0))[0];
   const moveAnim = useState(new Animated.Value(50))[0];
   const scaleAnim = useState(new Animated.Value(0.9))[0];
+  const buttonAnim = useState(new Animated.Value(0))[0];
   
   useEffect(() => {
     // Start animations when component mounts
@@ -67,12 +70,29 @@ const Login = ({ navigation }: any) => {
     };
   }, []);
   
+  // Button animation on press
+  const animateButton = () => {
+    Animated.sequence([
+      Animated.timing(buttonAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+  
   const handleLogin = async () => {
     if (!username.trim() || !password.trim()) {
       Alert.alert('Error', 'Por favor ingrese usuario y contraseña');
       return;
     }
     
+    animateButton();
     setLoading(true);
     
     try {
@@ -106,9 +126,22 @@ const Login = ({ navigation }: any) => {
     }
   };
   
+  const handleForgotPassword = () => {
+    Alert.alert(
+      'Recuperar contraseña',
+      'Envíe un correo a soporte.campusvirutal@utepsa.edu',
+      [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
+    );
+  };
+  
   const titleScale = scaleAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [0.8, 1],
+  });
+  
+  const buttonScale = buttonAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0.95],
   });
 
   return (
@@ -129,6 +162,7 @@ const Login = ({ navigation }: any) => {
           <Animated.View style={{ 
             transform: [{ scale: titleScale }],
             marginBottom: 40,
+            alignItems: 'center',
           }}>
             <Text style={styles.chip}>UTEPSA</Text>
             <Text style={styles.title}>Eventos</Text>
@@ -137,39 +171,68 @@ const Login = ({ navigation }: any) => {
           
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Usuario</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ingrese su usuario"
-              placeholderTextColor="#999"
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
-            />
+            <View style={styles.inputWrapper}>
+              <MaterialIcons name="person" size={20} color="#666" style={styles.inputIcon} />
+              <TextInput
+                style={styles.inputWithIcon}
+                placeholder="Ingrese su usuario"
+                placeholderTextColor="#999"
+                value={username}
+                onChangeText={setUsername}
+                autoCapitalize="none"
+              />
+            </View>
           </View>
           
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Contraseña</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ingrese su contraseña"
-              placeholderTextColor="#999"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
+            <View style={styles.inputWrapper}>
+              <MaterialIcons name="lock" size={20} color="#666" style={styles.inputIcon} />
+              <TextInput
+                style={styles.inputWithIcon}
+                placeholder="Ingrese su contraseña"
+                placeholderTextColor="#999"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity 
+                style={styles.eyeIconContainer}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <MaterialIcons 
+                  name={showPassword ? "visibility-off" : "visibility"} 
+                  size={20} 
+                  color="#666" 
+                />
+              </TouchableOpacity>
+            </View>
           </View>
           
           <TouchableOpacity
-            style={styles.loginButton}
+            activeOpacity={0.8}
             onPress={handleLogin}
             disabled={loading}
           >
-            {loading ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
-            )}
+            <Animated.View 
+              style={[
+                styles.loginButton,
+                { transform: [{ scale: buttonScale }] }
+              ]}
+            >
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+              )}
+            </Animated.View>
           </TouchableOpacity>
+          
+          <View style={styles.forgotPasswordContainer}>
+            <TouchableOpacity onPress={handleForgotPassword}>
+              <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
+            </TouchableOpacity>
+          </View>
         </Animated.View>
       </View>
     </TouchableWithoutFeedback>
@@ -187,20 +250,10 @@ const styles = StyleSheet.create({
   formContainer: {
     width: '100%',
     maxWidth: 400,
-    padding: 25,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 3,
+    padding: 20,
   },
   chip: {
-    alignSelf: 'flex-start',
+    alignSelf: 'center',
     backgroundColor: '#f0f0f3',
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -216,11 +269,13 @@ const styles = StyleSheet.create({
     color: '#000',
     marginBottom: 8,
     letterSpacing: -0.5,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     color: '#666',
     marginBottom: 20,
+    textAlign: 'center',
   },
   inputContainer: {
     marginBottom: 20,
@@ -232,14 +287,27 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     letterSpacing: -0.2,
   },
-  input: {
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     height: 55,
     borderWidth: 1,
     borderColor: '#E1E1E1',
     borderRadius: 12,
-    paddingHorizontal: 15,
-    fontSize: 16,
     backgroundColor: '#F9F9F9',
+  },
+  inputIcon: {
+    paddingHorizontal: 15,
+  },
+  eyeIconContainer: {
+    paddingHorizontal: 15,
+    height: '100%',
+    justifyContent: 'center',
+  },
+  inputWithIcon: {
+    flex: 1,
+    height: '100%',
+    fontSize: 16,
     color: '#000',
   },
   loginButton: {
@@ -255,6 +323,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     letterSpacing: 0.3,
+  },
+  forgotPasswordContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  forgotPasswordText: {
+    color: '#666',
+    fontSize: 14,
   },
 });
 
