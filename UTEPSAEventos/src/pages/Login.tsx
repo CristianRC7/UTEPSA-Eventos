@@ -76,7 +76,7 @@ const Login = ({ navigation }: any) => {
     setLoading(true);
     
     try {
-      const response = await fetch('http://192.168.0.15/server/src/Login.php', {
+      const response = await fetch('http://192.168.0.15/Utepsa-Eventos/server/src/Login.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
