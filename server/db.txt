@@ -1,0 +1,120 @@
+-- Crear tabla de usuarios
+CREATE TABLE usuarios (
+    id_usuario SERIAL PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    usuario VARCHAR(50) UNIQUE NOT NULL,
+    contrasena varchar(250) NOT NULL,
+    rol ENUM('interno', 'externo', 'administrador') NOT NULL
+);
+
+-- Crear tabla de eventos
+CREATE TABLE eventos (
+    id_evento SERIAL PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL,
+    descripcion TEXT NOT NULL,
+    fecha_inicio TIMESTAMP NOT NULL,
+    fecha_fin TIMESTAMP NOT NULL,
+    pagina_web VARCHAR(255) UNIQUE
+);
+
+-- Crear tabla de expositores
+CREATE TABLE expositores (
+    id_expositor SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT NOT NULL
+);
+
+-- Relación entre eventos y expositores
+CREATE TABLE evento_expositores (
+    id_evento INT NOT NULL,
+    id_expositor INT NOT NULL,
+    PRIMARY KEY (id_evento, id_expositor),
+    FOREIGN KEY (id_evento) REFERENCES eventos(id_evento) ON DELETE CASCADE,
+    FOREIGN KEY (id_expositor) REFERENCES expositores(id_expositor) ON DELETE CASCADE
+);
+
+-- Crear tabla de actividades
+CREATE TABLE actividades (
+    id_actividad SERIAL PRIMARY KEY,
+    id_evento INT NOT NULL,
+    titulo VARCHAR(100) NOT NULL,
+    descripcion TEXT NOT NULL,
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+    FOREIGN KEY (id_evento) REFERENCES eventos(id_evento) ON DELETE CASCADE
+);
+
+-- Inscripción de usuarios en eventos
+CREATE TABLE inscripciones (
+    id_inscripcion SERIAL PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_evento INT NOT NULL,
+    UNIQUE (id_usuario, id_evento),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_evento) REFERENCES eventos(id_evento) ON DELETE CASCADE
+);
+
+-- Inscripción de usuarios en actividades
+CREATE TABLE inscripcion_actividades (
+    id_inscripcion_actividad SERIAL PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_actividad INT NOT NULL,
+    UNIQUE (id_usuario, id_actividad),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_actividad) REFERENCES actividades(id_actividad) ON DELETE CASCADE
+);
+
+-- Certificados para usuarios inscritos en eventos
+CREATE TABLE certificados (
+    id_certificado SERIAL PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_evento INT NOT NULL,
+    nro_certificado VARCHAR(50) UNIQUE NOT NULL,
+    fecha_emision TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_evento) REFERENCES eventos(id_evento) ON DELETE CASCADE
+);
+
+-- Habilitación de formularios por actividad
+CREATE TABLE habilitacion_formularios (
+    id_habilitacion SERIAL PRIMARY KEY,
+    id_actividad INT NOT NULL,
+    fecha_inicio TIMESTAMP NOT NULL,
+    fecha_fin TIMESTAMP NOT NULL,
+    FOREIGN KEY (id_actividad) REFERENCES actividades(id_actividad) ON DELETE CASCADE
+);
+
+-- Formulario de evaluación de actividades
+CREATE TABLE formularios (
+    id_formulario SERIAL PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_actividad INT NOT NULL,
+    rating INT CHECK (rating BETWEEN 1 AND 5),
+    descripcion TEXT NOT NULL,
+    fecha_respuesta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_actividad) REFERENCES actividades(id_actividad) ON DELETE CASCADE,
+    CONSTRAINT chk_usuario_inscrito CHECK (
+        (id_usuario, id_actividad) IN (SELECT id_usuario, id_actividad FROM inscripcion_actividades)
+    )
+);
+
+-- Publicaciones de imágenes en la galería
+CREATE TABLE publicaciones (
+    id_publicacion SERIAL PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_evento INT NOT NULL,
+    estado ENUM('esperando_aprobacion', 'aprobado') DEFAULT 'esperando_aprobacion',
+    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_evento) REFERENCES eventos(id_evento) ON DELETE CASCADE
+);
+
+-- Imágenes asociadas a las publicaciones
+CREATE TABLE imagenes_publicacion (
+    id_imagen SERIAL PRIMARY KEY,
+    id_publicacion INT NOT NULL,
+    imagen_url VARCHAR(255) NOT NULL,
+    FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE
+);
