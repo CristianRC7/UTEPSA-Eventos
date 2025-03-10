@@ -1,5 +1,4 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import HomeScreen from '../pages/HomeScreen';
@@ -9,7 +8,7 @@ import Profile from '../pages/Profile';
 const Tab = createBottomTabNavigator();
 
 // Main TabNavigator Component
-const BottomNavigator = ({ route }: any) => {
+const BottomNavigator = ({ route, navigation }: any) => {
   const { userData } = route.params || {};
   
   return (

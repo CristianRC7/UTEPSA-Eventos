@@ -14,6 +14,7 @@ import {
   Platform,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { saveSession } from '../utils/sessionStorage';
 
 const { width } = Dimensions.get('window');
 
@@ -85,7 +86,7 @@ const Login = ({ navigation }: any) => {
       }),
     ]).start();
   };
-  
+
   const handleLogin = async () => {
     if (!username.trim() || !password.trim()) {
       Alert.alert('Error', 'Por favor ingrese usuario y contraseña');
@@ -110,6 +111,9 @@ const Login = ({ navigation }: any) => {
       const data = await response.json();
       
       if (data.success) {
+        // Save session data
+        await saveSession(data);
+        
         if (data.rol === 'administrador') {
           Alert.alert('Bienvenido', 'Hola admin');
         } else if (data.rol === 'interno' || data.rol === 'externo') {
@@ -125,7 +129,6 @@ const Login = ({ navigation }: any) => {
       setLoading(false);
     }
   };
-  
   const handleForgotPassword = () => {
     Alert.alert(
       'Recuperar contraseña',
