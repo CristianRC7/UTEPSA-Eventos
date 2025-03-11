@@ -106,7 +106,7 @@ CREATE TABLE publicaciones (
     id_publicacion INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
     id_evento INT NOT NULL,
-    estado ENUM('esperando_aprobacion', 'aprobado') DEFAULT 'esperando_aprobacion',
+    estado ENUM('esperando_aprobacion','rechazado' ,'aprobado') DEFAULT 'esperando_aprobacion',
     fecha_subida DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (id_evento) REFERENCES eventos(id_evento) ON DELETE CASCADE

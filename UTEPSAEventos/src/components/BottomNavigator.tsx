@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import HomeScreen from '../pages/HomeScreen';
-import PublicationScreen from '../pages/PublicationScreen';
+import PublicacionesScreen from '../pages/PublicationScreen';
 import Profile from '../pages/Profile';
 
 const Tab = createBottomTabNavigator();
@@ -13,6 +13,7 @@ const BottomNavigator = ({ route, navigation }: any) => {
   
   return (
     <Tab.Navigator
+      id="bottom-tab"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName = '';
@@ -48,7 +49,7 @@ const BottomNavigator = ({ route, navigation }: any) => {
         component={HomeScreen} 
         initialParams={{ userData }} 
       />
-      <Tab.Screen name="Publicaciones" component={PublicationScreen} />
+      <Tab.Screen name="Publicaciones" component={PublicacionesScreen} />
       <Tab.Screen 
         name="Perfil" 
         component={Profile} 
