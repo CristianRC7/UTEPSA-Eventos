@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const PostScreen = () => {
+const PublicationScreen = () => {
   return (
     <View style={styles.centerContainer}>
       <Text style={styles.developmentText}>Publicaciones</Text>
-      <Text style={styles.developmentSubtext}>Esta sección está en desarrollo.</Text>
+      <Text style={styles.developmentSubtext}>Esta sección está en desarrollo. xd</Text>
     </View>
   );
 };
@@ -30,4 +30,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PostScreen;
+export default PublicationScreen;
