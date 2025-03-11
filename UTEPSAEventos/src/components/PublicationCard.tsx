@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Share from 'react-native-share';
 
 interface Publication {
   id: number;
@@ -15,37 +16,20 @@ interface Publication {
 interface PublicationCardProps {
   publication: Publication;
   onLike?: () => void;
-  onShare?: () => void;
 }
 
-const PublicationCard = ({
-  publication,
-  onLike,
-  onShare,
-}: PublicationCardProps) => {
-  // Function to get status color
-//   const getStatusColor = (status: string) => {
-//     switch (status) {
-//       case 'aprobado':
-//         return '#4CAF50'; // Green
-//       case 'rechazado':
-//         return '#F44336'; // Red
-//       default:
-//         return '#FFC107'; // Yellow
-//     }
-//   };
-
-// //   // Function to get status text
-// //   const getStatusText = (status: string) => {
-// //     switch (status) {
-// //       case 'aprobado':
-// //         return 'Aprobado';
-// //       case 'rechazado':
-// //         return 'Rechazado';
-// //       default:
-// //         return 'Pendiente';
-// //     }
-// //   };
+const PublicationCard = ({ publication, onLike }: PublicationCardProps) => {
+  const handleShare = async () => {
+    try {
+      await Share.open({
+        title: 'Compartir evento',
+        message: `¡Mira este evento: ${publication.eventName}!`,
+        url: publication.imageUrl,
+      });
+    } catch (error) {
+      console.log('Error al compartir:', error);
+    }
+  };
 
   return (
     <View style={styles.card}>
@@ -58,19 +42,8 @@ const PublicationCard = ({
           </View>
           <View>
             <Text style={styles.userName}>{publication.userName}</Text>
-            {/* <Text style={styles.userRole}>{publication.userRole}</Text> */}
           </View>
         </View>
-        {/* <View
-          style={[
-            styles.statusChip,
-            { backgroundColor: getStatusColor(publication.status) },
-          ]}
-        >
-          <Text style={styles.statusText}>
-            {getStatusText(publication.status)}
-          </Text>
-        </View> */}
       </View>
 
       <View style={styles.cardContent}>
@@ -90,7 +63,7 @@ const PublicationCard = ({
           <Icon name="favorite-outline" size={22} color="#666" />
           <Text style={styles.actionText}>Me gusta</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={onShare}>
+        <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
           <Icon name="share" size={22} color="#666" />
           <Text style={styles.actionText}>Compartir</Text>
         </TouchableOpacity>
@@ -141,21 +114,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
-  },
-  userRole: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 2,
-  },
-  statusChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFFFFF',
   },
   cardContent: {
     marginBottom: 12,
