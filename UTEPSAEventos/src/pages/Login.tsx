@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { saveSession } from '../utils/sessionStorage';
+import { BASE_URL } from '../utils/Config';
 
 const { width } = Dimensions.get('window');
 
@@ -97,7 +98,7 @@ const Login = ({ navigation }: any) => {
     setLoading(true);
     
     try {
-      const response = await fetch('http://192.168.0.15/Utepsa-Eventos/server/src/Login.php', {
+      const response = await fetch(`${BASE_URL}/Login.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

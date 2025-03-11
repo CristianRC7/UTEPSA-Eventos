@@ -12,6 +12,7 @@ import {
   FlatList,
   Alert,
 } from 'react-native';
+import { BASE_URL } from '../utils/Config';
 
 // Home Tab Screen Component
 const HomeScreen = ({ route }: any) => {
@@ -54,8 +55,8 @@ const HomeScreen = ({ route }: any) => {
   const fetchEvents = async (query = '') => {
     setLoading(true);
     try {
-      const response = await fetch(`http://192.168.0.15/Utepsa-Eventos/server/src/Events.php?search=${encodeURIComponent(query)}`);
-      const data = await response.json();
+        const response = await fetch(`${BASE_URL}/Events.php?search=${encodeURIComponent(query)}`);
+        const data = await response.json();
       
       if (data.success) {
         setEvents(data.events);
