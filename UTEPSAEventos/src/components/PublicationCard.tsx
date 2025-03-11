@@ -26,28 +26,28 @@ const PublicationCard = ({
   onShare,
 }: PublicationCardProps) => {
   // Function to get status color
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'aprobado':
-        return '#4CAF50'; // Green
-      case 'rechazado':
-        return '#F44336'; // Red
-      default:
-        return '#FFC107'; // Yellow
-    }
-  };
+//   const getStatusColor = (status: string) => {
+//     switch (status) {
+//       case 'aprobado':
+//         return '#4CAF50'; // Green
+//       case 'rechazado':
+//         return '#F44336'; // Red
+//       default:
+//         return '#FFC107'; // Yellow
+//     }
+//   };
 
-  // Function to get status text
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'aprobado':
-        return 'Aprobado';
-      case 'rechazado':
-        return 'Rechazado';
-      default:
-        return 'Pendiente';
-    }
-  };
+// //   // Function to get status text
+// //   const getStatusText = (status: string) => {
+// //     switch (status) {
+// //       case 'aprobado':
+// //         return 'Aprobado';
+// //       case 'rechazado':
+// //         return 'Rechazado';
+// //       default:
+// //         return 'Pendiente';
+// //     }
+// //   };
 
   return (
     <View style={styles.card}>
@@ -60,10 +60,10 @@ const PublicationCard = ({
           </View>
           <View>
             <Text style={styles.userName}>{publication.userName}</Text>
-            <Text style={styles.userRole}>{publication.userRole}</Text>
+            {/* <Text style={styles.userRole}>{publication.userRole}</Text> */}
           </View>
         </View>
-        <View
+        {/* <View
           style={[
             styles.statusChip,
             { backgroundColor: getStatusColor(publication.status) },
@@ -72,7 +72,7 @@ const PublicationCard = ({
           <Text style={styles.statusText}>
             {getStatusText(publication.status)}
           </Text>
-        </View>
+        </View> */}
       </View>
 
       <View style={styles.cardContent}>

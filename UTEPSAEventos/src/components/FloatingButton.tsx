@@ -14,7 +14,7 @@ interface FloatingButtonProps {
 const FloatingButton = ({
   onPress,
   iconName = 'add',
-  backgroundColor = '#9b87f5',
+  backgroundColor = '#000',
   size = 60,
   iconColor = '#FFFFFF',
   iconSize = 30,

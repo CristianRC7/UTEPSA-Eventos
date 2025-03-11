@@ -119,7 +119,7 @@ const PublicationScreen= () => {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Publicaciones</Text>
         <Text style={styles.headerSubtitle}>
-          Comparte tus momentos en los eventos
+          Comparte tus momentos de los eventos
         </Text>
       </View>
 
