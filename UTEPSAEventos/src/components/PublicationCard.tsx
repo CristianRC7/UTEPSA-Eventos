@@ -15,14 +15,12 @@ interface Publication {
 interface PublicationCardProps {
   publication: Publication;
   onLike?: () => void;
-  onComment?: () => void;
   onShare?: () => void;
 }
 
 const PublicationCard = ({
   publication,
   onLike,
-  onComment,
   onShare,
 }: PublicationCardProps) => {
   // Function to get status color
@@ -91,10 +89,6 @@ const PublicationCard = ({
         <TouchableOpacity style={styles.actionButton} onPress={onLike}>
           <Icon name="favorite-outline" size={22} color="#666" />
           <Text style={styles.actionText}>Me gusta</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={onComment}>
-          <Icon name="chat-bubble-outline" size={22} color="#666" />
-          <Text style={styles.actionText}>Comentar</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton} onPress={onShare}>
           <Icon name="share" size={22} color="#666" />

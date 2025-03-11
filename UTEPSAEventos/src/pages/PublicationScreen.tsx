@@ -52,7 +52,7 @@ const MOCK_PUBLICATIONS = [
   },
 ];
 
-const PublicationScreen= () => {
+const PublicationScreen = () => {
   const [publications, setPublications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -90,10 +90,6 @@ const PublicationScreen= () => {
 
   const handleShare = (id: number) => {
     Alert.alert('Compartir', `Has compartido la publicación ${id}`);
-  };
-
-  const handleAddPublication = () => {
-    Alert.alert('Nueva Publicación', 'Aquí puedes crear una nueva publicación');
   };
 
   const renderItem = ({ item }: any) => (
@@ -147,7 +143,7 @@ const PublicationScreen= () => {
       />
 
       <View style={styles.floatingButtonContainer}>
-        <FloatingButton onPress={handleAddPublication} />
+        <FloatingButton />
       </View>
     </SafeAreaView>
   );

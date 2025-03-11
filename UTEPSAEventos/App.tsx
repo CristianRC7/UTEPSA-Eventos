@@ -5,6 +5,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar, BackHandler, Alert } from 'react-native';
 import Login from './src/pages/Login';
 import Home from './src/pages/Home';
+import MyPublication from './src/pages/MyPublication';
+import FormPublication from './src/components/FormPublication';
 import { getSession } from './src/utils/sessionStorage';
 
 const Stack = createNativeStackNavigator();
@@ -59,7 +61,6 @@ function App(): React.JSX.Element {
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <NavigationContainer>
         <Stack.Navigator
-          id="main-stack"
           initialRouteName={userSession ? "Home" : "Login"}
           screenOptions={{
             headerShown: false,
@@ -76,6 +77,8 @@ function App(): React.JSX.Element {
             initialParams={{ userData: userSession }}
             options={{ gestureEnabled: false }}
           />
+          <Stack.Screen name="MyPublication" component={MyPublication} />
+          <Stack.Screen name="FormPublication" component={FormPublication} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
