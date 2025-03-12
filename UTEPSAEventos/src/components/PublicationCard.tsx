@@ -1,24 +1,39 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Share from 'react-native-share';
 
 interface Publication {
   id: number;
   userName: string;
-  userRole: string;
   eventName: string;
-  status: 'esperando_aprobacion' | 'rechazado' | 'aprobado';
+  eventDescription?: string;
   date: string;
   imageUrl: string;
+  likes?: number;
+  hasUserLiked?: boolean;
 }
 
 interface PublicationCardProps {
   publication: Publication;
-  onLike?: () => void;
+  onLike: () => void;
+  onShare: () => void;
 }
 
-const PublicationCard = ({ publication, onLike }: PublicationCardProps) => {
+const PublicationCard = ({ 
+  publication, 
+  onLike, 
+  onShare 
+}: PublicationCardProps) => {
+  const [liked, setLiked] = useState(publication.hasUserLiked || false);
+  const [likeCount, setLikeCount] = useState(publication.likes || 0);
+
+  const handleLike = () => {
+    setLiked(!liked);
+    setLikeCount(liked ? likeCount - 1 : likeCount + 1);
+    onLike();
+  };
+
   const handleShare = async () => {
     try {
       await Share.open({
@@ -26,45 +41,65 @@ const PublicationCard = ({ publication, onLike }: PublicationCardProps) => {
         message: `¡Mira este evento: ${publication.eventName}!`,
         url: publication.imageUrl,
       });
+      onShare();
     } catch (error) {
       console.log('Error al compartir:', error);
     }
   };
 
   return (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <View style={styles.userInfo}>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.userInfoContainer}>
           <View style={styles.userAvatar}>
             <Text style={styles.userInitial}>
               {publication.userName.charAt(0).toUpperCase()}
             </Text>
           </View>
-          <View>
+          <View style={styles.userDetails}>
             <Text style={styles.userName}>{publication.userName}</Text>
           </View>
         </View>
       </View>
-
-      <View style={styles.cardContent}>
+      
+      <View style={styles.eventDetails}>
         <Text style={styles.eventName}>{publication.eventName}</Text>
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: publication.imageUrl }}
-            style={styles.image}
-            resizeMode="cover"
-          />
+        {publication.eventDescription && (
+          <Text style={styles.eventDescription} numberOfLines={2}>
+            {publication.eventDescription}
+          </Text>
+        )}
+        <View style={styles.dateContainer}>
+          <Icon name="calendar-today" size={14} color="#666" style={styles.dateIcon} />
+          <Text style={styles.date}>{publication.date}</Text>
         </View>
-        <Text style={styles.date}>{publication.date}</Text>
       </View>
-
-      <View style={styles.cardActions}>
-        <TouchableOpacity style={styles.actionButton} onPress={onLike}>
-          <Icon name="favorite-outline" size={22} color="#666" />
-          <Text style={styles.actionText}>Me gusta</Text>
+      
+      <Image 
+        source={{ uri: publication.imageUrl }} 
+        style={styles.image}
+        resizeMode="cover"
+      />
+      
+      <View style={styles.actionsContainer}>
+        <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
+          <Icon 
+            name={liked ? "favorite" : "favorite-outline"} 
+            size={24} 
+            color={liked ? "#F44336" : "#666"} 
+          />
+          <View style={styles.likeInfo}>
+            <Text style={[styles.actionText, liked && styles.likedText]}>
+              {liked ? 'Te gusta' : 'Me gusta'}
+            </Text>
+            {likeCount > 0 && (
+              <Text style={styles.likeCount}>{likeCount}</Text>
+            )}
+          </View>
         </TouchableOpacity>
+        
         <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-          <Icon name="share" size={22} color="#666" />
+          <Icon name="share" size={24} color="#666" />
           <Text style={styles.actionText}>Compartir</Text>
         </TouchableOpacity>
       </View>
@@ -73,26 +108,26 @@ const PublicationCard = ({ publication, onLike }: PublicationCardProps) => {
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
+  container: {
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    overflow: 'hidden',
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#EFEFEF',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    borderWidth: 1,
-    borderColor: '#EFEFEF',
   },
-  cardHeader: {
+  header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    padding: 16,
   },
-  userInfo: {
+  userInfoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -110,52 +145,79 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#8B5CF6',
   },
+  userDetails: {
+    flexDirection: 'column',
+  },
   userName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
   },
-  cardContent: {
-    marginBottom: 12,
+  eventDetails: {
+    paddingHorizontal: 16,
+    paddingBottom: 12,
   },
   eventName: {
     fontSize: 18,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 12,
+    marginBottom: 6,
   },
-  imageContainer: {
-    borderRadius: 12,
-    overflow: 'hidden',
+  eventDescription: {
+    fontSize: 14,
+    color: '#666',
     marginBottom: 8,
+    lineHeight: 20,
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateIcon: {
+    marginRight: 4,
+  },
+  date: {
+    fontSize: 14,
+    color: '#666',
   },
   image: {
     width: '100%',
-    height: 200,
-    backgroundColor: '#F9F9F9',
+    height: 240,
+    backgroundColor: '#f0f0f0',
   },
-  date: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'right',
-  },
-  cardActions: {
+  actionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    padding: 16,
     borderTopWidth: 1,
     borderTopColor: '#EFEFEF',
-    paddingTop: 12,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
   },
   actionText: {
+    marginLeft: 8,
     fontSize: 14,
     color: '#666',
-    marginLeft: 6,
+  },
+  likedText: {
+    color: '#F44336',
+  },
+  likeInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  likeCount: {
+    marginLeft: 4,
+    fontSize: 14,
+    color: '#666',
+    backgroundColor: '#F5F5F5',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
   },
 });
 

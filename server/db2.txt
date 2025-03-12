@@ -112,6 +112,16 @@ CREATE TABLE publicaciones (
     FOREIGN KEY (id_evento) REFERENCES eventos(id_evento) ON DELETE CASCADE
 );
 
+-- Likes a las publicaciones de los eventos
+CREATE TABLE likes_publicaciones (
+    id_like INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_publicacion INT NOT NULL,
+    UNIQUE (id_usuario, id_publicacion), -- Evita que un usuario dé like más de una vez a la misma publicación
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE
+);
+
 -- Imágenes asociadas a las publicaciones
 CREATE TABLE imagenes_publicacion (
     id_imagen INT AUTO_INCREMENT PRIMARY KEY,
