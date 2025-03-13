@@ -61,6 +61,7 @@ function App(): React.JSX.Element {
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <NavigationContainer>
         <Stack.Navigator
+          id="main-stack"
           initialRouteName={userSession ? "Home" : "Login"}
           screenOptions={{
             headerShown: false,

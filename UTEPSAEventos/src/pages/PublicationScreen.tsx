@@ -23,6 +23,11 @@ const MOCK_PUBLICATIONS = [
     eventDescription: 'Exploración de las últimas tendencias tecnológicas del 2023.',
     date: '15/10/2023 - 14:30',
     imageUrl: 'https://picsum.photos/id/1/600/400',
+    imageUrls: [
+      'https://picsum.photos/id/1/600/400',
+      'https://picsum.photos/id/10/600/400',
+      'https://picsum.photos/id/11/600/400'
+    ],
     likes: 24,
     hasUserLiked: false
   },
@@ -33,6 +38,10 @@ const MOCK_PUBLICATIONS = [
     eventDescription: 'Desarrollo de habilidades de liderazgo en entornos cambiantes.',
     date: '20/10/2023 - 09:15',
     imageUrl: 'https://picsum.photos/id/20/600/400',
+    imageUrls: [
+      'https://picsum.photos/id/20/600/400',
+      'https://picsum.photos/id/21/600/400'
+    ],
     likes: 8,
     hasUserLiked: true
   },
@@ -53,6 +62,12 @@ const MOCK_PUBLICATIONS = [
     eventDescription: 'Herramientas prácticas para iniciar y hacer crecer tu propio negocio.',
     date: '12/11/2023 - 10:00',
     imageUrl: 'https://picsum.photos/id/42/600/400',
+    imageUrls: [
+      'https://picsum.photos/id/42/600/400',
+      'https://picsum.photos/id/45/600/400',
+      'https://picsum.photos/id/48/600/400',
+      'https://picsum.photos/id/49/600/400'
+    ],
     likes: 15,
     hasUserLiked: false
   },
@@ -78,6 +93,7 @@ const PublicationScreen = () => {
 
     fetchPublications();
   }, []);
+
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -109,6 +125,7 @@ const PublicationScreen = () => {
         return data;
     }
   };
+
 
   const handleFilter = (option: string) => {
     setFilterOption(option);
