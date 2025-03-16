@@ -9,6 +9,24 @@ import MyPublication from './src/pages/MyPublication';
 import FormPublication from './src/components/FormPublication';
 import { getSession } from './src/utils/sessionStorage';
 
+// Global function for handling back button press
+const handleBackPress = () => {
+  Alert.alert(
+    'Salir',
+    '¿Desea salir de la aplicación?',
+    [
+      {
+        text: 'No',
+        onPress: () => null,
+        style: 'cancel',
+      },
+      { text: 'Sí', onPress: () => BackHandler.exitApp() },
+    ],
+    { cancelable: false }
+  );
+  return true; // Prevent default behavior
+};
+
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
@@ -27,23 +45,8 @@ function App(): React.JSX.Element {
 
     checkSession();
     
-    // Handle Android back button
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      Alert.alert(
-        'Salir',
-        '¿Desea salir de la aplicación?',
-        [
-          {
-            text: 'No',
-            onPress: () => null,
-            style: 'cancel',
-          },
-          { text: 'Sí', onPress: () => BackHandler.exitApp() },
-        ],
-        { cancelable: false }
-      );
-      return true; // Prevent default behavior
-    });
+    // Handle Android back button globally
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
 
     return () => backHandler.remove();
   }, []);
@@ -56,12 +59,11 @@ function App(): React.JSX.Element {
     );
   }
 
-  return (
+ return (
     <SafeAreaProvider>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <NavigationContainer>
         <Stack.Navigator
-          id="main-stack"
           initialRouteName={userSession ? "Home" : "Login"}
           screenOptions={{
             headerShown: false,
@@ -71,7 +73,11 @@ function App(): React.JSX.Element {
             animation: 'fade_from_bottom',
           }}
         >
-          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen 
+            name="Login" 
+            component={Login} 
+            options={{ gestureEnabled: false }}
+          />
           <Stack.Screen 
             name="Home" 
             component={Home} 

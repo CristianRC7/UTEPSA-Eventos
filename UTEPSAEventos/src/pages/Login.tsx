@@ -11,10 +11,9 @@ import {
   Dimensions,
   Keyboard,
   TouchableWithoutFeedback,
-  Platform,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { saveSession } from '../utils/sessionStorage';
+import { saveSession, getSession } from '../utils/sessionStorage';
 import { BASE_URL } from '../utils/Config';
 
 const { width } = Dimensions.get('window');
@@ -25,6 +24,7 @@ const Login = ({ navigation }: any) => {
   const [loading, setLoading] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
   
   // Animations
   const fadeAnim = useState(new Animated.Value(0))[0];
@@ -33,6 +33,21 @@ const Login = ({ navigation }: any) => {
   const buttonAnim = useState(new Animated.Value(0))[0];
   
   useEffect(() => {
+    // Check if user is already logged in
+    const checkForExistingSession = async () => {
+      const userSession = await getSession();
+      if (userSession) {
+        // Redirect to Home if a session exists
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home', params: { userData: userSession } }],
+        });
+      }
+      setCheckingSession(false);
+    };
+    
+    checkForExistingSession();
+    
     // Start animations when component mounts
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -118,7 +133,11 @@ const Login = ({ navigation }: any) => {
         if (data.rol === 'administrador') {
           Alert.alert('Bienvenido', 'Hola admin');
         } else if (data.rol === 'interno' || data.rol === 'externo') {
-          navigation.navigate('Home', { userData: data });
+          // Use reset instead of navigate to prevent going back to login
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Home', params: { userData: data } }],
+          });
         }
       } else {
         Alert.alert('Error', data.message || 'Credenciales inválidas');
@@ -130,6 +149,7 @@ const Login = ({ navigation }: any) => {
       setLoading(false);
     }
   };
+  
   const handleForgotPassword = () => {
     Alert.alert(
       'Recuperar contraseña',
@@ -147,6 +167,16 @@ const Login = ({ navigation }: any) => {
     inputRange: [0, 1],
     outputRange: [1, 0.95],
   });
+
+  if (checkingSession) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#000" />
+        <Text style={{ marginTop: 20, fontSize: 16, color: '#666' }}>Verificando sesión...</Text>
+      </View>
+    );
+  }
+
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
