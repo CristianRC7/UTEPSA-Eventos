@@ -1,7 +1,12 @@
 import React from 'react';
 import BottomNavigator from '../components/BottomNavigator';
 
-const Home = ({ route, navigation }: any) => {
+interface HomeProps {
+  route: any;
+  navigation: any;
+}
+
+const Home: React.FC<HomeProps> = ({ route, navigation }) => {
   return <BottomNavigator route={route} navigation={navigation} />;
 };
 

@@ -7,6 +7,7 @@ import Login from './src/pages/Login';
 import Home from './src/pages/Home';
 import MyPublication from './src/pages/MyPublication';
 import FormPublication from './src/components/FormPublication';
+import DashboardEvent from './src/pages/DashboardEvent';
 import { getSession } from './src/utils/sessionStorage';
 
 // Global function for handling back button press
@@ -64,6 +65,7 @@ function App(): React.JSX.Element {
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <NavigationContainer>
         <Stack.Navigator
+          id="main-stack"
           initialRouteName={userSession ? "Home" : "Login"}
           screenOptions={{
             headerShown: false,
@@ -86,6 +88,7 @@ function App(): React.JSX.Element {
           />
           <Stack.Screen name="MyPublication" component={MyPublication} />
           <Stack.Screen name="FormPublication" component={FormPublication} />
+          <Stack.Screen name="DashboardEvent" component={DashboardEvent} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

@@ -7,8 +7,13 @@ import Profile from '../pages/Profile';
 
 const Tab = createBottomTabNavigator();
 
+interface BottomNavigatorProps {
+  route: any;
+  navigation: any;
+}
+
 // Main TabNavigator Component
-const BottomNavigator = ({ route, navigation }: any) => {
+const BottomNavigator: React.FC<BottomNavigatorProps> = ({ route, navigation }) => {
   const { userData } = route.params || {};
   
   return (

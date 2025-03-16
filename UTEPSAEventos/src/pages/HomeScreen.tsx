@@ -12,10 +12,12 @@ import {
   FlatList,
   Alert,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { BASE_URL } from '../utils/Config';
 
 // Home Tab Screen Component
 const HomeScreen = ({ route }: any) => {
+  const navigation = useNavigation();
   const userData = route.params?.userData;
   const [searchQuery, setSearchQuery] = useState('');
   const [events, setEvents] = useState([]);
@@ -55,8 +57,8 @@ const HomeScreen = ({ route }: any) => {
   const fetchEvents = async (query = '') => {
     setLoading(true);
     try {
-        const response = await fetch(`${BASE_URL}/Events.php?search=${encodeURIComponent(query)}`);
-        const data = await response.json();
+      const response = await fetch(`${BASE_URL}/Events.php?search=${encodeURIComponent(query)}`);
+      const data = await response.json();
       
       if (data.success) {
         setEvents(data.events);
@@ -87,8 +89,16 @@ const HomeScreen = ({ route }: any) => {
     fetchEvents('');
   };
   
+  const handleEventPress = (event: any) => {
+    navigation.navigate('DashboardEvent', { event });
+  };
+  
   const renderEventItem = ({ item }: any) => (
-    <View style={styles.eventCard}>
+    <TouchableOpacity 
+      style={styles.eventCard}
+      onPress={() => handleEventPress(item)}
+      activeOpacity={0.7}
+    >
       <Text style={styles.eventTitle}>{item.titulo}</Text>
       <Text style={styles.eventDescription} numberOfLines={2}>
         {item.descripcion}
@@ -101,7 +111,7 @@ const HomeScreen = ({ route }: any) => {
         <Text style={styles.eventDateLabel}>Fin:</Text>
         <Text style={styles.eventDate}>{formatDate(item.fecha_fin)}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
   
   const renderEmptyList = () => (
@@ -126,9 +136,9 @@ const HomeScreen = ({ route }: any) => {
             transform: [{ translateY: moveAnim }]
           }
         ]}>
-            <Text style={styles.welcomeChip}>
-                {userData?.rol === 'interno' ? 'Usuario Interno' : 'Usuario Externo'}
-            </Text>
+          <Text style={styles.welcomeChip}>
+            {userData?.rol === 'interno' ? 'Usuario Interno' : 'Usuario Externo'}
+          </Text>
           <Text style={styles.headerTitle}>Bienvenido</Text>
           <Text style={styles.headerSubtitle}>
             {userData?.nombre} {userData?.apellidos}
@@ -177,7 +187,6 @@ const HomeScreen = ({ route }: any) => {
     </SafeAreaView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
