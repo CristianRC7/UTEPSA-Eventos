@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Alert,
   StatusBar,
+  Linking,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -30,65 +31,75 @@ interface DashboardEventProps {
 const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
   const navigation = useNavigation<any>();
   const { event } = route.params || {};
-  
+
+  // Format date to "day/month/year - Hour:Minute" format
   const formatDate = (dateStr: string) => {
     try {
       const date = new Date(dateStr);
       if (isNaN(date.getTime())) {
         return dateStr;
       }
-      
       const day = date.getDate().toString().padStart(2, '0');
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
       const year = date.getFullYear();
       const hours = date.getHours().toString().padStart(2, '0');
       const minutes = date.getMinutes().toString().padStart(2, '0');
-      
       return `${day}/${month}/${year} - ${hours}:${minutes}`;
     } catch (error) {
       console.error('Error formatting date:', error);
       return dateStr; // Return original string if formatting fails
     }
   };
-  
+
   const handleButtonPress = (feature: string) => {
-    Alert.alert('Información', `Apartado ${feature} en desarrollo`);
+    if (feature === 'Pagina Web') {
+      if (event?.pagina_web) {
+        const webUrl = !event.pagina_web.startsWith('http://') && !event.pagina_web.startsWith('https://') 
+          ? 'https://' + event.pagina_web
+          : event.pagina_web;
+        Linking.openURL(webUrl).catch(() => {
+          Alert.alert('Error', 'No se pudo abrir el sitio web');
+        });
+      } else {
+        Alert.alert('Información', 'Este evento no tiene una página web asociada');
+      }
+    } else {
+      Alert.alert('Información', `Apartado ${feature} en desarrollo`);
+    }
   };
-  
+
   const handleBack = () => {
     navigation.goBack();
   };
 
-  // Menu options for the dashboard
+  // Menu options for the dashboard (added Pagina Web)
   const menuOptions = [
     { name: 'Cronograma', icon: 'event', color: '#4F46E5' },
     { name: 'Expositores', icon: 'people', color: '#10B981' },
-    { name: 'Pagina Web', icon: 'language', color: '#F59E0B' },
     { name: 'Formulario', icon: 'assignment', color: '#EC4899' },
     { name: 'Puntos de inscripción', icon: 'place', color: '#3B82F6' },
+    { name: 'Pagina Web', icon: 'language', color: '#F59E0B' },
     { name: 'Soporte', icon: 'help', color: '#8B5CF6' },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={handleBack}
         >
           <Icon name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalles del Evento</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.spacer} />
       </View>
-      
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.eventInfoSection}>
           <Text style={styles.eventTitle}>{event?.titulo || 'Evento'}</Text>
           <Text style={styles.eventDescription}>{event?.descripcion || 'Sin descripción disponible'}</Text>
-          
+
           <View style={styles.dateInfoContainer}>
             <View style={styles.dateInfo}>
               <Icon name="event" size={18} color="#666" style={styles.dateIcon} />
@@ -97,7 +108,6 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
                 <Text style={styles.dateValue}>{formatDate(event?.fecha_inicio) || 'No disponible'}</Text>
               </View>
             </View>
-            
             <View style={styles.dateInfo}>
               <Icon name="event" size={18} color="#666" style={styles.dateIcon} />
               <View>
@@ -107,10 +117,8 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
             </View>
           </View>
         </View>
-        
         <View style={styles.menuSection}>
           <Text style={styles.menuTitle}>Opciones del evento</Text>
-          
           <View style={styles.menuGrid}>
             {menuOptions.map((option, index) => (
               <TouchableOpacity
@@ -132,11 +140,13 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  spacer: {
+    width: 24,
   },
   header: {
     flexDirection: 'row',
@@ -171,7 +181,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#4B5563',
     lineHeight: 24,
-    marginBottom: 20,
+    marginBottom: 12,
   },
   dateInfoContainer: {
     flexDirection: 'row',

@@ -23,10 +23,10 @@ const HomeScreen = ({ route }: any) => {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  
+
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const moveAnim = React.useRef(new Animated.Value(30)).current;
-  
+
   // Format date to "day/month/year - Hour:Minute" format
   const formatDate = (dateStr: string) => {
     try {
@@ -35,20 +35,20 @@ const HomeScreen = ({ route }: any) => {
         // If date parsing fails, try to extract parts manually
         return dateStr;
       }
-      
+
       const day = date.getDate().toString().padStart(2, '0');
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
       const year = date.getFullYear();
       const hours = date.getHours().toString().padStart(2, '0');
       const minutes = date.getMinutes().toString().padStart(2, '0');
-      
+
       return `${day}/${month}/${year} - ${hours}:${minutes}`;
     } catch (error) {
       console.error('Error formatting date:', error);
       return dateStr; // Return original string if formatting fails
     }
   };
-  
+
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -62,17 +62,17 @@ const HomeScreen = ({ route }: any) => {
         useNativeDriver: true,
       }),
     ]).start();
-    
+
     // Load events on initial render
     fetchEvents();
-  }, []);
-  
+  }, [fadeAnim, moveAnim]);
+
   const fetchEvents = async (query = '') => {
     setLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/Events.php?search=${encodeURIComponent(query)}`);
       const data = await response.json();
-      
+
       if (data.success) {
         setEvents(data.events);
       } else {
@@ -91,21 +91,21 @@ const HomeScreen = ({ route }: any) => {
       setRefreshing(false);
     }
   };
-  
+
   const handleSearch = () => {
     fetchEvents(searchQuery);
   };
-  
+
   const handleRefresh = () => {
     setRefreshing(true);
     setSearchQuery('');
     fetchEvents('');
   };
-  
+
   const handleEventPress = (event: any) => {
     navigation.navigate('DashboardEvent', { event });
   };
-  
+
   const renderEventItem = ({ item }: any) => (
     <TouchableOpacity 
       style={styles.eventCard}
@@ -126,7 +126,6 @@ const HomeScreen = ({ route }: any) => {
       </View>
     </TouchableOpacity>
   );
-  
   const renderEmptyList = () => (
     <View style={styles.emptyContainer}>
       <Text style={styles.emptyText}>No hay eventos disponibles</Text>
@@ -138,7 +137,7 @@ const HomeScreen = ({ route }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
@@ -157,7 +156,6 @@ const HomeScreen = ({ route }: any) => {
             {userData?.nombre} {userData?.apellidos}
           </Text>
         </Animated.View>
-        
         <Animated.View style={{
           opacity: fadeAnim,
           transform: [{ translateY: moveAnim }]
@@ -178,9 +176,7 @@ const HomeScreen = ({ route }: any) => {
               <Text style={styles.searchButtonText}>Buscar</Text>
             </TouchableOpacity>
           </View>
-          
           <Text style={styles.sectionTitle}>Próximos Eventos</Text>
-          
           {loading ? (
             <ActivityIndicator size="large" color="#000" style={styles.loader} />
           ) : (

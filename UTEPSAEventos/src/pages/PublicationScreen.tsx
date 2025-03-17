@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  SafeAreaView, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  SafeAreaView,
   ActivityIndicator,
   Alert,
   RefreshControl,
   TouchableOpacity,
-  Modal
+  Modal,
 } from 'react-native';
 import PublicationCard from '../components/PublicationCard';
 import FloatingButton from '../components/FloatingButton';
@@ -196,39 +196,39 @@ const PublicationScreen = () => {
         visible={filterModalVisible}
         onRequestClose={() => setFilterModalVisible(false)}
       >
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
           onPress={() => setFilterModalVisible(false)}
         >
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Filtrar publicaciones</Text>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={[styles.filterOption, filterOption === 'all' && styles.selectedFilter]}
               onPress={() => handleFilter('all')}
             >
               <Icon name="view-list" size={20} color={filterOption === 'all' ? "#8B5CF6" : "#666"} />
               <Text style={[styles.filterText, filterOption === 'all' && styles.selectedFilterText]}>Todas</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={[styles.filterOption, filterOption === 'popular' && styles.selectedFilter]}
               onPress={() => handleFilter('popular')}
             >
               <Icon name="star" size={20} color={filterOption === 'popular' ? "#8B5CF6" : "#666"} />
               <Text style={[styles.filterText, filterOption === 'popular' && styles.selectedFilterText]}>Más populares</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={[styles.filterOption, filterOption === 'recent' && styles.selectedFilter]}
               onPress={() => handleFilter('recent')}
             >
               <Icon name="access-time" size={20} color={filterOption === 'recent' ? "#8B5CF6" : "#666"} />
               <Text style={[styles.filterText, filterOption === 'recent' && styles.selectedFilterText]}>Más recientes</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={[styles.filterOption, filterOption === 'liked' && styles.selectedFilter]}
               onPress={() => handleFilter('liked')}
             >

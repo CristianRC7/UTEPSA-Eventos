@@ -48,16 +48,16 @@ const BottomNavigator: React.FC<BottomNavigatorProps> = ({ route, navigation }) 
         headerShown: false,
       })}
     >
-      <Tab.Screen 
-        name="Inicio" 
-        component={HomeScreen} 
-        initialParams={{ userData }} 
+      <Tab.Screen
+        name="Inicio"
+        component={HomeScreen}
+        initialParams={{ userData }}
       />
       <Tab.Screen name="Publicaciones" component={PublicationScreen} />
       <Tab.Screen 
-        name="Perfil" 
-        component={Profile} 
-        initialParams={{ userData }} 
+        name="Perfil"
+        component={Profile}
+        initialParams={{ userData }}
       />
     </Tab.Navigator>
   );

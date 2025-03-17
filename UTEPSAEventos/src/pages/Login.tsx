@@ -25,13 +25,13 @@ const Login = ({ navigation }: any) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
-  
+
   // Animations
   const fadeAnim = useState(new Animated.Value(0))[0];
   const moveAnim = useState(new Animated.Value(50))[0];
   const scaleAnim = useState(new Animated.Value(0.9))[0];
   const buttonAnim = useState(new Animated.Value(0))[0];
-  
+
   useEffect(() => {
     // Check if user is already logged in
     const checkForExistingSession = async () => {
@@ -45,9 +45,9 @@ const Login = ({ navigation }: any) => {
       }
       setCheckingSession(false);
     };
-    
+
     checkForExistingSession();
-    
+
     // Start animations when component mounts
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -66,7 +66,7 @@ const Login = ({ navigation }: any) => {
         useNativeDriver: true,
       }),
     ]).start();
-    
+
     // Keyboard listeners
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -85,8 +85,8 @@ const Login = ({ navigation }: any) => {
       keyboardDidShowListener.remove();
       keyboardDidHideListener.remove();
     };
-  }, []);
-  
+  }, [fadeAnim, moveAnim, navigation, scaleAnim]);
+
   // Button animation on press
   const animateButton = () => {
     Animated.sequence([
@@ -108,10 +108,10 @@ const Login = ({ navigation }: any) => {
       Alert.alert('Error', 'Por favor ingrese usuario y contraseña');
       return;
     }
-    
+
     animateButton();
     setLoading(true);
-    
+
     try {
       const response = await fetch(`${BASE_URL}/Login.php`, {
         method: 'POST',
@@ -123,13 +123,13 @@ const Login = ({ navigation }: any) => {
           contrasena: password,
         }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         // Save session data
         await saveSession(data);
-        
+
         if (data.rol === 'administrador') {
           Alert.alert('Bienvenido', 'Hola admin');
         } else if (data.rol === 'interno' || data.rol === 'externo') {
@@ -149,7 +149,7 @@ const Login = ({ navigation }: any) => {
       setLoading(false);
     }
   };
-  
+
   const handleForgotPassword = () => {
     Alert.alert(
       'Recuperar contraseña',
@@ -157,12 +157,12 @@ const Login = ({ navigation }: any) => {
       [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
     );
   };
-  
+
   const titleScale = scaleAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [0.8, 1],
   });
-  
+
   const buttonScale = buttonAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [1, 0.95],
@@ -181,7 +181,7 @@ const Login = ({ navigation }: any) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Animated.View 
+        <Animated.View
           style={[
             styles.formContainer,
             {
@@ -202,7 +202,7 @@ const Login = ({ navigation }: any) => {
             <Text style={styles.title}>Eventos</Text>
             <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
           </Animated.View>
-          
+
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Usuario</Text>
             <View style={styles.inputWrapper}>
@@ -217,7 +217,7 @@ const Login = ({ navigation }: any) => {
               />
             </View>
           </View>
-          
+
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Contraseña</Text>
             <View style={styles.inputWrapper}>
@@ -230,19 +230,19 @@ const Login = ({ navigation }: any) => {
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
               />
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.eyeIconContainer}
                 onPress={() => setShowPassword(!showPassword)}
               >
-                <MaterialIcons 
+                <MaterialIcons
                   name={showPassword ? "visibility-off" : "visibility"} 
-                  size={20} 
-                  color="#666" 
+                  size={20}
+                  color="#666"
                 />
               </TouchableOpacity>
             </View>
           </View>
-          
+
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={handleLogin}
@@ -261,7 +261,7 @@ const Login = ({ navigation }: any) => {
               )}
             </Animated.View>
           </TouchableOpacity>
-          
+
           <View style={styles.forgotPasswordContainer}>
             <TouchableOpacity onPress={handleForgotPassword}>
               <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>

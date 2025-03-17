@@ -23,15 +23,15 @@ const Profile = ({ route, navigation }: any) => {
           text: 'Cancelar',
           style: 'cancel',
         },
-        { 
-          text: 'Sí', 
+        {
+          text: 'Sí',
           onPress: async () => {
             await clearSession();
             navigation.reset({
               index: 0,
               routes: [{ name: 'Login' }],
             });
-          } 
+          },
         },
       ],
       { cancelable: true }
@@ -47,24 +47,24 @@ const Profile = ({ route, navigation }: any) => {
           </Text>
           <Text style={styles.headerTitle}>Mi Perfil</Text>
         </View>
-        
+
         <View style={styles.profileInfo}>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Nombre:</Text>
             <Text style={styles.infoValue}>{getFullName()}</Text>
           </View>
-          
+
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Usuario:</Text>
             <Text style={styles.infoValue}>{userData?.usuario}</Text>
           </View>
-          
+
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Rol:</Text>
             <Text style={styles.infoValue}>{userData?.rol}</Text>
           </View>
         </View>
-        
+
         <TouchableOpacity
           style={styles.logoutButton}
           onPress={handleLogout}
