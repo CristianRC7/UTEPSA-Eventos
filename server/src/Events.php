@@ -2,7 +2,7 @@
 // Permitir CORS para desarrollo
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Methods: GET, OPTIONS");
 header("Content-Type: application/json; charset=UTF-8");
 
 // Manejar solicitud OPTIONS (pre-flight)
@@ -23,100 +23,66 @@ class Events {
     }
     
     public function searchEvents($searchTerm = '') {
-        // Si no hay término de búsqueda, obtener todos los eventos
-        if (empty($searchTerm)) {
-            $query = "SELECT id_evento, titulo, descripcion, fecha_inicio, fecha_fin, pagina_web 
-                      FROM " . $this->table_name . " 
-                      ORDER BY fecha_inicio DESC";
-            
-            $stmt = $this->conn->prepare($query);
+        // Construir la consulta SQL base
+        $query = "SELECT e.id_evento, e.titulo, e.descripcion, e.fecha_inicio, e.fecha_fin, w.url_web as pagina_web 
+                 FROM " . $this->table_name . " e
+                 LEFT JOIN web_evento w ON e.id_evento = w.id_evento";
+        
+        // Si hay un término de búsqueda, añadir la condición WHERE
+        if (!empty($searchTerm)) {
+            $query .= " WHERE e.titulo LIKE :search 
+                      OR e.descripcion LIKE :search 
+                      ORDER BY e.fecha_inicio DESC"; // Ordenar descendente (más reciente primero)
         } else {
-            // Si hay término de búsqueda, filtrar eventos por título
-            $query = "SELECT id_evento, titulo, descripcion, fecha_inicio, fecha_fin, pagina_web 
-                      FROM " . $this->table_name . " 
-                      WHERE titulo LIKE :searchTerm 
-                      ORDER BY fecha_inicio DESC";
-            
-            $stmt = $this->conn->prepare($query);
-            
-            // Sanitizar y preparar el término de búsqueda
-            $searchTerm = htmlspecialchars(strip_tags($searchTerm));
-            $searchTerm = "%{$searchTerm}%";
-            
-            // Vincular parámetro
-            $stmt->bindParam(":searchTerm", $searchTerm);
+            // Si no hay término de búsqueda, ordenar por fecha de inicio descendente (más reciente primero)
+            $query .= " ORDER BY e.fecha_inicio DESC";
         }
         
-        // Ejecutar consulta
+        // Preparar la sentencia
+        $stmt = $this->conn->prepare($query);
+        
+        // Si hay un término de búsqueda, vincular el parámetro
+        if (!empty($searchTerm)) {
+            $searchParam = "%" . $searchTerm . "%";
+            $stmt->bindParam(":search", $searchParam);
+        }
+        
+        // Ejecutar la consulta
         $stmt->execute();
         
         // Verificar si se encontraron eventos
-        $num = $stmt->rowCount();
-        
-        if ($num > 0) {
-            $events_arr = array();
-            
+        if ($stmt->rowCount() > 0) {
+            // Devolver los eventos encontrados
+            $events = [];
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                // Formatear las fechas
-                $fecha_inicio = date("d/m/Y H:i", strtotime($row['fecha_inicio']));
-                $fecha_fin = date("d/m/Y H:i", strtotime($row['fecha_fin']));
-                
-                $event_item = array(
-                    'id_evento' => $row['id_evento'],
-                    'titulo' => $row['titulo'],
-                    'descripcion' => $row['descripcion'],
-                    'fecha_inicio' => $fecha_inicio,
-                    'fecha_fin' => $fecha_fin,
-                    'pagina_web' => $row['pagina_web']
-                );
-                
-                array_push($events_arr, $event_item);
+                $events[] = $row;
             }
             
             return [
                 'success' => true,
-                'events' => $events_arr
+                'events' => $events
             ];
         } else {
             return [
                 'success' => false,
-                'message' => 'No se encontraron eventos'
+                'message' => 'No se encontraron eventos',
+                'events' => []
             ];
         }
     }
 }
 
-// Inicializar la conexión a la base de datos
+// Procesar la solicitud
 $database = new Database();
 $db = $database->getConnection();
-$events = new Events($db);
+$eventsObj = new Events($db);
 
-// Determinar el método de solicitud
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Obtener el término de búsqueda si existe
-    $searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
-    
-    // Buscar eventos
-    $result = $events->searchEvents($searchTerm);
-    
-    // Devolver la respuesta
-    echo json_encode($result);
-} else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Obtener los datos enviados
-    $data = json_decode(file_get_contents("php://input"));
-    
-    // Verificar que se recibió el término de búsqueda
-    $searchTerm = isset($data->search) ? $data->search : '';
-    
-    // Buscar eventos
-    $result = $events->searchEvents($searchTerm);
-    
-    // Devolver la respuesta
-    echo json_encode($result);
-} else {
-    echo json_encode([
-        "success" => false,
-        "message" => "Método no permitido"
-    ]);
-}
+// Obtener el término de búsqueda de la URL
+$searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
+
+// Realizar la búsqueda
+$result = $eventsObj->searchEvents($searchTerm);
+
+// Devolver la respuesta
+echo json_encode($result);
 ?>

@@ -17,23 +17,36 @@ import { BASE_URL } from '../utils/Config';
 
 // Home Tab Screen Component
 const HomeScreen = ({ route }: any) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const userData = route.params?.userData;
   const [searchQuery, setSearchQuery] = useState('');
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const moveAnim = React.useRef(new Animated.Value(30)).current;
   
-  // Format date to a more readable format
+  // Format date to "day/month/year - Hour:Minute" format
   const formatDate = (dateStr: string) => {
-    const parts = dateStr.split(' ');
-    if (parts.length >= 2) {
-      return `${parts[0]} - ${parts[1]}`;
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) {
+        // If date parsing fails, try to extract parts manually
+        return dateStr;
+      }
+      
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      
+      return `${day}/${month}/${year} - ${hours}:${minutes}`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return dateStr; // Return original string if formatting fails
     }
-    return dateStr;
   };
   
   useEffect(() => {
@@ -187,6 +200,7 @@ const HomeScreen = ({ route }: any) => {
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -12,9 +12,44 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const DashboardEvent = ({ route }: any) => {
-  const navigation = useNavigation();
+interface DashboardEventProps {
+  route: {
+    params: {
+      event: {
+        id_evento: number;
+        titulo: string;
+        descripcion: string;
+        fecha_inicio: string;
+        fecha_fin: string;
+        pagina_web?: string;
+      };
+    };
+  };
+}
+
+const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
+  const navigation = useNavigation<any>();
   const { event } = route.params || {};
+  
+  const formatDate = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) {
+        return dateStr;
+      }
+      
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      
+      return `${day}/${month}/${year} - ${hours}:${minutes}`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return dateStr; // Return original string if formatting fails
+    }
+  };
   
   const handleButtonPress = (feature: string) => {
     Alert.alert('Información', `Apartado ${feature} en desarrollo`);
@@ -59,7 +94,7 @@ const DashboardEvent = ({ route }: any) => {
               <Icon name="event" size={18} color="#666" style={styles.dateIcon} />
               <View>
                 <Text style={styles.dateLabel}>Fecha de inicio</Text>
-                <Text style={styles.dateValue}>{event?.fecha_inicio || 'No disponible'}</Text>
+                <Text style={styles.dateValue}>{formatDate(event?.fecha_inicio) || 'No disponible'}</Text>
               </View>
             </View>
             
@@ -67,7 +102,7 @@ const DashboardEvent = ({ route }: any) => {
               <Icon name="event" size={18} color="#666" style={styles.dateIcon} />
               <View>
                 <Text style={styles.dateLabel}>Fecha de fin</Text>
-                <Text style={styles.dateValue}>{event?.fecha_fin || 'No disponible'}</Text>
+                <Text style={styles.dateValue}>{formatDate(event?.fecha_fin) || 'No disponible'}</Text>
               </View>
             </View>
           </View>
@@ -96,6 +131,7 @@ const DashboardEvent = ({ route }: any) => {
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

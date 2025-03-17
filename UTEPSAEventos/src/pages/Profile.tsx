@@ -5,6 +5,15 @@ import { clearSession } from '../utils/sessionStorage';
 const Profile = ({ route, navigation }: any) => {
   const userData = route.params?.userData;
 
+  const getFullName = () => {
+    if (userData?.apellido_paterno && userData?.apellido_materno) {
+      return `${userData.nombre} ${userData.apellido_paterno} ${userData.apellido_materno}`;
+    } else if (userData?.apellidos) {
+      return `${userData.nombre} ${userData.apellidos}`;
+    }
+    return userData?.nombre || 'Usuario';
+  };
+
   const handleLogout = async () => {
     Alert.alert(
       'Cerrar Sesión',
@@ -42,7 +51,7 @@ const Profile = ({ route, navigation }: any) => {
         <View style={styles.profileInfo}>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Nombre:</Text>
-            <Text style={styles.infoValue}>{userData?.nombre} {userData?.apellidos}</Text>
+            <Text style={styles.infoValue}>{getFullName()}</Text>
           </View>
           
           <View style={styles.infoItem}>

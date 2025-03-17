@@ -23,7 +23,8 @@ class Login {
     }
     
     public function authenticate($usuario, $contrasena) {
-        $query = "SELECT id_usuario, nombre, apellidos, usuario, contrasena, rol 
+        // Updated query to align with new database structure
+        $query = "SELECT id_usuario, nombre, apellido_paterno, apellido_materno, usuario, contrasena, rol 
                   FROM " . $this->table_name . " 
                   WHERE usuario = :usuario 
                   LIMIT 0,1";
@@ -46,11 +47,16 @@ class Login {
             
             // Verificar contraseña en texto plano
             if($contrasena === $stored_password) {
+                // Create combined lastname for backward compatibility
+                $apellidos = $row['apellido_paterno'] . ' ' . $row['apellido_materno'];
+                
                 return [
                     'success' => true,
                     'id_usuario' => $row['id_usuario'],
                     'nombre' => $row['nombre'],
-                    'apellidos' => $row['apellidos'],
+                    'apellido_paterno' => $row['apellido_paterno'],
+                    'apellido_materno' => $row['apellido_materno'],
+                    'apellidos' => $apellidos, 
                     'usuario' => $row['usuario'],
                     'rol' => $row['rol']
                 ];
