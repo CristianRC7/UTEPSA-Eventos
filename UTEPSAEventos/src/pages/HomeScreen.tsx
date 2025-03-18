@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   FlatList,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { BASE_URL } from '../utils/Config';
@@ -70,6 +71,8 @@ const HomeScreen = ({ route }: any) => {
   useFocusEffect(
     React.useCallback(() => {
       fetchEvents();
+      return () => {
+      };
     }, [])
   );
 
@@ -123,71 +126,70 @@ const HomeScreen = ({ route }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Animated.View style={[
-          styles.headerSection,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: moveAnim }]
-          }
-        ]}>
-          <Text style={styles.welcomeChip}>
-            {userData?.rol === 'interno' ? 'Usuario Interno' : 'Usuario Externo'}
-          </Text>
-          <Text style={styles.headerTitle}>Bienvenido</Text>
-          <Text style={styles.headerSubtitle}>
-            {userData?.nombre} {userData?.apellidos}
-          </Text>
-        </Animated.View>
-
-        <Animated.View style={{
+      <Animated.View style={[
+        styles.headerSection,
+        {
           opacity: fadeAnim,
           transform: [{ translateY: moveAnim }]
-        }}>
-          <View style={styles.searchContainer}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Buscar eventos..."
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onSubmitEditing={handleSearch}
-              returnKeyType="search"
-            />
-            <TouchableOpacity 
-              style={styles.searchButton}
-              onPress={handleSearch}
-            >
-              <Text style={styles.searchButtonText}>Buscar</Text>
-            </TouchableOpacity>
-          </View>
+        }
+      ]}>
+        <Text style={styles.welcomeChip}>
+          {userData?.rol === 'interno' ? 'Usuario Interno' : 'Usuario Externo'}
+        </Text>
+        <Text style={styles.headerTitle}>Bienvenido</Text>
+        <Text style={styles.headerSubtitle}>
+          {userData?.nombre} {userData?.apellidos}
+        </Text>
+      </Animated.View>
 
-          <Text style={styles.sectionTitle}>Próximos Eventos</Text>
+      <Animated.View style={{
+        opacity: fadeAnim,
+        transform: [{ translateY: moveAnim }],
+        paddingHorizontal: 20,
+      }}>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar eventos..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onSubmitEditing={handleSearch}
+            returnKeyType="search"
+          />
+          <TouchableOpacity 
+            style={styles.searchButton}
+            onPress={handleSearch}
+          >
+            <Text style={styles.searchButtonText}>Buscar</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.sectionTitle}>Próximos Eventos</Text>
+      </Animated.View>
 
-          {loading ? (
-            <ActivityIndicator size="large" color="#000" style={styles.loader} />
-          ) : (
-            <FlatList
-              data={events}
-              renderItem={({ item }) => (
-                <EventCard 
-                  event={item}
-                  onPress={handleEventPress}
-                  formatDate={formatDate}
-                />
-              )}
-              keyExtractor={(item) => item.id_evento.toString()}
-              ListEmptyComponent={renderEmptyList}
-              style={styles.eventsList}
-              scrollEnabled={false}
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
+      {loading ? (
+        <ActivityIndicator size="large" color="#000" style={styles.loader} />
+      ) : (
+        <FlatList
+          data={events}
+          renderItem={({ item }) => (
+            <EventCard 
+              event={item}
+              onPress={handleEventPress}
+              formatDate={formatDate}
             />
           )}
-        </Animated.View>
-      </ScrollView>
+          keyExtractor={(item) => item.id_evento.toString()}
+          ListEmptyComponent={renderEmptyList}
+          contentContainerStyle={styles.listContentContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={["#000"]}
+            />
+          }
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -197,11 +199,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  scrollContainer: {
-    padding: 20,
-  },
   headerSection: {
-    marginBottom: 30,
+    padding: 20,
+    paddingBottom: 10,
+  },
+  listContentContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   welcomeChip: {
     alignSelf: 'flex-start',
@@ -227,7 +231,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flexDirection: 'row',
-    marginBottom: 20,
+    marginVertical: 20,
   },
   searchInput: {
     flex: 1,
@@ -272,6 +276,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#EFEFEF',
+    marginTop: 20,
   },
   emptyText: {
     fontSize: 18,
@@ -287,7 +292,8 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   loader: {
-    marginVertical: 20,
+    flex: 1,
+    justifyContent: 'center',
   },
 });
 

@@ -31,7 +31,7 @@ interface DashboardEventProps {
 const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
   const navigation = useNavigation<any>();
   const { event } = route.params || {};
-  
+
   // Format date to "day/month/year - Hour:Minute" format
   const formatDate = (dateStr: string) => {
     try {
