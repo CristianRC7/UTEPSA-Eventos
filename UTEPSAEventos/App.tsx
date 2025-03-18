@@ -45,7 +45,7 @@ function App(): React.JSX.Element {
     };
 
     checkSession();
-    
+
     // Handle Android back button globally
     const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
 

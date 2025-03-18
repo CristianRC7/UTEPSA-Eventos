@@ -22,7 +22,7 @@ const Login = ({ navigation }: any) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [_isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
 
@@ -235,7 +235,7 @@ const Login = ({ navigation }: any) => {
                 onPress={() => setShowPassword(!showPassword)}
               >
                 <MaterialIcons
-                  name={showPassword ? "visibility-off" : "visibility"} 
+                  name={showPassword ? "visibility-off" : "visibility"}
                   size={20}
                   color="#666"
                 />

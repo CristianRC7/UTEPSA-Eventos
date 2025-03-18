@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+
 interface DashboardEventProps {
   route: {
     params: {
@@ -30,7 +31,7 @@ interface DashboardEventProps {
 const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
   const navigation = useNavigation<any>();
   const { event } = route.params || {};
-
+  
   // Format date to "day/month/year - Hour:Minute" format
   const formatDate = (dateStr: string) => {
     try {
@@ -51,17 +52,8 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
   };
 
   const handleButtonPress = (feature: string) => {
-    if (feature === 'Pagina Web') {
-      if (event?.pagina_web) {
-        const webUrl = !event.pagina_web.startsWith('http://') && !event.pagina_web.startsWith('https://')
-          ? 'https://' + event.pagina_web
-          : event.pagina_web;
-        Linking.openURL(webUrl).catch(() => {
-          Alert.alert('Error', 'No se pudo abrir el sitio web');
-        });
-      } else {
-        Alert.alert('Información', 'Este evento no tiene una página web asociada');
-      }
+    if (feature === 'Convocatorias') {
+      Alert.alert('Información', 'Apartado Convocatorias en desarrollo');
     } else if (feature === 'Soporte') {
       Alert.alert('Soporte', 'Si necesitas ayuda, contáctate con soporte en el 3er piso, bloque este o al correo soporte.campusvirtual@utepsa.edu');
     } else {
@@ -73,13 +65,13 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
     navigation.goBack();
   };
 
-  // Menu options for the dashboard (added Pagina Web)
+  // Menu options for the dashboard (added Convocatorias)
   const menuOptions = [
     { name: 'Cronograma', icon: 'event', color: '#4F46E5' },
     { name: 'Expositores', icon: 'people', color: '#10B981' },
     { name: 'Formulario', icon: 'assignment', color: '#EC4899' },
     { name: 'Puntos de inscripción', icon: 'place', color: '#3B82F6' },
-    { name: 'Pagina Web', icon: 'language', color: '#F59E0B' },
+    { name: 'Convocatorias', icon: 'announcement', color: '#F59E0B' },
     { name: 'Soporte', icon: 'help', color: '#8B5CF6' },
   ];
 
@@ -100,7 +92,20 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
         <View style={styles.eventInfoSection}>
           <Text style={styles.eventTitle}>{event?.titulo || 'Evento'}</Text>
           <Text style={styles.eventDescription}>{event?.descripcion || 'Sin descripción disponible'}</Text>
-
+          {event?.pagina_web && (
+            <TouchableOpacity
+              onPress={() => {
+                const webUrl = !event.pagina_web.startsWith('http://') && !event.pagina_web.startsWith('https://')
+                  ? 'https://' + event.pagina_web
+                  : event.pagina_web;
+                Linking.openURL(webUrl).catch(() => {
+                  Alert.alert('Error', 'No se pudo abrir el sitio web');
+                });
+              }}
+            >
+              <Text style={styles.websiteLink}>Visitar nuestra página web del evento</Text>
+            </TouchableOpacity>
+          )}
           <View style={styles.dateInfoContainer}>
             <View style={styles.dateInfo}>
               <Icon name="event" size={18} color="#666" style={styles.dateIcon} />
@@ -182,6 +187,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#4B5563',
     lineHeight: 24,
+    marginBottom: 12,
+  },
+  websiteLink: {
+    fontSize: 16,
+    color: '#1E90FF',
+    textDecorationLine: 'underline',
     marginBottom: 12,
   },
   dateInfoContainer: {

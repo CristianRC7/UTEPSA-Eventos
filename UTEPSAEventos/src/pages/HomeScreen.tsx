@@ -12,8 +12,9 @@ import {
   FlatList,
   Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { BASE_URL } from '../utils/Config';
+import EventCard from '../components/EventCard';
 
 // Home Tab Screen Component
 const HomeScreen = ({ route }: any) => {
@@ -49,6 +50,7 @@ const HomeScreen = ({ route }: any) => {
     }
   };
 
+  // Animation effect on component mount
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -62,10 +64,14 @@ const HomeScreen = ({ route }: any) => {
         useNativeDriver: true,
       }),
     ]).start();
-
-    // Load events on initial render
-    fetchEvents();
   }, [fadeAnim, moveAnim]);
+
+  // Fetch events when screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchEvents();
+    }, [])
+  );
 
   const fetchEvents = async (query = '') => {
     setLoading(true);
@@ -106,26 +112,6 @@ const HomeScreen = ({ route }: any) => {
     navigation.navigate('DashboardEvent', { event });
   };
 
-  const renderEventItem = ({ item }: any) => (
-    <TouchableOpacity 
-      style={styles.eventCard}
-      onPress={() => handleEventPress(item)}
-      activeOpacity={0.7}
-    >
-      <Text style={styles.eventTitle}>{item.titulo}</Text>
-      <Text style={styles.eventDescription} numberOfLines={2}>
-        {item.descripcion}
-      </Text>
-      <View style={styles.eventDateContainer}>
-        <Text style={styles.eventDateLabel}>Inicio:</Text>
-        <Text style={styles.eventDate}>{formatDate(item.fecha_inicio)}</Text>
-      </View>
-      <View style={styles.eventDateContainer}>
-        <Text style={styles.eventDateLabel}>Fin:</Text>
-        <Text style={styles.eventDate}>{formatDate(item.fecha_fin)}</Text>
-      </View>
-    </TouchableOpacity>
-  );
   const renderEmptyList = () => (
     <View style={styles.emptyContainer}>
       <Text style={styles.emptyText}>No hay eventos disponibles</Text>
@@ -156,6 +142,7 @@ const HomeScreen = ({ route }: any) => {
             {userData?.nombre} {userData?.apellidos}
           </Text>
         </Animated.View>
+
         <Animated.View style={{
           opacity: fadeAnim,
           transform: [{ translateY: moveAnim }]
@@ -176,13 +163,21 @@ const HomeScreen = ({ route }: any) => {
               <Text style={styles.searchButtonText}>Buscar</Text>
             </TouchableOpacity>
           </View>
+
           <Text style={styles.sectionTitle}>Próximos Eventos</Text>
+
           {loading ? (
             <ActivityIndicator size="large" color="#000" style={styles.loader} />
           ) : (
             <FlatList
               data={events}
-              renderItem={renderEventItem}
+              renderItem={({ item }) => (
+                <EventCard 
+                  event={item}
+                  onPress={handleEventPress}
+                  formatDate={formatDate}
+                />
+              )}
               keyExtractor={(item) => item.id_evento.toString()}
               ListEmptyComponent={renderEmptyList}
               style={styles.eventsList}
@@ -268,40 +263,6 @@ const styles = StyleSheet.create({
   },
   eventsList: {
     marginBottom: 20,
-  },
-  eventCard: {
-    backgroundColor: '#F9F9F9',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: '#EFEFEF',
-  },
-  eventTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  eventDescription: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 22,
-    marginBottom: 10,
-  },
-  eventDateContainer: {
-    flexDirection: 'row',
-    marginTop: 5,
-  },
-  eventDateLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginRight: 5,
-  },
-  eventDate: {
-    fontSize: 14,
-    color: '#666',
   },
   emptyContainer: {
     padding: 20,
