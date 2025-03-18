@@ -61,25 +61,7 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
     }
   };
   
-  const openWebsite = async (url: string) => {
-    // Make sure the url has http or https prefix
-    let webUrl = url;
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      webUrl = 'https://' + url;
-    }
-    
-    try {
-      const canOpen = await Linking.canOpenURL(webUrl);
-      if (canOpen) {
-        await Linking.openURL(webUrl);
-      } else {
-        Alert.alert('Error', 'No se puede abrir la URL: ' + webUrl);
-      }
-    } catch (error) {
-      console.error('Error opening URL:', error);
-      Alert.alert('Error', 'Ocurrió un problema al abrir la página web');
-    }
-  };
+
   
   const handleBack = () => {
     navigation.goBack();
@@ -109,20 +91,23 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
         <View style={{ width: 24 }} />
       </View>
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        <View style={styles.eventInfoSection}>
+      <View style={styles.eventInfoSection}>
           <Text style={styles.eventTitle}>{event?.titulo || 'Evento'}</Text>
           <Text style={styles.eventDescription}>{event?.descripcion || 'Sin descripción disponible'}</Text>
-          
           {event?.pagina_web && (
-            <TouchableOpacity 
-              style={styles.websiteLink} 
-              onPress={() => openWebsite(event.pagina_web!)}
+            <TouchableOpacity
+              onPress={() => {
+                const webUrl = !event.pagina_web.startsWith('http://') && !event.pagina_web.startsWith('https://')
+                  ? 'https://' + event.pagina_web
+                  : event.pagina_web;
+                Linking.openURL(webUrl).catch(() => {
+                  Alert.alert('Error', 'No se pudo abrir el sitio web');
+                });
+              }}
             >
-              <Icon name="language" size={16} color="#F59E0B" style={styles.websiteIcon} />
-              <Text style={styles.websiteLinkText}>Visitar sitio web</Text>
+              <Text style={styles.websiteLink}>Visita nuestra página web</Text>
             </TouchableOpacity>
           )}
-          
           <View style={styles.dateInfoContainer}>
             <View style={styles.dateInfo}>
               <Icon name="event" size={18} color="#666" style={styles.dateIcon} />
@@ -204,9 +189,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   websiteLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
+    fontSize: 16,
+    color: '#1E90FF',
+    textDecorationLine: 'underline',
+    marginBottom: 12,
   },
   websiteIcon: {
     marginRight: 6,
