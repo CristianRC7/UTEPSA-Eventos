@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
 interface DashboardEventProps {
   route: {
     params: {
@@ -54,7 +53,7 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
   const handleButtonPress = (feature: string) => {
     if (feature === 'Pagina Web') {
       if (event?.pagina_web) {
-        const webUrl = !event.pagina_web.startsWith('http://') && !event.pagina_web.startsWith('https://') 
+        const webUrl = !event.pagina_web.startsWith('http://') && !event.pagina_web.startsWith('https://')
           ? 'https://' + event.pagina_web
           : event.pagina_web;
         Linking.openURL(webUrl).catch(() => {
@@ -63,6 +62,8 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
       } else {
         Alert.alert('Información', 'Este evento no tiene una página web asociada');
       }
+    } else if (feature === 'Soporte') {
+      Alert.alert('Soporte', 'Si necesitas ayuda, contáctate con soporte en el 3er piso, bloque este o al correo soporte.campusvirtual@utepsa.edu');
     } else {
       Alert.alert('Información', `Apartado ${feature} en desarrollo`);
     }
