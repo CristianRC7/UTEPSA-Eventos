@@ -31,7 +31,7 @@ interface DashboardEventProps {
 const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
   const navigation = useNavigation<any>();
   const { event } = route.params || {};
-
+  
   // Format date to "day/month/year - Hour:Minute" format
   const formatDate = (dateStr: string) => {
     try {
@@ -44,34 +44,54 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
       const year = date.getFullYear();
       const hours = date.getHours().toString().padStart(2, '0');
       const minutes = date.getMinutes().toString().padStart(2, '0');
-      return `${day}/${month}/${year} ${hours}:${minutes}`;
+      return `${day}/${month}/${year} - ${hours}:${minutes}`;
     } catch (error) {
       console.error('Error formatting date:', error);
       return dateStr; // Return original string if formatting fails
     }
   };
-
+  
   const handleButtonPress = (feature: string) => {
-    if (feature === 'Convocatorias') {
-      Alert.alert('Información', 'Apartado Convocatorias en desarrollo');
+    if (feature === 'Expositores') {
+      navigation.navigate('SpeakerScreen', { eventId: event.id_evento, eventTitle: event.titulo });
     } else if (feature === 'Soporte') {
       Alert.alert('Soporte', 'Si necesitas ayuda, contáctate con soporte en el 3er piso, bloque este o al correo soporte.campusvirtual@utepsa.edu');
     } else {
       Alert.alert('Información', `Apartado ${feature} en desarrollo`);
     }
   };
-
+  
+  const openWebsite = async (url: string) => {
+    // Make sure the url has http or https prefix
+    let webUrl = url;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      webUrl = 'https://' + url;
+    }
+    
+    try {
+      const canOpen = await Linking.canOpenURL(webUrl);
+      if (canOpen) {
+        await Linking.openURL(webUrl);
+      } else {
+        Alert.alert('Error', 'No se puede abrir la URL: ' + webUrl);
+      }
+    } catch (error) {
+      console.error('Error opening URL:', error);
+      Alert.alert('Error', 'Ocurrió un problema al abrir la página web');
+    }
+  };
+  
   const handleBack = () => {
     navigation.goBack();
   };
 
-  // Menu options for the dashboard (added Convocatorias)
+  // Menu options for the dashboard
   const menuOptions = [
     { name: 'Cronograma', icon: 'event', color: '#4F46E5' },
     { name: 'Expositores', icon: 'people', color: '#10B981' },
     { name: 'Formulario', icon: 'assignment', color: '#EC4899' },
     { name: 'Puntos de inscripción', icon: 'place', color: '#3B82F6' },
-    { name: 'Convocatorias', icon: 'announcement', color: '#F59E0B' },
+    {name: 'Convoctorias', icon: 'description', color: '#F59E0B'},
     { name: 'Soporte', icon: 'help', color: '#8B5CF6' },
   ];
 
@@ -86,26 +106,23 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
           <Icon name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalles del Evento</Text>
-        <View style={styles.spacer} />
+        <View style={{ width: 24 }} />
       </View>
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.eventInfoSection}>
           <Text style={styles.eventTitle}>{event?.titulo || 'Evento'}</Text>
           <Text style={styles.eventDescription}>{event?.descripcion || 'Sin descripción disponible'}</Text>
+          
           {event?.pagina_web && (
-            <TouchableOpacity
-              onPress={() => {
-                const webUrl = !event.pagina_web.startsWith('http://') && !event.pagina_web.startsWith('https://')
-                  ? 'https://' + event.pagina_web
-                  : event.pagina_web;
-                Linking.openURL(webUrl).catch(() => {
-                  Alert.alert('Error', 'No se pudo abrir el sitio web');
-                });
-              }}
+            <TouchableOpacity 
+              style={styles.websiteLink} 
+              onPress={() => openWebsite(event.pagina_web!)}
             >
-              <Text style={styles.websiteLink}>Visitar nuestra página web del evento</Text>
+              <Icon name="language" size={16} color="#F59E0B" style={styles.websiteIcon} />
+              <Text style={styles.websiteLinkText}>Visitar sitio web</Text>
             </TouchableOpacity>
           )}
+          
           <View style={styles.dateInfoContainer}>
             <View style={styles.dateInfo}>
               <Icon name="event" size={18} color="#666" style={styles.dateIcon} />
@@ -151,9 +168,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  spacer: {
-    width: 24,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -190,10 +204,18 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   websiteLink: {
-    fontSize: 16,
-    color: '#1E90FF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  websiteIcon: {
+    marginRight: 6,
+  },
+  websiteLinkText: {
+    fontSize: 14,
+    color: '#F59E0B',
+    fontWeight: '500',
     textDecorationLine: 'underline',
-    marginBottom: 12,
   },
   dateInfoContainer: {
     flexDirection: 'row',
