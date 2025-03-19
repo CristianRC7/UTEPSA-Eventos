@@ -187,6 +187,7 @@ const styles = StyleSheet.create({
     color: '#4B5563',
     lineHeight: 24,
     marginBottom: 12,
+    textAlign: 'justify',
   },
   websiteLink: {
     fontSize: 16,
