@@ -9,6 +9,7 @@ import MyPublication from './src/pages/MyPublication';
 import FormPublication from './src/components/FormPublication';
 import DashboardEvent from './src/pages/DashboardEvent';
 import SpeakerScreen from './src/pages/SpeakerScreen';
+import ScheduleScreen from './src/pages/ScheduleScreen';
 import { getSession } from './src/utils/sessionStorage';
 
 // Global function for handling back button press
@@ -90,6 +91,7 @@ function App(): React.JSX.Element {
           <Stack.Screen name="FormPublication" component={FormPublication} />
           <Stack.Screen name="DashboardEvent" component={DashboardEvent} />
           <Stack.Screen name="SpeakerScreen" component={SpeakerScreen} />
+          <Stack.Screen name="ScheduleScreen" component={ScheduleScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

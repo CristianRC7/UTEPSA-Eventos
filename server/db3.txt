@@ -22,7 +22,7 @@ CREATE TABLE eventos (
     fecha_fin DATETIME NOT NULL
 );
 
--- Crear tabla de pagina web de eventos
+-- Crear tabla de página web de eventos
 CREATE TABLE web_evento (
     id_web_evento INT AUTO_INCREMENT PRIMARY KEY,
     id_evento INT NOT NULL,
@@ -49,8 +49,8 @@ CREATE TABLE evento_expositores (
     FOREIGN KEY (id_expositor) REFERENCES expositores(id_expositor) ON DELETE CASCADE
 );
 
--- Crear tabla de actividades
-CREATE TABLE actividades (
+-- Crear tabla cronograma de eventos (antes "actividades")
+CREATE TABLE cronograma_eventos (
     id_actividad INT AUTO_INCREMENT PRIMARY KEY,
     id_evento INT NOT NULL,
     titulo VARCHAR(100) NOT NULL,
@@ -58,8 +58,10 @@ CREATE TABLE actividades (
     fecha DATE NOT NULL,
     hora TIME NOT NULL,
     ubicacion VARCHAR(255) NOT NULL,
+    inscripcion_habilitada BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (id_evento) REFERENCES eventos(id_evento) ON DELETE CASCADE
 );
+
 
 -- Inscripción de usuarios en eventos
 CREATE TABLE inscripciones (
@@ -71,14 +73,15 @@ CREATE TABLE inscripciones (
     FOREIGN KEY (id_evento) REFERENCES eventos(id_evento) ON DELETE CASCADE
 );
 
--- Inscripción de usuarios en actividades
+-- Inscripción de usuarios en cronograma de eventos
 CREATE TABLE inscripcion_actividades (
     id_inscripcion_actividad INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
     id_actividad INT NOT NULL,
+    estado ENUM('confirmado', 'no confirmado') DEFAULT 'no confirmado',
     UNIQUE (id_usuario, id_actividad),
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-    FOREIGN KEY (id_actividad) REFERENCES actividades(id_actividad) ON DELETE CASCADE
+    FOREIGN KEY (id_actividad) REFERENCES cronograma_eventos(id_actividad) ON DELETE CASCADE
 );
 
 -- Certificados para usuarios inscritos en eventos
@@ -98,7 +101,7 @@ CREATE TABLE habilitacion_formularios (
     id_actividad INT NOT NULL,
     fecha_inicio DATETIME NOT NULL,
     fecha_fin DATETIME NOT NULL,
-    FOREIGN KEY (id_actividad) REFERENCES actividades(id_actividad) ON DELETE CASCADE
+    FOREIGN KEY (id_actividad) REFERENCES cronograma_eventos(id_actividad) ON DELETE CASCADE
 );
 
 -- Formulario de evaluación de actividades
@@ -110,7 +113,7 @@ CREATE TABLE formularios (
     descripcion TEXT NOT NULL,
     fecha_respuesta DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-    FOREIGN KEY (id_actividad) REFERENCES actividades(id_actividad) ON DELETE CASCADE
+    FOREIGN KEY (id_actividad) REFERENCES cronograma_eventos(id_actividad) ON DELETE CASCADE
 );
 
 -- Publicaciones de imágenes en la galería
@@ -129,7 +132,7 @@ CREATE TABLE likes_publicaciones (
     id_like INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
     id_publicacion INT NOT NULL,
-    UNIQUE (id_usuario, id_publicacion), -- Evita que un usuario dé like más de una vez a la misma publicación
+    UNIQUE (id_usuario, id_publicacion),
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE
 );

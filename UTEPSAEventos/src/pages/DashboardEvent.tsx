@@ -44,7 +44,7 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
       const year = date.getFullYear();
       const hours = date.getHours().toString().padStart(2, '0');
       const minutes = date.getMinutes().toString().padStart(2, '0');
-      return `${day}/${month}/${year} - ${hours}:${minutes}`;
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
     } catch (error) {
       console.error('Error formatting date:', error);
       return dateStr; // Return original string if formatting fails
@@ -54,14 +54,14 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
   const handleButtonPress = (feature: string) => {
     if (feature === 'Expositores') {
       navigation.navigate('SpeakerScreen', { eventId: event.id_evento, eventTitle: event.titulo });
+    } else if (feature === 'Cronograma') {
+      navigation.navigate('ScheduleScreen', { eventId: event.id_evento, eventTitle: event.titulo });
     } else if (feature === 'Soporte') {
       Alert.alert('Soporte', 'Si necesitas ayuda, contáctate con soporte en el 3er piso, bloque este o al correo soporte.campusvirtual@utepsa.edu');
     } else {
       Alert.alert('Información', `Apartado ${feature} en desarrollo`);
     }
   };
-  
-
   
   const handleBack = () => {
     navigation.goBack();
@@ -73,7 +73,7 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
     { name: 'Expositores', icon: 'people', color: '#10B981' },
     { name: 'Formulario', icon: 'assignment', color: '#EC4899' },
     { name: 'Puntos de inscripción', icon: 'place', color: '#3B82F6' },
-    {name: 'Convoctorias', icon: 'description', color: '#F59E0B'},
+    { name: 'Convoctorias', icon: 'description', color: '#F59E0B'},
     { name: 'Soporte', icon: 'help', color: '#8B5CF6' },
   ];
 
@@ -147,7 +147,6 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
     </SafeAreaView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
