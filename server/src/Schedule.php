@@ -32,10 +32,7 @@ class Schedule {
         }
         
         // Construir la consulta SQL para obtener las actividades de un evento específico
-        // y formatear la fecha al formato dd/mm/yyyy
-        $query = "SELECT id_actividad, titulo, descripcion, 
-                 DATE_FORMAT(fecha, '%d/%m/%Y') as fecha, 
-                 hora, ubicacion, inscripcion_habilitada 
+        $query = "SELECT id_actividad, titulo, descripcion, fecha, hora, ubicacion, inscripcion_habilitada 
                  FROM " . $this->table_name . " 
                  WHERE id_evento = :event_id 
                  ORDER BY fecha ASC, hora ASC";
