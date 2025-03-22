@@ -10,20 +10,9 @@ interface DayTabsProps {
 
 const DayTabs: React.FC<DayTabsProps> = ({ schedule, selectedDay, onSelectDay }) => {
   const formatDate = (dateStr: string) => {
-    try {
-      const date = new Date(dateStr);
-      if (isNaN(date.getTime())) {
-        return dateStr; // Si la fecha no es válida, devuelve el valor original
-      }
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const year = date.getFullYear();
-      return `${day}/${month}/${year}`;
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return dateStr; // Devuelve el valor original si ocurre un error
-    }
+    return dateStr;
   };
+
   // Dividir los días en grupos de 3 para mostrarlos en filas
   const rows = [];
   for (let i = 0; i < schedule.length; i += 3) {
