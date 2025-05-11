@@ -4,27 +4,18 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface SpeakerHeaderProps {
   title: string;
-  eventTitle?: string;
   onBack: () => void;
 }
 
-const SpeakerHeader: React.FC<SpeakerHeaderProps> = ({ title, eventTitle, onBack }) => {
+const SpeakerHeader: React.FC<SpeakerHeaderProps> = ({ title, onBack }) => {
   return (
-    <>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Icon name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{title}</Text>
-        <View style={styles.spacer} />
-      </View>
-
-      {eventTitle && (
-        <View style={styles.eventTitleContainer}>
-          <Text style={styles.eventTitle}>{eventTitle}</Text>
-        </View>
-      )}
-    </>
+    <View style={styles.header}>
+      <TouchableOpacity style={styles.backButton} onPress={onBack}>
+        <Icon name="arrow-back" size={24} color="#000" />
+      </TouchableOpacity>
+      <Text style={styles.headerTitle}>{title}</Text>
+      <View style={styles.spacer} />
+    </View>
   );
 };
 

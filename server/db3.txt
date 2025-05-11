@@ -49,7 +49,7 @@ CREATE TABLE evento_expositores (
     FOREIGN KEY (id_expositor) REFERENCES expositores(id_expositor) ON DELETE CASCADE
 );
 
--- Crear tabla cronograma de eventos (antes "actividades")
+-- Crear tabla cronograma de eventos
 CREATE TABLE cronograma_eventos (
     id_actividad INT AUTO_INCREMENT PRIMARY KEY,
     id_evento INT NOT NULL,

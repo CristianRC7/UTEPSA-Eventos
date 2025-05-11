@@ -34,7 +34,7 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
       if (data.success) {
         const processedData = processScheduleData(data.activities);
         setSchedule(processedData);
-        
+
         if (processedData.length > 0 && selectedDay === null) {
           setSelectedDay(processedData[0].dia_numero);
         }
@@ -67,7 +67,7 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
 
     return sortedDates.map((date, index) => {
       const dayNumber = index + 1;
-      
+
       const activitiesForDate = dateGroups[date]
         .map(activity => ({
           ...activity,
@@ -98,7 +98,7 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
 
   const getCurrentDayActivities = () => {
     if (selectedDay === null || schedule.length === 0) return [];
-    
+
     const selectedDayData = schedule.find(day => day.dia_numero === selectedDay);
     return selectedDayData ? selectedDayData.actividades : [];
   };
@@ -113,7 +113,7 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
       ) : (
         <>
           <Text style={styles.eventTitle}>{eventTitle}</Text>
-          
+
           {schedule.length > 0 ? (
             <>
               <DayTabs 

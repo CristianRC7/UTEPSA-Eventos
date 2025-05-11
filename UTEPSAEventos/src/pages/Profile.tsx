@@ -58,11 +58,6 @@ const Profile = ({ route, navigation }: any) => {
             <Text style={styles.infoLabel}>Usuario:</Text>
             <Text style={styles.infoValue}>{userData?.usuario}</Text>
           </View>
-
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Rol:</Text>
-            <Text style={styles.infoValue}>{userData?.rol}</Text>
-          </View>
         </View>
 
         <TouchableOpacity

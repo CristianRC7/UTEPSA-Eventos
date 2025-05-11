@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -19,21 +19,20 @@ interface SpeakerScreenProps {
   route: {
     params: {
       eventId: number;
-      eventTitle: string;
     };
   };
 }
 
 const SpeakerScreen: React.FC<SpeakerScreenProps> = ({ route }) => {
   const navigation = useNavigation();
-  const { eventId, eventTitle } = route.params;
+  const { eventId } = route.params;
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const fetchSpeakers = async () => {
+  const fetchSpeakers = useCallback(async () => {
     try {
       const response = await fetch(`${BASE_URL}/Speakers.php?event_id=${eventId}`);
       const data = await response.json();
@@ -53,11 +52,11 @@ const SpeakerScreen: React.FC<SpeakerScreenProps> = ({ route }) => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [eventId]);
 
   useEffect(() => {
     fetchSpeakers();
-  }, [eventId]);
+  }, [eventId, fetchSpeakers]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -83,7 +82,6 @@ const SpeakerScreen: React.FC<SpeakerScreenProps> = ({ route }) => {
       
       <SpeakerHeader 
         title="Expositores" 
-        eventTitle={eventTitle} 
         onBack={handleBack} 
       />
 
