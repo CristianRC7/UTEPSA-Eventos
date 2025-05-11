@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   View,
   Text,
@@ -18,17 +18,10 @@ import Icon from "react-native-vector-icons/MaterialIcons"
 import { useNavigation } from "@react-navigation/native"
 import ImagePicker from "react-native-image-crop-picker"
 import { PermissionsAndroid } from "react-native"
+import { getSession } from "../utils/sessionStorage"
+import { BASE_URL } from "../utils/Config"
 
 const MAX_IMAGES = 5;
-
-// Eventos de ejemplo - estos vendrían del backend en una implementación real
-const EVENTOS_EJEMPLO = [
-  { id: 1, nombre: "Concierto Benéfico 2023" },
-  { id: 2, nombre: "Maratón por la Educación" },
-  { id: 3, nombre: "Festival de Arte Urbano" },
-  { id: 4, nombre: "Feria Gastronómica Local" },
-  { id: 5, nombre: "Torneo Deportivo Comunitario" },
-]
 
 const FormPublication = () => {
   const navigation = useNavigation()
@@ -38,6 +31,27 @@ const FormPublication = () => {
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [showEventSelector, setShowEventSelector] = useState(false)
+  const [eventList, setEventList] = useState<any[]>([])
+
+  useEffect(() => {
+    if (showEventSelector) {
+      fetchEvents()
+    }
+  }, [showEventSelector])
+
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/Events.php`)
+      const data = await response.json()
+      if (data.success) {
+        setEventList(data.events)
+      } else {
+        setEventList([])
+      }
+    } catch (error) {
+      setEventList([])
+    }
+  }
 
   // Request permission for accessing gallery on Android
   const requestGalleryPermission = async () => {
@@ -154,29 +168,51 @@ const FormPublication = () => {
   }
 
   // Simulate form submission
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (selectedImages.length === 0) {
       Alert.alert("Error", "Por favor selecciona al menos una imagen")
       return
     }
-
-    if (!eventName.trim()) {
+    if (!selectedEventId) {
       Alert.alert("Error", "Por favor selecciona un evento")
       return
     }
-
-    // Show loading state
     setIsLoading(true)
-
-    // Simulate API call delay
-    setTimeout(() => {
-      setIsLoading(false)
-      Alert.alert(
-        "Publicación enviada",
-        "Tu publicación ha sido enviada y está en proceso de revisión. ¡Gracias por compartir!",
-        [{ text: "OK", onPress: () => navigation.goBack() }],
-      )
-    }, 2000)
+    try {
+      const userData = await getSession()
+      if (!userData || !userData.id_usuario) {
+        Alert.alert('Error', 'No se pudo obtener el usuario.')
+        setIsLoading(false)
+        return
+      }
+      const formData = new FormData()
+      formData.append('id_usuario', userData.id_usuario)
+      formData.append('id_evento', selectedEventId)
+      formData.append('descripcion', caption)
+      selectedImages.forEach((img, idx) => {
+        formData.append('imagenes[]', {
+          uri: img.path,
+          type: img.mime || 'image/jpeg',
+          name: img.filename || `imagen_${idx}.jpg`
+        })
+      })
+      const response = await fetch(`${BASE_URL}/CreatePublication.php`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      const data = await response.json()
+      if (data.success) {
+        Alert.alert("Publicación enviada", data.message || "Tu publicación ha sido enviada y está en proceso de revisión.", [{ text: "OK", onPress: () => navigation.goBack() }])
+      } else {
+        Alert.alert("Error", data.message || "No se pudo enviar la publicación")
+      }
+    } catch (error) {
+      Alert.alert("Error", "Ocurrió un error al enviar la publicación")
+    }
+    setIsLoading(false)
   }
 
   const handleGoBack = () => {
@@ -316,23 +352,23 @@ const FormPublication = () => {
             </View>
 
             <FlatList
-              data={EVENTOS_EJEMPLO}
-              keyExtractor={(item) => item.id.toString()}
+              data={eventList}
+              keyExtractor={(item) => item.id_evento.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={[styles.eventItem, selectedEventId === item.id && styles.eventItemSelected]}
-                  onPress={() => handleSelectEvent(item.id, item.nombre)}
+                  style={[styles.eventItem, selectedEventId === item.id_evento && styles.eventItemSelected]}
+                  onPress={() => handleSelectEvent(item.id_evento, item.titulo)}
                 >
                   <Icon
                     name="event"
                     size={20}
-                    color={selectedEventId === item.id ? "#FFF" : "#555"}
+                    color={selectedEventId === item.id_evento ? "#FFF" : "#555"}
                     style={styles.eventIcon}
                   />
-                  <Text style={[styles.eventText, selectedEventId === item.id && styles.eventTextSelected]}>
-                    {item.nombre}
+                  <Text style={[styles.eventText, selectedEventId === item.id_evento && styles.eventTextSelected]}>
+                    {item.titulo}
                   </Text>
-                  {selectedEventId === item.id && <Icon name="check" size={20} color="#FFF" style={styles.checkIcon} />}
+                  {selectedEventId === item.id_evento && <Icon name="check" size={20} color="#FFF" style={styles.checkIcon} />}
                 </TouchableOpacity>
               )}
               contentContainerStyle={styles.eventsList}
