@@ -8,6 +8,7 @@ interface Publication {
   id: number
   userName: string
   eventName: string
+  publicationDescription?: string
   eventDescription?: string
   date: string
   imageUrl: string
@@ -25,6 +26,8 @@ interface PublicationCardProps {
 const PublicationCard = ({ publication, onLike, onShare }: PublicationCardProps) => {
   const [liked, setLiked] = useState(publication.hasUserLiked || false)
   const [likeCount, setLikeCount] = useState(publication.likes || 0)
+  const [showFullDescription, setShowFullDescription] = useState(false)
+  const [descLines, setDescLines] = useState(0)
 
   // Usar imageUrls si existe, de lo contrario usar imageUrl como un array de una sola imagen
   const images = publication.imageUrls || [publication.imageUrl]
@@ -63,10 +66,26 @@ const PublicationCard = ({ publication, onLike, onShare }: PublicationCardProps)
 
       <View style={styles.eventDetails}>
         <Text style={styles.eventName}>{publication.eventName}</Text>
-        {publication.eventDescription && (
-          <Text style={styles.eventDescription} numberOfLines={2}>
-            {publication.eventDescription}
-          </Text>
+        {publication.publicationDescription && (
+          <View style={{flexDirection: 'row', alignItems: 'flex-start', flexWrap: 'wrap'}}>
+            <Text
+              style={styles.eventDescription}
+              numberOfLines={showFullDescription ? undefined : 3}
+              onTextLayout={e => setDescLines(e.nativeEvent.lines.length)}
+            >
+              {publication.publicationDescription}
+            </Text>
+            {descLines > 3 && !showFullDescription && (
+              <TouchableOpacity onPress={() => setShowFullDescription(true)}>
+                <Text style={styles.seeMoreText}>Ver más</Text>
+              </TouchableOpacity>
+            )}
+            {showFullDescription && descLines > 3 && (
+              <TouchableOpacity onPress={() => setShowFullDescription(false)}>
+                <Text style={styles.seeMoreText}>Ocultar</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         )}
         <View style={styles.dateContainer}>
           <Icon name="calendar-today" size={14} color="#666" style={styles.dateIcon} />
@@ -207,6 +226,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 10,
+  },
+  seeMoreText: {
+    color: '#8B5CF6',
+    fontSize: 14,
+    marginTop: 4,
+    fontWeight: '500',
   },
 })
 

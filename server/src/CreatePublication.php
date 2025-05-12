@@ -29,11 +29,12 @@ class Publication {
         if (!is_numeric($id_usuario) || !is_numeric($id_evento)) {
             return [ 'success' => false, 'message' => 'Datos inválidos.' ];
         }
-        // Insertar publicación
-        $query = "INSERT INTO {$this->table_publicacion} (id_usuario, id_evento, estado) VALUES (:id_usuario, :id_evento, 'esperando_aprobacion')";
+        // Insertar publicación con descripción
+        $query = "INSERT INTO {$this->table_publicacion} (id_usuario, id_evento, descripcion, estado) VALUES (:id_usuario, :id_evento, :descripcion, 'esperando_aprobacion')";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id_usuario", $id_usuario);
         $stmt->bindParam(":id_evento", $id_evento);
+        $stmt->bindParam(":descripcion", $descripcion);
         if (!$stmt->execute()) {
             return [ 'success' => false, 'message' => 'No se pudo crear la publicación.' ];
         }

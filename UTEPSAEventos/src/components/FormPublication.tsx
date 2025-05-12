@@ -22,6 +22,7 @@ import { getSession } from "../utils/sessionStorage"
 import { BASE_URL } from "../utils/Config"
 
 const MAX_IMAGES = 5;
+const MAX_DESCRIPTION_LENGTH = 250;
 
 const FormPublication = () => {
   const navigation = useNavigation()
@@ -304,13 +305,19 @@ const FormPublication = () => {
             <TextInput
               style={styles.textArea}
               value={caption}
-              onChangeText={setCaption}
+              onChangeText={text => {
+                if (text.length <= MAX_DESCRIPTION_LENGTH) setCaption(text);
+              }}
               placeholder="Escribe una descripción..."
               placeholderTextColor="#999"
               multiline={true}
               numberOfLines={4}
               textAlignVertical="top"
+              maxLength={MAX_DESCRIPTION_LENGTH + 1}
             />
+            <Text style={{ alignSelf: 'flex-end', color: caption.length > MAX_DESCRIPTION_LENGTH ? 'red' : '#999', fontSize: 12 }}>
+              {caption.length}/{MAX_DESCRIPTION_LENGTH}
+            </Text>
           </View>
         </View>
       </ScrollView>
@@ -319,10 +326,10 @@ const FormPublication = () => {
         <TouchableOpacity
           style={[
             styles.submitButton,
-            (selectedImages.length === 0 || !eventName.trim() || isLoading) && styles.disabledButton,
+            (selectedImages.length === 0 || !eventName.trim() || isLoading || caption.length > MAX_DESCRIPTION_LENGTH) && styles.disabledButton,
           ]}
           onPress={handleSubmit}
-          disabled={selectedImages.length === 0 || !eventName.trim() || isLoading}
+          disabled={selectedImages.length === 0 || !eventName.trim() || isLoading || caption.length > MAX_DESCRIPTION_LENGTH}
         >
           {isLoading ? (
             <ActivityIndicator color="#FFF" size="small" />

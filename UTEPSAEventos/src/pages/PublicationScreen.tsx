@@ -14,94 +14,61 @@ import {
 import PublicationCard from '../components/PublicationCard';
 import FloatingButton from '../components/FloatingButton';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
-const MOCK_PUBLICATIONS = [
-  {
-    id: 1,
-    userName: 'Carlos Méndez',
-    eventName: 'Conferencia de Tecnología',
-    eventDescription: 'Exploración de las últimas tendencias tecnológicas del 2023.',
-    date: '15/10/2023 - 14:30',
-    imageUrl: 'https://picsum.photos/id/1/600/400',
-    imageUrls: [
-      'https://picsum.photos/id/1/600/400',
-      'https://picsum.photos/id/10/600/400',
-      'https://picsum.photos/id/11/600/400'
-    ],
-    likes: 24,
-    hasUserLiked: false
-  },
-  {
-    id: 2,
-    userName: 'María González',
-    eventName: 'Seminario de Liderazgo',
-    eventDescription: 'Desarrollo de habilidades de liderazgo en entornos cambiantes.',
-    date: '20/10/2023 - 09:15',
-    imageUrl: 'https://picsum.photos/id/20/600/400',
-    imageUrls: [
-      'https://picsum.photos/id/20/600/400',
-      'https://picsum.photos/id/21/600/400'
-    ],
-    likes: 8,
-    hasUserLiked: true
-  },
-  {
-    id: 3,
-    userName: 'Roberto Silva',
-    eventName: 'Jornada de Innovación',
-    eventDescription: 'Espacio para compartir ideas innovadoras y proyectos disruptivos.',
-    date: '05/11/2023 - 16:45',
-    imageUrl: 'https://picsum.photos/id/37/600/400',
-    likes: 0,
-    hasUserLiked: false
-  },
-  {
-    id: 4,
-    userName: 'Ana López',
-    eventName: 'Taller de Emprendimiento',
-    eventDescription: 'Herramientas prácticas para iniciar y hacer crecer tu propio negocio.',
-    date: '12/11/2023 - 10:00',
-    imageUrl: 'https://picsum.photos/id/42/600/400',
-    imageUrls: [
-      'https://picsum.photos/id/42/600/400',
-      'https://picsum.photos/id/45/600/400',
-      'https://picsum.photos/id/48/600/400',
-      'https://picsum.photos/id/49/600/400'
-    ],
-    likes: 15,
-    hasUserLiked: false
-  },
-];
+import { getSession } from '../utils/sessionStorage';
+import { BASE_URL } from '../utils/Config';
 
 const PublicationScreen = () => {
-  const [publications, setPublications] = useState([]);
-  const [filteredPublications, setFilteredPublications] = useState([]);
+  const [publications, setPublications] = useState<any[]>([]);
+  const [filteredPublications, setFilteredPublications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [filterOption, setFilterOption] = useState('all');
 
   useEffect(() => {
-    const fetchPublications = () => {
-      setTimeout(() => {
-        setPublications(MOCK_PUBLICATIONS);
-        setFilteredPublications(MOCK_PUBLICATIONS);
-        setLoading(false);
-        setRefreshing(false);
-      }, 1000);
+    const fetchUserAndPublications = async () => {
+      setLoading(true);
+      const userData = await getSession();
+      const id_usuario = userData?.id_usuario;
+      try {
+        const response = await fetch(`${BASE_URL}/get_publicaciones.php?id_usuario=${id_usuario}`);
+        const data = await response.json();
+        if (data.success) {
+          setPublications(data.publications);
+          setFilteredPublications(data.publications);
+        } else {
+          setPublications([]);
+          setFilteredPublications([]);
+        }
+      } catch (error) {
+        setPublications([]);
+        setFilteredPublications([]);
+      }
+      setLoading(false);
+      setRefreshing(false);
     };
-
-    fetchPublications();
+    fetchUserAndPublications();
   }, []);
 
-
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setRefreshing(true);
-    setTimeout(() => {
-      setPublications(MOCK_PUBLICATIONS);
-      setFilteredPublications(applyFilter(MOCK_PUBLICATIONS, filterOption));
-      setRefreshing(false);
-    }, 1000);
+    const userData = await getSession();
+    const id_usuario = userData?.id_usuario;
+    try {
+      const response = await fetch(`${BASE_URL}/get_publicaciones.php?id_usuario=${id_usuario}`);
+      const data = await response.json();
+      if (data.success) {
+        setPublications(data.publications);
+        setFilteredPublications(applyFilter(data.publications, filterOption));
+      } else {
+        setPublications([]);
+        setFilteredPublications([]);
+      }
+    } catch (error) {
+      setPublications([]);
+      setFilteredPublications([]);
+    }
+    setRefreshing(false);
   };
 
   const handleLike = (id: number) => {

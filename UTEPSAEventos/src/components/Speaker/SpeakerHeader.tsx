@@ -9,13 +9,13 @@ interface SpeakerHeaderProps {
 
 const SpeakerHeader: React.FC<SpeakerHeaderProps> = ({ title, onBack }) => {
   return (
-    <View style={styles.header}>
-      <TouchableOpacity style={styles.backButton} onPress={onBack}>
-        <Icon name="arrow-back" size={24} color="#000" />
-      </TouchableOpacity>
-      <Text style={styles.headerTitle}>{title}</Text>
-      <View style={styles.spacer} />
-    </View>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+          <Icon name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{title}</Text>
+        <View style={styles.spacer} />
+      </View>
   );
 };
 
