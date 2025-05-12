@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import Share from "react-native-share"
@@ -29,6 +29,11 @@ const PublicationCard = ({ publication, onShare }: PublicationCardProps) => {
   const [likeCount, setLikeCount] = useState(publication.likes || 0)
   const [showFullDescription, setShowFullDescription] = useState(false)
   const [descLines, setDescLines] = useState(0)
+
+  useEffect(() => {
+    setLiked(publication.hasUserLiked || false)
+    setLikeCount(publication.likes || 0)
+  }, [publication.hasUserLiked, publication.likes])
 
   // Usar imageUrls si existe, de lo contrario usar imageUrl como un array de una sola imagen
   const images = publication.imageUrls || [publication.imageUrl]
