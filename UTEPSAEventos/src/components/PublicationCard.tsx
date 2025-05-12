@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import Share from "react-native-share"
 import Carousel from "./Carousel"
+import { BASE_URL } from '../utils/Config';
+import { getSession } from '../utils/sessionStorage';
 
 interface Publication {
   id: number
@@ -19,11 +21,10 @@ interface Publication {
 
 interface PublicationCardProps {
   publication: Publication
-  onLike: () => void
   onShare: () => void
 }
 
-const PublicationCard = ({ publication, onLike, onShare }: PublicationCardProps) => {
+const PublicationCard = ({ publication, onShare }: PublicationCardProps) => {
   const [liked, setLiked] = useState(publication.hasUserLiked || false)
   const [likeCount, setLikeCount] = useState(publication.likes || 0)
   const [showFullDescription, setShowFullDescription] = useState(false)
@@ -32,10 +33,25 @@ const PublicationCard = ({ publication, onLike, onShare }: PublicationCardProps)
   // Usar imageUrls si existe, de lo contrario usar imageUrl como un array de una sola imagen
   const images = publication.imageUrls || [publication.imageUrl]
 
-  const handleLike = () => {
-    setLiked(!liked)
-    setLikeCount(liked ? likeCount - 1 : likeCount + 1)
-    onLike()
+  const handleLike = async () => {
+    try {
+      const userData = await getSession();
+      if (!userData || !userData.id_usuario) return;
+      const formData = new FormData();
+      formData.append('id_usuario', userData.id_usuario);
+      formData.append('id_publicacion', publication.id);
+      const response = await fetch(`${BASE_URL}/LikePublication.php`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await response.json();
+      if (data.success) {
+        setLiked(data.hasUserLiked);
+        setLikeCount(data.likes);
+      }
+    } catch (error) {
+      // Manejo de error opcional
+    }
   }
 
   const handleShare = async () => {
@@ -107,7 +123,7 @@ const PublicationCard = ({ publication, onLike, onShare }: PublicationCardProps)
           <Icon name={liked ? "favorite" : "favorite-outline"} size={24} color={liked ? "#F44336" : "#666"} />
           <View style={styles.likeInfo}>
             <Text style={[styles.actionText, liked && styles.likedText]}>{liked ? "Te gusta" : "Me gusta"}</Text>
-            {likeCount > 0 && <Text style={styles.likeCount}>{likeCount}</Text>}
+            <Text style={styles.likeCount}>{likeCount}</Text>
           </View>
         </TouchableOpacity>
 

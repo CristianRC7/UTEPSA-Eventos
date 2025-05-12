@@ -71,10 +71,6 @@ const PublicationScreen = () => {
     setRefreshing(false);
   };
 
-  const handleLike = (id: number) => {
-    Alert.alert('Me gusta', `Le has dado me gusta a la publicación ${id}`);
-  };
-
   const handleShare = (id: number) => {
     Alert.alert('Compartir', `Has compartido la publicación ${id}`);
   };
@@ -103,7 +99,6 @@ const PublicationScreen = () => {
   const renderItem = ({ item }: any) => (
     <PublicationCard
       publication={item}
-      onLike={() => handleLike(item.id)}
       onShare={() => handleShare(item.id)}
     />
   );
@@ -111,7 +106,7 @@ const PublicationScreen = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#9b87f5" />
+        <ActivityIndicator size="large" color="#000" />
         <Text style={styles.loadingText}>Cargando publicaciones...</Text>
       </View>
     );
