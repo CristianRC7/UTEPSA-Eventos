@@ -22,13 +22,22 @@ class Schedule {
         $this->conn = $db;
     }
     
-    public function getScheduleByEventId($eventId) {
+    public function getScheduleByEventId($eventId, $id_usuario = null) {
         // Validar que el ID del evento sea un entero
         if (!is_numeric($eventId)) {
             return [
                 'success' => false,
                 'message' => 'ID de evento inválido'
             ];
+        }
+        
+        // Verificar si el usuario está inscrito en el evento
+        $userInscrito = false;
+        if ($id_usuario) {
+            $sqlCheck = "SELECT 1 FROM inscripciones WHERE id_usuario = ? AND id_evento = ?";
+            $stmtCheck = $this->conn->prepare($sqlCheck);
+            $stmtCheck->execute([$id_usuario, $eventId]);
+            $userInscrito = $stmtCheck->fetchColumn() ? true : false;
         }
         
         // Construir la consulta SQL para obtener las actividades de un evento específico
@@ -47,13 +56,16 @@ class Schedule {
         $stmt->execute();
         
         // Verificar si se encontraron actividades
-        if ($stmt->rowCount() > 0) {
-            // Devolver las actividades encontradas
-            $activities = [];
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $activities[] = $row;
+        $activities = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            // Si el usuario no está inscrito, forzar inscripcion_habilitada a false
+            if (!$userInscrito) {
+                $row['inscripcion_habilitada'] = false;
             }
-            
+            $activities[] = $row;
+        }
+        
+        if (count($activities) > 0) {
             return [
                 'success' => true,
                 'activities' => $activities
@@ -75,6 +87,7 @@ $scheduleObj = new Schedule($db);
 
 // Obtener el ID del evento de la URL
 $eventId = isset($_GET['event_id']) ? $_GET['event_id'] : null;
+$id_usuario = isset($_GET['id_usuario']) ? $_GET['id_usuario'] : null;
 
 if ($eventId === null) {
     echo json_encode([
@@ -86,7 +99,7 @@ if ($eventId === null) {
 }
 
 // Obtener el cronograma
-$result = $scheduleObj->getScheduleByEventId($eventId);
+$result = $scheduleObj->getScheduleByEventId($eventId, $id_usuario);
 
 // Devolver la respuesta
 echo json_encode($result);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StatusBar, View, Text, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BASE_URL } from '../utils/Config';
+import { getSession } from '../utils/sessionStorage';
 
 import ScheduleHeader from '../components/schedule/ScheduleHeader';
 import DayTabs from '../components/schedule/DayTabs';
@@ -28,7 +29,10 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
 
   const fetchSchedule = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/Schedule.php?event_id=${eventId}`);
+      const userData = await getSession();
+      const id_usuario = userData?.id_usuario;
+      const url = id_usuario ? `${BASE_URL}/Schedule.php?event_id=${eventId}&id_usuario=${id_usuario}` : `${BASE_URL}/Schedule.php?event_id=${eventId}`;
+      const response = await fetch(url);
       const data = await response.json();
 
       if (data.success) {
