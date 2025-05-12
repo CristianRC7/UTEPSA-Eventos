@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
-  ScrollView,
   Animated,
   TextInput,
   ActivityIndicator,
@@ -133,9 +132,6 @@ const HomeScreen = ({ route }: any) => {
           transform: [{ translateY: moveAnim }]
         }
       ]}>
-        <Text style={styles.welcomeChip}>
-          {userData?.rol === 'interno' ? 'Usuario Interno' : 'Usuario Externo'}
-        </Text>
         <Text style={styles.headerTitle}>Bienvenido</Text>
         <Text style={styles.headerSubtitle}>
           {userData?.nombre} {userData?.apellidos}
@@ -206,17 +202,6 @@ const styles = StyleSheet.create({
   listContentContainer: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-  },
-  welcomeChip: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#f0f0f3',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 25,
-    marginBottom: 8,
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#333',
   },
   headerTitle: {
     fontSize: 32,

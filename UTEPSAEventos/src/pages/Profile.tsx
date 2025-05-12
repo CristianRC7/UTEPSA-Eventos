@@ -42,9 +42,6 @@ const Profile = ({ route, navigation }: any) => {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.profileHeader}>
-          <Text style={styles.welcomeChip}>
-            {userData?.rol === 'interno' ? 'Usuario Interno' : 'Usuario Externo'}
-          </Text>
           <Text style={styles.headerTitle}>Mi Perfil</Text>
         </View>
 
@@ -81,17 +78,6 @@ const styles = StyleSheet.create({
   },
   profileHeader: {
     marginBottom: 30,
-  },
-  welcomeChip: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#f0f0f3',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 25,
-    marginBottom: 8,
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#333',
   },
   headerTitle: {
     fontSize: 32,
