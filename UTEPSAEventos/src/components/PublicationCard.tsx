@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
+import { useState, useEffect, useRef } from "react"
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from "react-native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import Share from "react-native-share"
 import Carousel from "./Carousel"
@@ -29,11 +29,28 @@ const PublicationCard = ({ publication, onShare }: PublicationCardProps) => {
   const [likeCount, setLikeCount] = useState(publication.likes || 0)
   const [showFullDescription, setShowFullDescription] = useState(false)
   const [descLines, setDescLines] = useState(0)
+  const scaleAnim = useRef(new Animated.Value(1)).current
 
   useEffect(() => {
     setLiked(publication.hasUserLiked || false)
     setLikeCount(publication.likes || 0)
   }, [publication.hasUserLiked, publication.likes])
+
+  const animateLike = () => {
+    scaleAnim.setValue(1)
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 1.4,
+        duration: 120,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 120,
+        useNativeDriver: true,
+      })
+    ]).start()
+  }
 
   // Usar imageUrls si existe, de lo contrario usar imageUrl como un array de una sola imagen
   const images = publication.imageUrls || [publication.imageUrl]
@@ -53,6 +70,7 @@ const PublicationCard = ({ publication, onShare }: PublicationCardProps) => {
       if (data.success) {
         setLiked(data.hasUserLiked);
         setLikeCount(data.likes);
+        animateLike();
       }
     } catch (error) {
       // Manejo de error opcional
@@ -125,7 +143,9 @@ const PublicationCard = ({ publication, onShare }: PublicationCardProps) => {
 
       <View style={styles.actionsContainer}>
         <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-          <Icon name={liked ? "favorite" : "favorite-outline"} size={24} color={liked ? "#F44336" : "#666"} />
+          <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+            <Icon name={liked ? "favorite" : "favorite-outline"} size={24} color={liked ? "#F44336" : "#666"} />
+          </Animated.View>
           <View style={styles.likeInfo}>
             <Text style={[styles.actionText, liked && styles.likedText]}>{liked ? "Te gusta" : "Me gusta"}</Text>
             <Text style={styles.likeCount}>{likeCount}</Text>

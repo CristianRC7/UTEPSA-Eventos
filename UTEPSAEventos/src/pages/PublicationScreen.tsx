@@ -24,6 +24,7 @@ const PublicationScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [filterOption, setFilterOption] = useState('all');
+  const [filtering, setFiltering] = useState(false);
 
   useEffect(() => {
     const fetchUserAndPublications = async () => {
@@ -79,21 +80,22 @@ const PublicationScreen = () => {
     switch (option) {
       case 'popular':
         return [...data].sort((a, b) => (b.likes || 0) - (a.likes || 0));
-      case 'recent':
-        // This is just a mock sort by date for demonstration
-        return [...data].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       case 'liked':
         return data.filter(item => item.hasUserLiked);
+      case 'all':
       default:
-        return data;
+        return [...data].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     }
   };
 
-
   const handleFilter = (option: string) => {
+    setFiltering(true);
     setFilterOption(option);
-    setFilteredPublications(applyFilter(publications, option));
-    setFilterModalVisible(false);
+    setTimeout(() => {
+      setFilteredPublications(applyFilter(publications, option));
+      setFiltering(false);
+      setFilterModalVisible(false);
+    }, 400); // Simula carga, puedes quitar el setTimeout si el filtrado es asíncrono
   };
 
   const renderItem = ({ item }: any) => (
@@ -103,7 +105,7 @@ const PublicationScreen = () => {
     />
   );
 
-  if (loading) {
+  if (loading || filtering) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#000" />
@@ -118,10 +120,10 @@ const PublicationScreen = () => {
         <View style={styles.headerTop}>
           <Text style={styles.headerTitle}>Publicaciones</Text>
           <TouchableOpacity 
-            style={styles.filterButton}
+            style={[styles.filterButton, filterModalVisible && styles.filterButtonActive]}
             onPress={() => setFilterModalVisible(true)}
           >
-            <Icon name="filter-list" size={24} color="#000" />
+            <Icon name="filter-list" size={24} color={filterModalVisible ? "#FFF" : "#000"} />
           </TouchableOpacity>
         </View>
         <Text style={styles.headerSubtitle}>
@@ -167,34 +169,26 @@ const PublicationScreen = () => {
             <Text style={styles.modalTitle}>Filtrar publicaciones</Text>
 
             <TouchableOpacity
-              style={[styles.filterOption, filterOption === 'all' && styles.selectedFilter]}
+              style={[styles.filterOption, filterOption === 'all' && styles.selectedFilterOption]}
               onPress={() => handleFilter('all')}
             >
-              <Icon name="view-list" size={20} color={filterOption === 'all' ? "#8B5CF6" : "#666"} />
+              <Icon name="view-list" size={20} color={filterOption === 'all' ? "#FFF" : "#000"} />
               <Text style={[styles.filterText, filterOption === 'all' && styles.selectedFilterText]}>Todas</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.filterOption, filterOption === 'popular' && styles.selectedFilter]}
+              style={[styles.filterOption, filterOption === 'popular' && styles.selectedFilterOption]}
               onPress={() => handleFilter('popular')}
             >
-              <Icon name="star" size={20} color={filterOption === 'popular' ? "#8B5CF6" : "#666"} />
+              <Icon name="star" size={20} color={filterOption === 'popular' ? "#FFF" : "#000"} />
               <Text style={[styles.filterText, filterOption === 'popular' && styles.selectedFilterText]}>Más populares</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.filterOption, filterOption === 'recent' && styles.selectedFilter]}
-              onPress={() => handleFilter('recent')}
-            >
-              <Icon name="access-time" size={20} color={filterOption === 'recent' ? "#8B5CF6" : "#666"} />
-              <Text style={[styles.filterText, filterOption === 'recent' && styles.selectedFilterText]}>Más recientes</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.filterOption, filterOption === 'liked' && styles.selectedFilter]}
+              style={[styles.filterOption, filterOption === 'liked' && styles.selectedFilterOption]}
               onPress={() => handleFilter('liked')}
             >
-              <Icon name="favorite" size={20} color={filterOption === 'liked' ? "#8B5CF6" : "#666"} />
+              <Icon name="favorite" size={20} color={filterOption === 'liked' ? "#FFF" : "#000"} />
               <Text style={[styles.filterText, filterOption === 'liked' && styles.selectedFilterText]}>Me gustan</Text>
             </TouchableOpacity>
           </View>
@@ -244,7 +238,12 @@ const styles = StyleSheet.create({
   filterButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: '#F0EAFF',
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  filterButtonActive: {
+    backgroundColor: '#000',
   },
   headerSubtitle: {
     fontSize: 16,
@@ -318,16 +317,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 8,
   },
-  selectedFilter: {
-    backgroundColor: '#F0EAFF',
+  selectedFilterOption: {
+    backgroundColor: '#000',
   },
   filterText: {
     fontSize: 16,
-    color: '#666',
+    color: '#000',
     marginLeft: 12,
   },
   selectedFilterText: {
-    color: '#8B5CF6',
+    color: '#FFF',
     fontWeight: '500',
   },
 });
