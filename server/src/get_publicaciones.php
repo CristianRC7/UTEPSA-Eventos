@@ -80,7 +80,7 @@ $publicationList = new PublicationList($db);
 
 $id_usuario = $_GET['id_usuario'] ?? $_POST['id_usuario'] ?? null;
 
-$baseImgUrl = 'http://10.40.22.186/UTEPSA-Eventos/server/src/';
+$baseImgUrl = 'http://10.40.23.87/UTEPSA-Eventos/server/src/';
 
 $publications = $publicationList->getAll($id_usuario, $baseImgUrl);
 echo json_encode([

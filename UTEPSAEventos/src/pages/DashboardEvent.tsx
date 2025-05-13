@@ -58,6 +58,10 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
       navigation.navigate('ScheduleScreen', { eventId: event.id_evento, eventTitle: event.titulo });
     } else if (feature === 'Soporte') {
       Alert.alert('Soporte', 'Si necesitas ayuda, contáctate con soporte en el 3er piso, bloque este o al correo soporte.campusvirtual@utepsa.edu');
+    } else if (feature === 'Mis inscripciones') {
+      navigation.navigate('MyInscription');
+    } else if (feature === 'Formulario') {
+      navigation.navigate('MyFormsEvent');
     } else {
       Alert.alert('Información', `Apartado ${feature} en desarrollo`);
     }
@@ -73,7 +77,7 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
     { name: 'Expositores', icon: 'people', color: '#10B981' },
     { name: 'Formulario', icon: 'assignment', color: '#EC4899' },
     { name: 'Puntos de inscripción', icon: 'place', color: '#3B82F6' },
-    { name: 'Convoctorias', icon: 'description', color: '#F59E0B'},
+    { name: 'Mis inscripciones', icon: 'assignment-turned-in', color: '#F59E0B' },
     { name: 'Soporte', icon: 'help', color: '#8B5CF6' },
   ];
 
@@ -97,10 +101,11 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
           {event?.pagina_web && (
             <TouchableOpacity
               onPress={() => {
+                if (!event?.pagina_web) return;
                 const webUrl = !event.pagina_web.startsWith('http://') && !event.pagina_web.startsWith('https://')
                   ? 'https://' + event.pagina_web
                   : event.pagina_web;
-                Linking.openURL(webUrl).catch(() => {
+                Linking.openURL(webUrl as string).catch(() => {
                   Alert.alert('Error', 'No se pudo abrir el sitio web');
                 });
               }}
