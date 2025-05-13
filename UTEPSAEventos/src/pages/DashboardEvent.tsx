@@ -62,6 +62,8 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
       navigation.navigate('MyInscription');
     } else if (feature === 'Formulario') {
       navigation.navigate('MyFormsEvent');
+    } else if (feature === 'Puntos de inscripción') {
+      navigation.navigate('RegistrationPoints');
     } else {
       Alert.alert('Información', `Apartado ${feature} en desarrollo`);
     }

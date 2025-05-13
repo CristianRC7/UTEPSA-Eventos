@@ -12,6 +12,7 @@ import SpeakerScreen from './src/pages/SpeakerScreen';
 import ScheduleScreen from './src/pages/ScheduleScreen';
 import MyInscription from './src/pages/MyInscription';
 import MyFormsEvent from './src/pages/MyFormsEvent';
+import RegistrationPoints from './src/pages/RegistrationPoints';
 import { getSession } from './src/utils/sessionStorage';
 
 // Global function for handling back button press
@@ -96,6 +97,7 @@ function App(): React.JSX.Element {
           <Stack.Screen name="ScheduleScreen" component={ScheduleScreen} />
           <Stack.Screen name="MyInscription" component={MyInscription} />
           <Stack.Screen name="MyFormsEvent" component={MyFormsEvent} />
+          <Stack.Screen name="RegistrationPoints" component={RegistrationPoints} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
