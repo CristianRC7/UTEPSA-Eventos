@@ -35,7 +35,12 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, onPress }) => {
           <Icon name="place" size={14} color="#666" />
           <Text style={styles.activityLocationText}>{activity.ubicacion}</Text>
         </View>
-        {activity.inscripcion_habilitada && (
+        {activity.inscrito ? (
+          <View style={styles.inscriptionBadge}>
+            <Icon name="check-circle" size={14} color="#10B981" />
+            <Text style={[styles.inscriptionBadgeText, { color: '#10B981' }]}>Inscrito</Text>
+          </View>
+        ) : activity.inscripcion_habilitada && (
           <View style={styles.inscriptionBadge}>
             <Icon name="event-available" size={14} color="#4F46E5" />
             <Text style={styles.inscriptionBadgeText}>Inscripción habilitada</Text>

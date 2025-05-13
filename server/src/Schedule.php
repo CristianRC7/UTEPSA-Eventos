@@ -33,11 +33,18 @@ class Schedule {
         
         // Verificar si el usuario está inscrito en el evento
         $userInscrito = false;
+        $actividadesInscritas = [];
         if ($id_usuario) {
             $sqlCheck = "SELECT 1 FROM inscripciones WHERE id_usuario = ? AND id_evento = ?";
             $stmtCheck = $this->conn->prepare($sqlCheck);
             $stmtCheck->execute([$id_usuario, $eventId]);
             $userInscrito = $stmtCheck->fetchColumn() ? true : false;
+
+            // Obtener actividades a las que el usuario está inscrito
+            $sqlAct = "SELECT id_actividad FROM inscripcion_actividades WHERE id_usuario = ?";
+            $stmtAct = $this->conn->prepare($sqlAct);
+            $stmtAct->execute([$id_usuario]);
+            $actividadesInscritas = $stmtAct->fetchAll(PDO::FETCH_COLUMN, 0);
         }
         
         // Construir la consulta SQL para obtener las actividades de un evento específico
@@ -62,6 +69,8 @@ class Schedule {
             if (!$userInscrito) {
                 $row['inscripcion_habilitada'] = false;
             }
+            // Agregar campo 'inscrito' si el usuario está inscrito a la actividad
+            $row['inscrito'] = in_array($row['id_actividad'], $actividadesInscritas);
             $activities[] = $row;
         }
         

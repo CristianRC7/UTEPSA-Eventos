@@ -7,6 +7,7 @@ export interface ScheduleActivity {
   ubicacion: string;
   dia_numero: number;
   inscripcion_habilitada?: boolean;
+  inscrito?: boolean;
 }
 
 export interface GroupedSchedule {
