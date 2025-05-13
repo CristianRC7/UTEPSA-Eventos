@@ -38,10 +38,7 @@ class PublicationList {
             $stmt_imgs = $this->conn->prepare($sql_imgs);
             $stmt_imgs->execute([$pub['id_publicacion']]);
             $imagenes = $stmt_imgs->fetchAll(PDO::FETCH_COLUMN);
-            // Formatear URLs completas
-            $imagenes = array_map(function($img) use ($baseImgUrl) {
-                return $baseImgUrl . $img;
-            }, $imagenes);
+            // No modificar $imagenes, ya contiene solo la ruta relativa
 
             // Contar likes
             $sql_likes = "SELECT COUNT(*) FROM likes_publicaciones WHERE id_publicacion = ?";
@@ -80,9 +77,9 @@ $publicationList = new PublicationList($db);
 
 $id_usuario = $_GET['id_usuario'] ?? $_POST['id_usuario'] ?? null;
 
-$baseImgUrl = 'http://10.40.23.87/UTEPSA-Eventos/server/src/';
+//$baseImgUrl = 'http://10.40.23.87/UTEPSA-Eventos/server/src/';
 
-$publications = $publicationList->getAll($id_usuario, $baseImgUrl);
+$publications = $publicationList->getAll($id_usuario);
 echo json_encode([
     'success' => true,
     'publications' => $publications

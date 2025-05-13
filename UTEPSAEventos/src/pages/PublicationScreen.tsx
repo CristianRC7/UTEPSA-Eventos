@@ -91,11 +91,9 @@ const PublicationScreen = () => {
   const handleFilter = (option: string) => {
     setFiltering(true);
     setFilterOption(option);
-    setTimeout(() => {
-      setFilteredPublications(applyFilter(publications, option));
-      setFiltering(false);
-      setFilterModalVisible(false);
-    }, 400); // Simula carga, puedes quitar el setTimeout si el filtrado es asíncrono
+    setFilteredPublications(applyFilter(publications, option));
+    setFiltering(false);
+    setFilterModalVisible(false);
   };
 
   const renderItem = ({ item }: any) => (

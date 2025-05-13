@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { 
   View, 
   FlatList, 
@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import LoadingPulse from "./LoadingPulse";
+import { BASE_URL } from '../utils/Config';
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CAROUSEL_INTERVAL = 6000; // 6 segundos
@@ -44,20 +45,7 @@ const Carousel = ({
   // Solo mostrar controles si hay más de una imagen
   const hasMultipleImages = images.length > 1;
 
-  // Configurar el carrusel automático
-  useEffect(() => {
-    if (autoPlay && hasMultipleImages) {
-      startAutoPlay();
-    }
-
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [activeIndex, autoPlay, hasMultipleImages]);
-
-  const startAutoPlay = () => {
+  const startAutoPlay = useCallback(() => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
@@ -69,7 +57,19 @@ const Carousel = ({
         goToSlide(activeIndex + 1);
       }
     }, CAROUSEL_INTERVAL);
-  };
+  }, [activeIndex, images.length]);
+
+  useEffect(() => {
+    if (autoPlay && hasMultipleImages) {
+      startAutoPlay();
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [activeIndex, autoPlay, hasMultipleImages, startAutoPlay]);
 
   const goToSlide = (index: number) => {
     if (flatListRef.current) {
@@ -120,7 +120,7 @@ const Carousel = ({
         <LoadingPulse width={SCREEN_WIDTH} height={height} />
       )}
       <Image 
-        source={{ uri: item }} 
+        source={item ? { uri: `${BASE_URL}/${item}` } : undefined}
         style={[
           styles.image, 
           { height, opacity: imagesLoaded[item] ? 1 : 0 }
