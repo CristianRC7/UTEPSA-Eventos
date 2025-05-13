@@ -154,7 +154,7 @@ const MyPublication = () => {
         {item.imageUrls.map((img: string, idx: number) => (
           <View key={idx} style={styles.imgPreviewBox}>
             <View style={styles.imgPreview}>
-              <Image source={{ uri: img }} style={[styles.imgReal]} resizeMode="cover" />
+              <Image source={img ? { uri: `${BASE_URL}/${img}` } : undefined} style={[styles.imgReal]} resizeMode="cover" />
             </View>
             <Text style={styles.imgLabel}>Imagen {idx+1}</Text>
           </View>

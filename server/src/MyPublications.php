@@ -15,11 +15,11 @@ require_once '../conexion.php';
 class MyPublications {
     private $conn;
     private $imgDir;
-    private $baseImgUrl;
-    public function __construct($db, $imgDir, $baseImgUrl) {
+    //private $baseImgUrl;
+    public function __construct($db, $imgDir) {
         $this->conn = $db;
         $this->imgDir = $imgDir;
-        $this->baseImgUrl = $baseImgUrl;
+        //$this->baseImgUrl = $baseImgUrl;
     }
 
     // Obtener publicaciones del usuario
@@ -41,7 +41,7 @@ class MyPublications {
             $stmt_imgs = $this->conn->prepare($sql_imgs);
             $stmt_imgs->execute([$pub['id_publicacion']]);
             $imagenes = $stmt_imgs->fetchAll(PDO::FETCH_COLUMN);
-            $imagenes = array_map(function($img) { return $this->baseImgUrl . $img; }, $imagenes);
+            // No modificar $imagenes, ya contiene solo la ruta relativa
             // Likes
             $sql_likes = "SELECT COUNT(*) FROM likes_publicaciones WHERE id_publicacion = ?";
             $stmt_likes = $this->conn->prepare($sql_likes);
@@ -98,8 +98,8 @@ class MyPublications {
 $database = new Database();
 $db = $database->getConnection();
 $imgDir = __DIR__ . "/publication_img/";
-$baseImgUrl = 'http://10.40.22.186/UTEPSA-Eventos/server/src/';
-$myPubs = new MyPublications($db, $imgDir, $baseImgUrl);
+//$baseImgUrl = 'http://10.40.22.186/UTEPSA-Eventos/server/src/';
+$myPubs = new MyPublications($db, $imgDir);
 
 $method = $_SERVER['REQUEST_METHOD'];
 
