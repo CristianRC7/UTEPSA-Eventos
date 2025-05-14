@@ -151,6 +151,7 @@ const HomeScreen = ({ route }: any) => {
             onChangeText={setSearchQuery}
             onSubmitEditing={handleSearch}
             returnKeyType="search"
+            placeholderTextColor="#888"
           />
           <TouchableOpacity 
             style={styles.searchButton}
