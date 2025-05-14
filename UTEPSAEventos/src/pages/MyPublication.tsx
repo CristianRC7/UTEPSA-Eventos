@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,20 +10,16 @@ import {
   Alert,
   Modal,
   TextInput,
-  ScrollView,
-  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { getSession } from '../utils/sessionStorage';
 import { BASE_URL } from '../utils/Config';
 import BottomSheet from '../components/BottomSheet';
+import MyPublicationCard from '../components/MyPublication/MyPublicationCard';
+import LoadingPulseCardAnimation from '../components/LoadingPulseCardAnimation';
 
 const MAX_DESCRIPTION_LENGTH = 250;
-
-// Definir funciones de estilos fuera de StyleSheet
-const estadoBox = (estado: string) => ({ backgroundColor: estado==='aprobado'?'#4CAF50':estado==='rechazado'?'#F44336':'#FFC107', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 });
-const estadoText = { color: '#FFF', fontWeight: '700' as const, fontSize: 12, textTransform: 'capitalize' as const };
 
 const MyPublication = () => {
   const navigation = useNavigation();
@@ -38,13 +34,10 @@ const MyPublication = () => {
   const [eventList, setEventList] = useState<any[]>([]);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchPublications();
-  }, []);
-
-  const fetchPublications = async () => {
-    setLoading(true);
+  const fetchPublications = useCallback(async () => {
+    if (!refreshing) setLoading(true);
     const userData = await getSession();
     if (!userData?.id_usuario) return;
     try {
@@ -59,7 +52,12 @@ const MyPublication = () => {
       setPublications([]);
     }
     setLoading(false);
-  };
+    setRefreshing(false);
+  }, [refreshing]);
+
+  useEffect(() => {
+    fetchPublications();
+  }, [fetchPublications]);
 
   const fetchEvents = async () => {
     try {
@@ -143,42 +141,10 @@ const MyPublication = () => {
     navigation.goBack();
   };
 
-  const renderPublication = ({ item }: any) => (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>{item.eventName}</Text>
-        <View style={estadoBox(item.estado)}>
-          <Text style={estadoText}>{item.estado.replace('_', ' ')}</Text>
-        </View>
-      </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginVertical: 8}}>
-        {item.imageUrls.map((img: string, idx: number) => (
-          <View key={idx} style={styles.imgPreviewBox}>
-            <View style={styles.imgPreview}>
-              <Image source={img ? { uri: `${BASE_URL}/${img}` } : undefined} style={[styles.imgReal]} resizeMode="cover" />
-            </View>
-            <Text style={styles.imgLabel}>Imagen {idx+1}</Text>
-          </View>
-        ))}
-      </ScrollView>
-      <Text style={styles.cardDesc}>{item.publicationDescription}</Text>
-      <Text style={styles.cardDate}>{item.date}</Text>
-      <View style={styles.cardActions}>
-        <TouchableOpacity style={styles.editBtnBlack} onPress={() => handleEdit(item)}>
-          <Icon name="edit" size={20} color="#FFF" />
-          <Text style={styles.editBtnText}>Editar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.deleteBtn} onPress={() => setDeletingId(item.id)}>
-          <Icon name="delete" size={20} color="#FFF" />
-          <Text style={styles.deleteBtnText}>Eliminar</Text>
-        </TouchableOpacity>
-        <View style={styles.likesBox}>
-          <Icon name="favorite" size={18} color="#F44336" />
-          <Text style={styles.likesText}>{item.likes}</Text>
-        </View>
-      </View>
-    </View>
-  );
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchPublications();
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -190,17 +156,23 @@ const MyPublication = () => {
         <View style={styles.rightPlaceholder} />
       </View>
       {loading ? (
-        <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
-          <ActivityIndicator size="large" color="#000" />
-          <Text style={{marginTop:12, color:'#666'}}>Cargando publicaciones...</Text>
-        </View>
+        <LoadingPulseCardAnimation />
       ) : (
         <FlatList
           data={publications}
-          renderItem={renderPublication}
+          renderItem={({ item }) => (
+            <MyPublicationCard
+              publication={item}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              setDeletingId={setDeletingId}
+            />
+          )}
           keyExtractor={item => item.id.toString()}
           contentContainerStyle={{padding:16, paddingBottom:40}}
           ListEmptyComponent={<Text style={{textAlign:'center', color:'#999', marginTop:40}}>No tienes publicaciones.</Text>}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
         />
       )}
       {/* Modal de edición */}

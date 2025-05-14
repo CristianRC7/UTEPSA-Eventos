@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import { getSession } from '../utils/sessionStorage';
 import { BASE_URL } from '../utils/Config';
 import BottomSheet from '../components/BottomSheet';
 import LoadingPulseCardAnimation from '../components/LoadingPulseCardAnimation';
+import { useFocusEffect } from '@react-navigation/native';
 
 const PublicationScreen = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -26,30 +27,34 @@ const PublicationScreen = () => {
   const [filterOption, setFilterOption] = useState('all');
   const [filtering, setFiltering] = useState(false);
 
-  useEffect(() => {
-    const fetchUserAndPublications = async () => {
-      setLoading(true);
-      const userData = await getSession();
-      const id_usuario = userData?.id_usuario;
-      try {
-        const response = await fetch(`${BASE_URL}/get_publicaciones.php?id_usuario=${id_usuario}`);
-        const data = await response.json();
-        if (data.success) {
-          setPublications(data.publications);
-          setFilteredPublications(data.publications);
-        } else {
-          setPublications([]);
-          setFilteredPublications([]);
-        }
-      } catch (error) {
+  // Función para consultar publicaciones
+  const fetchUserAndPublications = async () => {
+    setLoading(true);
+    const userData = await getSession();
+    const id_usuario = userData?.id_usuario;
+    try {
+      const response = await fetch(`${BASE_URL}/get_publicaciones.php?id_usuario=${id_usuario}`);
+      const data = await response.json();
+      if (data.success) {
+        setPublications(data.publications);
+        setFilteredPublications(data.publications);
+      } else {
         setPublications([]);
         setFilteredPublications([]);
       }
-      setLoading(false);
-      setRefreshing(false);
-    };
-    fetchUserAndPublications();
-  }, []);
+    } catch (error) {
+      setPublications([]);
+      setFilteredPublications([]);
+    }
+    setLoading(false);
+    setRefreshing(false);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserAndPublications();
+    }, [])
+  );
 
   const handleRefresh = async () => {
     setRefreshing(true);
