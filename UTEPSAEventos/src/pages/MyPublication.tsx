@@ -23,7 +23,7 @@ const MAX_DESCRIPTION_LENGTH = 250;
 
 // Definir funciones de estilos fuera de StyleSheet
 const estadoBox = (estado: string) => ({ backgroundColor: estado==='aprobado'?'#4CAF50':estado==='rechazado'?'#F44336':'#FFC107', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 });
-const estadoText = { color: '#FFF', fontWeight: '700', fontSize: 12, textTransform: 'capitalize' };
+const estadoText = { color: '#FFF', fontWeight: '700' as const, fontSize: 12, textTransform: 'capitalize' as const };
 
 const MyPublication = () => {
   const navigation = useNavigation();
@@ -286,8 +286,8 @@ const MyPublication = () => {
               <TouchableOpacity style={[styles.deleteBtn, {marginRight:8}]} onPress={()=>handleDelete(deletingId!)} disabled={actionLoading}>
                 {actionLoading ? <ActivityIndicator color="#FFF" size="small" /> : <Text style={styles.deleteBtnText}>Eliminar</Text>}
               </TouchableOpacity>
-              <TouchableOpacity style={styles.editBtn} onPress={()=>setDeletingId(null)}>
-                <Text style={styles.editBtnText}>Cancelar</Text>
+              <TouchableOpacity style={styles.deleteBtn} onPress={()=>setDeletingId(null)}>
+                <Text style={styles.deleteBtnText}>Cancelar</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -328,6 +328,7 @@ const styles = StyleSheet.create({
   inputLabel: { fontSize: 16, fontWeight: '500', color: '#333', marginBottom: 8 },
   textArea: { fontSize: 16, color: '#333', minHeight: 80, borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 8, padding: 12, backgroundColor: '#F5F5F5' },
   eventItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8, marginBottom: 8, backgroundColor: '#F5F5F5' },
+  eventItemSelected: { backgroundColor: '#000' },
   eventIcon: { marginRight: 12 },
   eventText: { flex: 1, fontSize: 16, color: '#333' },
   eventTextSelected: { color: '#FFF' },

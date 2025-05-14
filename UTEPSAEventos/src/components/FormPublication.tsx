@@ -12,7 +12,6 @@ import {
   Alert,
   ActivityIndicator,
   FlatList,
-  Modal,
 } from "react-native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import { useNavigation } from "@react-navigation/native"
@@ -20,6 +19,7 @@ import ImagePicker from "react-native-image-crop-picker"
 import { PermissionsAndroid } from "react-native"
 import { getSession } from "../utils/sessionStorage"
 import { BASE_URL } from "../utils/Config"
+import BottomSheet from "./BottomSheet"
 
 const MAX_IMAGES = 5;
 const MAX_DESCRIPTION_LENGTH = 250;
@@ -118,7 +118,7 @@ const FormPublication = () => {
         setSelectedImages(totalImages)
       }
     } catch (error) {
-      if (error.toString().includes("cancel")) {
+      if ((error as any).toString().includes("cancel")) {
         // User cancelled the operation
       } else {
         console.log("Error selecting images:", error)
@@ -145,7 +145,7 @@ const FormPublication = () => {
       })
       setSelectedImages([...selectedImages, image])
     } catch (error) {
-      if (error.toString().includes("cancel")) {
+      if ((error as any).toString().includes("cancel")) {
         // User cancelled the operation
       } else {
         console.log("Error taking photo:", error)
@@ -155,7 +155,7 @@ const FormPublication = () => {
   }
 
   // Remove an image from the selected images
-  const removeImage = (index) => {
+  const removeImage = (index: number) => {
     const updatedImages = [...selectedImages]
     updatedImages.splice(index, 1)
     setSelectedImages(updatedImages)
@@ -343,46 +343,43 @@ const FormPublication = () => {
       </View>
 
       {/* Modal para seleccionar evento */}
-      <Modal
+      <BottomSheet
         visible={showEventSelector}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowEventSelector(false)}
+        onClose={() => setShowEventSelector(false)}
+        title="Selecciona un evento"
+        height={400}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Selecciona un evento</Text>
-              <TouchableOpacity onPress={() => setShowEventSelector(false)}>
-                <Icon name="close" size={24} color="#333" />
-              </TouchableOpacity>
-            </View>
-
-            <FlatList
-              data={eventList}
-              keyExtractor={(item) => item.id_evento.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={[styles.eventItem, selectedEventId === item.id_evento && styles.eventItemSelected]}
-                  onPress={() => handleSelectEvent(item.id_evento, item.titulo)}
-                >
-                  <Icon
-                    name="event"
-                    size={20}
-                    color={selectedEventId === item.id_evento ? "#FFF" : "#555"}
-                    style={styles.eventIcon}
-                  />
-                  <Text style={[styles.eventText, selectedEventId === item.id_evento && styles.eventTextSelected]}>
-                    {item.titulo}
-                  </Text>
-                  {selectedEventId === item.id_evento && <Icon name="check" size={20} color="#FFF" style={styles.checkIcon} />}
-                </TouchableOpacity>
-              )}
-              contentContainerStyle={styles.eventsList}
-            />
-          </View>
-        </View>
-      </Modal>
+        <FlatList
+          data={eventList}
+          keyExtractor={(item) => item.id_evento.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[
+                styles.eventItem,
+                selectedEventId === item.id_evento && styles.eventItemSelected,
+                { backgroundColor: selectedEventId === item.id_evento ? '#000' : '#FFF' }
+              ]}
+              onPress={() => handleSelectEvent(item.id_evento, item.titulo)}
+            >
+              <Icon
+                name="event"
+                size={20}
+                color={selectedEventId === item.id_evento ? "#FFF" : "#555"}
+                style={styles.eventIcon}
+              />
+              <Text style={[
+                styles.eventText,
+                selectedEventId === item.id_evento && styles.eventTextSelected,
+                { color: selectedEventId === item.id_evento ? '#FFF' : '#333' }
+              ]}>
+                {item.titulo}
+              </Text>
+              {selectedEventId === item.id_evento && <Icon name="check" size={20} color="#FFF" style={styles.checkIcon} />}
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={styles.eventsList}
+        />
+      </BottomSheet>
     </SafeAreaView>
   )
 }
@@ -613,31 +610,6 @@ const styles = StyleSheet.create({
     width: 1,
     height: "100%",
     backgroundColor: "#E0E0E0",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    backgroundColor: "#FFFFFF",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingBottom: 20,
-    maxHeight: "70%",
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
   },
   eventsList: {
     padding: 16,
