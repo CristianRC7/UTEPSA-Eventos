@@ -59,7 +59,7 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
     } else if (feature === 'Soporte') {
       Alert.alert('Soporte', 'Si necesitas ayuda, contáctate con soporte en el 3er piso, bloque este o al correo soporte.campusvirtual@utepsa.edu');
     } else if (feature === 'Mis inscripciones') {
-      navigation.navigate('MyInscription');
+      navigation.navigate('MyInscription', { id_evento: event.id_evento });
     } else if (feature === 'Formulario') {
       navigation.navigate('MyFormsEvent');
     } else if (feature === 'Puntos de inscripción') {
