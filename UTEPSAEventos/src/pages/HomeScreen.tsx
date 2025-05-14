@@ -7,7 +7,6 @@ import {
   SafeAreaView,
   Animated,
   TextInput,
-  ActivityIndicator,
   FlatList,
   Alert,
   RefreshControl,
@@ -15,6 +14,7 @@ import {
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { BASE_URL } from '../utils/Config';
 import EventCard from '../components/EventCard';
+import LoadingPulseCardAnimation from '../components/LoadingPulseCardAnimation';
 
 // Home Tab Screen Component
 const HomeScreen = ({ route }: any) => {
@@ -163,7 +163,9 @@ const HomeScreen = ({ route }: any) => {
       </Animated.View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#000" style={styles.loader} />
+        <View style={{ flex: 1 }}>
+          <LoadingPulseCardAnimation />
+        </View>
       ) : (
         <FlatList
           data={events}
