@@ -13,9 +13,13 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 const BottomSheet: React.FC<BottomSheetProps> = ({ visible, onClose, title, children, height = 350 }) => {
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const [modalVisible, setModalVisible] = React.useState(visible);
 
   useEffect(() => {
     if (visible) {
+      setModalVisible(true);
+      // Reiniciar la posición antes de animar la entrada
+      slideAnim.setValue(SCREEN_HEIGHT);
       Animated.timing(slideAnim, {
         toValue: SCREEN_HEIGHT - height,
         duration: 300,
@@ -24,15 +28,19 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ visible, onClose, title, chil
     } else {
       Animated.timing(slideAnim, {
         toValue: SCREEN_HEIGHT,
-        duration: 200,
+        duration: 250,
         useNativeDriver: false,
-      }).start();
+      }).start(() => {
+        setModalVisible(false);
+      });
     }
   }, [visible, height, slideAnim]);
 
+  if (!modalVisible) return null;
+
   return (
     <Modal
-      visible={visible}
+      visible={modalVisible}
       animationType="fade"
       transparent
       onRequestClose={onClose}
