@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { getSession } from '../utils/sessionStorage';
 import { BASE_URL } from '../utils/Config';
+import BottomSheet from '../components/BottomSheet';
 
 const MAX_DESCRIPTION_LENGTH = 250;
 
@@ -239,33 +240,41 @@ const MyPublication = () => {
             </View>
           </View>
         </View>
-        {/* Modal selector de evento */}
-        <Modal visible={showEventSelector} transparent animationType="slide" onRequestClose={()=>setShowEventSelector(false)}>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Selecciona un evento</Text>
-              <FlatList
-                data={eventList}
-                keyExtractor={item => item.id_evento.toString()}
-                renderItem={({item})=>(
-                  <TouchableOpacity
-                    style={[styles.eventItem, editEventId===item.id_evento && styles.eventItemSelected]}
-                    onPress={()=>{
-                      setEditEventId(item.id_evento);
-                      setEditEventName(item.titulo);
-                      setShowEventSelector(false);
-                    }}
-                  >
-                    <Icon name="event" size={20} color={editEventId===item.id_evento?"#FFF":"#555"} style={styles.eventIcon}/>
-                    <Text style={[styles.eventText, editEventId===item.id_evento && styles.eventTextSelected]}>{item.titulo}</Text>
-                    {editEventId===item.id_evento && <Icon name="check" size={20} color="#FFF" style={styles.checkIcon}/>} 
-                  </TouchableOpacity>
-                )}
-                contentContainerStyle={styles.eventsList}
-              />
-            </View>
-          </View>
-        </Modal>
+        {/* Modal selector de evento reemplazado por BottomSheet */}
+        <BottomSheet
+          visible={showEventSelector}
+          onClose={()=>setShowEventSelector(false)}
+          title="Selecciona un evento"
+          height={400}
+        >
+          <FlatList
+            data={eventList}
+            keyExtractor={item => item.id_evento.toString()}
+            renderItem={({item})=>(
+              <TouchableOpacity
+                style={[
+                  styles.eventItem,
+                  editEventId===item.id_evento && styles.eventItemSelected,
+                  {backgroundColor: editEventId===item.id_evento ? '#000' : '#FFF'}
+                ]}
+                onPress={()=>{
+                  setEditEventId(item.id_evento);
+                  setEditEventName(item.titulo);
+                  setShowEventSelector(false);
+                }}
+              >
+                <Icon name="event" size={20} color={editEventId===item.id_evento?"#FFF":"#555"} style={styles.eventIcon}/>
+                <Text style={[
+                  styles.eventText,
+                  editEventId===item.id_evento && styles.eventTextSelected,
+                  {color: editEventId===item.id_evento ? '#FFF' : '#333'}
+                ]}>{item.titulo}</Text>
+                {editEventId===item.id_evento && <Icon name="check" size={20} color="#FFF" style={styles.checkIcon}/>} 
+              </TouchableOpacity>
+            )}
+            contentContainerStyle={styles.eventsList}
+          />
+        </BottomSheet>
       </Modal>
       {/* Modal de confirmación de eliminación */}
       <Modal visible={!!deletingId} transparent animationType="fade" onRequestClose={()=>setDeletingId(null)}>
@@ -319,7 +328,6 @@ const styles = StyleSheet.create({
   inputLabel: { fontSize: 16, fontWeight: '500', color: '#333', marginBottom: 8 },
   textArea: { fontSize: 16, color: '#333', minHeight: 80, borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 8, padding: 12, backgroundColor: '#F5F5F5' },
   eventItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8, marginBottom: 8, backgroundColor: '#F5F5F5' },
-  eventItemSelected: { backgroundColor: '#8B5CF6' },
   eventIcon: { marginRight: 12 },
   eventText: { flex: 1, fontSize: 16, color: '#333' },
   eventTextSelected: { color: '#FFF' },
