@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from "react"
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from "react-native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import Share from "react-native-share"
-import Carousel from "./Carousel"
-import { BASE_URL } from '../utils/Config';
-import { getSession } from '../utils/sessionStorage';
+import Carousel from "../Carousel"
+import { BASE_URL } from '../../utils/Config';
+import { getSession } from '../../utils/sessionStorage';
 
 interface Publication {
   id: number

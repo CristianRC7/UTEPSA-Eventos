@@ -5,17 +5,17 @@ import {
   StyleSheet,
   FlatList,
   SafeAreaView,
-  ActivityIndicator,
   Alert,
   RefreshControl,
   TouchableOpacity,
 } from 'react-native';
-import PublicationCard from '../components/PublicationCard';
+import PublicationCard from '../components/Publication/PublicationCard';
 import FloatingButton from '../components/FloatingButton';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { getSession } from '../utils/sessionStorage';
 import { BASE_URL } from '../utils/Config';
 import BottomSheet from '../components/BottomSheet';
+import LoadingPulseCardAnimation from '../components/LoadingPulseCardAnimation';
 
 const PublicationScreen = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -103,15 +103,6 @@ const PublicationScreen = () => {
     />
   );
 
-  if (loading || filtering) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#000" />
-        <Text style={styles.loadingText}>Cargando publicaciones...</Text>
-      </View>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -129,28 +120,32 @@ const PublicationScreen = () => {
         </Text>
       </View>
 
-      <FlatList
-        data={filteredPublications}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            colors={['#000']}
-          />
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No hay publicaciones disponibles</Text>
-            <Text style={styles.emptySubtext}>
-              Las publicaciones aparecerán aquí cuando sean compartidas.
-            </Text>
-          </View>
-        }
-      />
+      {(loading || filtering || refreshing) ? (
+        <LoadingPulseCardAnimation />
+      ) : (
+        <FlatList
+          data={filteredPublications}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={['#000']}
+            />
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No hay publicaciones disponibles</Text>
+              <Text style={styles.emptySubtext}>
+                Las publicaciones aparecerán aquí cuando sean compartidas.
+              </Text>
+            </View>
+          }
+        />
+      )}
 
       <BottomSheet
         visible={filterModalVisible}
