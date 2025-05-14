@@ -9,13 +9,13 @@ import {
   Alert,
   RefreshControl,
   TouchableOpacity,
-  Modal,
 } from 'react-native';
 import PublicationCard from '../components/PublicationCard';
 import FloatingButton from '../components/FloatingButton';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { getSession } from '../utils/sessionStorage';
 import { BASE_URL } from '../utils/Config';
+import BottomSheet from '../components/BottomSheet';
 
 const PublicationScreen = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -152,46 +152,36 @@ const PublicationScreen = () => {
         }
       />
 
-      <Modal
-        animationType="fade"
-        transparent={true}
+      <BottomSheet
         visible={filterModalVisible}
-        onRequestClose={() => setFilterModalVisible(false)}
+        onClose={() => setFilterModalVisible(false)}
+        title="Filtrar publicaciones"
+        height={270}
       >
         <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setFilterModalVisible(false)}
+          style={[styles.filterOption, filterOption === 'all' && styles.selectedFilterOption]}
+          onPress={() => handleFilter('all')}
         >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Filtrar publicaciones</Text>
-
-            <TouchableOpacity
-              style={[styles.filterOption, filterOption === 'all' && styles.selectedFilterOption]}
-              onPress={() => handleFilter('all')}
-            >
-              <Icon name="view-list" size={20} color={filterOption === 'all' ? "#FFF" : "#000"} />
-              <Text style={[styles.filterText, filterOption === 'all' && styles.selectedFilterText]}>Todas</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.filterOption, filterOption === 'popular' && styles.selectedFilterOption]}
-              onPress={() => handleFilter('popular')}
-            >
-              <Icon name="star" size={20} color={filterOption === 'popular' ? "#FFF" : "#000"} />
-              <Text style={[styles.filterText, filterOption === 'popular' && styles.selectedFilterText]}>Más populares</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.filterOption, filterOption === 'liked' && styles.selectedFilterOption]}
-              onPress={() => handleFilter('liked')}
-            >
-              <Icon name="favorite" size={20} color={filterOption === 'liked' ? "#FFF" : "#000"} />
-              <Text style={[styles.filterText, filterOption === 'liked' && styles.selectedFilterText]}>Me gustan</Text>
-            </TouchableOpacity>
-          </View>
+          <Icon name="view-list" size={20} color={filterOption === 'all' ? "#FFF" : "#000"} />
+          <Text style={[styles.filterText, filterOption === 'all' && styles.selectedFilterText]}>Todas</Text>
         </TouchableOpacity>
-      </Modal>
+
+        <TouchableOpacity
+          style={[styles.filterOption, filterOption === 'popular' && styles.selectedFilterOption]}
+          onPress={() => handleFilter('popular')}
+        >
+          <Icon name="star" size={20} color={filterOption === 'popular' ? "#FFF" : "#000"} />
+          <Text style={[styles.filterText, filterOption === 'popular' && styles.selectedFilterText]}>Más populares</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.filterOption, filterOption === 'liked' && styles.selectedFilterOption]}
+          onPress={() => handleFilter('liked')}
+        >
+          <Icon name="favorite" size={20} color={filterOption === 'liked' ? "#FFF" : "#000"} />
+          <Text style={[styles.filterText, filterOption === 'liked' && styles.selectedFilterText]}>Me gustan</Text>
+        </TouchableOpacity>
+      </BottomSheet>
 
       <View style={styles.floatingButtonContainer}>
         <FloatingButton />
@@ -279,33 +269,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 25,
     right: 25,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 16,
-    textAlign: 'center',
   },
   filterOption: {
     flexDirection: 'row',
