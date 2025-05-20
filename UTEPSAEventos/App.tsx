@@ -12,6 +12,7 @@ import ScheduleScreen from './src/pages/ScheduleScreen';
 import MyInscription from './src/pages/MyInscription';
 import MyFormsEvent from './src/pages/MyFormsEvent';
 import RegistrationPoints from './src/pages/RegistrationPoints';
+import MyCertificateScreen from './src/pages/MyCertificateScreen';
 import { getSession } from './src/utils/sessionStorage';
 import BottomNavigator from './src/components/BottomNavigator';
 
@@ -98,6 +99,7 @@ function App(): React.JSX.Element {
           <Stack.Screen name="MyInscription" component={MyInscription} />
           <Stack.Screen name="MyFormsEvent" component={MyFormsEvent} />
           <Stack.Screen name="RegistrationPoints" component={RegistrationPoints} />
+          <Stack.Screen name="MyCertificateScreen" component={MyCertificateScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

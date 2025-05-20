@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Alert } from 'react-native';
 import { clearSession } from '../utils/sessionStorage';
+import ModalForm from '../components/ModalForm';
 
 const Profile = ({ route, navigation }: any) => {
   const userData = route.params?.userData;
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
 
   const getFullName = () => {
     if (userData?.apellido_paterno && userData?.apellido_materno) {
@@ -58,11 +61,40 @@ const Profile = ({ route, navigation }: any) => {
         </View>
 
         <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => setShowPasswordModal(true)}
+        >
+          <Text style={styles.actionButtonText}>Cambiar contraseña</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('MyCertificateScreen')}
+        >
+          <Text style={styles.actionButtonText}>Ver mis certificados</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
           style={styles.logoutButton}
           onPress={handleLogout}
         >
           <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
         </TouchableOpacity>
+
+        {/* Modal para cambiar contraseña */}
+        <ModalForm
+          visible={showPasswordModal}
+          onClose={() => setShowPasswordModal(false)}
+          title="Cambiar contraseña"
+          value={newPassword}
+          onChangeText={setNewPassword}
+          onSubmit={() => {
+            setShowPasswordModal(false);
+            setNewPassword('');
+            Alert.alert('Contraseña cambiada', 'Tu contraseña ha sido cambiada (simulado)');
+          }}
+          placeholder="Ingresa tu nueva contraseña"
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -106,6 +138,27 @@ const styles = StyleSheet.create({
   infoValue: {
     fontSize: 16,
     color: '#555',
+  },
+  actionButton: {
+    backgroundColor: '#111',
+    height: 50,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#111',
+    shadowColor: '#111',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    letterSpacing: 0.2,
   },
   logoutButton: {
     backgroundColor: '#F2F2F2',
