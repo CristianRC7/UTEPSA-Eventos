@@ -4,7 +4,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar, BackHandler, Alert } from 'react-native';
 import Login from './src/pages/Login';
-import Home from './src/pages/Home';
 import MyPublication from './src/pages/MyPublication';
 import FormPublication from './src/components/FormPublication';
 import DashboardEvent from './src/pages/DashboardEvent';
@@ -14,6 +13,7 @@ import MyInscription from './src/pages/MyInscription';
 import MyFormsEvent from './src/pages/MyFormsEvent';
 import RegistrationPoints from './src/pages/RegistrationPoints';
 import { getSession } from './src/utils/sessionStorage';
+import BottomNavigator from './src/components/BottomNavigator';
 
 // Global function for handling back button press
 const handleBackPress = () => {
@@ -79,14 +79,14 @@ function App(): React.JSX.Element {
             animation: 'fade_from_bottom',
           }}
         >
-          <Stack.Screen 
-            name="Login" 
-            component={Login} 
+          <Stack.Screen
+            name="Login"
+            component={Login}
             options={{ gestureEnabled: false }}
           />
-          <Stack.Screen 
-            name="Home" 
-            component={Home} 
+          <Stack.Screen
+            name="Home"
+            component={BottomNavigator} 
             initialParams={{ userData: userSession }}
             options={{ gestureEnabled: false }}
           />
