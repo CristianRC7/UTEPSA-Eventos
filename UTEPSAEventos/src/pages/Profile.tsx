@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Alert } from 'react-native';
-import { clearSession } from '../utils/sessionStorage';
+import { clearSession, changePassword } from '../utils/sessionStorage';
 import ModalForm from '../components/ModalForm';
 
 const Profile = ({ route, navigation }: any) => {
   const userData = route.params?.userData;
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [newPassword, setNewPassword] = useState('');
+  const [loadingPassword, setLoadingPassword] = useState(false);
 
   const getFullName = () => {
     if (userData?.apellido_paterno && userData?.apellido_materno) {
@@ -88,10 +89,14 @@ const Profile = ({ route, navigation }: any) => {
           title="Cambiar contraseña"
           value={newPassword}
           onChangeText={setNewPassword}
-          onSubmit={() => {
+          loading={loadingPassword}
+          onSubmit={async () => {
+            setLoadingPassword(true);
+            const res = await changePassword(userData?.id_usuario, newPassword);
+            setLoadingPassword(false);
             setShowPasswordModal(false);
             setNewPassword('');
-            Alert.alert('Contraseña cambiada', 'Tu contraseña ha sido cambiada (simulado)');
+            Alert.alert(res.success ? 'Éxito' : 'Error', res.message);
           }}
           placeholder="Ingresa tu nueva contraseña"
         />

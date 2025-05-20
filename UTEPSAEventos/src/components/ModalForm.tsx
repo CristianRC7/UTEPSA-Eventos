@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface ModalFormProps {
   visible: boolean;
@@ -24,6 +25,8 @@ const ModalForm: React.FC<ModalFormProps> = ({
   placeholder = '',
   submitLabel = 'Cambiar',
 }) => {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <Modal
       visible={visible}
@@ -34,14 +37,22 @@ const ModalForm: React.FC<ModalFormProps> = ({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>{title}</Text>
-          <TextInput
-            style={styles.input}
-            placeholder={placeholder}
-            secureTextEntry
-            value={value}
-            onChangeText={onChangeText}
-            placeholderTextColor="#aaa"
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder={placeholder}
+              secureTextEntry={!showPassword}
+              value={value}
+              onChangeText={onChangeText}
+              placeholderTextColor="#aaa"
+            />
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => setShowPassword((prev) => !prev)}
+            >
+              <Icon name={showPassword ? 'visibility' : 'visibility-off'} size={22} color="#888" />
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity
             style={styles.submitButton}
             onPress={onSubmit}
@@ -101,6 +112,20 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     backgroundColor: '#F7F7F7',
     color: '#222',
+    paddingRight: 40,
+  },
+  inputContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 18,
+    position: 'relative',
+  },
+  iconButton: {
+    position: 'absolute',
+    right: 10,
+    padding: 4,
+    zIndex: 2,
   },
   submitButton: {
     backgroundColor: '#111',
