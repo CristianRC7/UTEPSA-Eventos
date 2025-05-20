@@ -19,7 +19,8 @@ CREATE TABLE eventos (
     titulo VARCHAR(100) NOT NULL,
     descripcion TEXT NOT NULL,
     fecha_inicio DATETIME NOT NULL,
-    fecha_fin DATETIME NOT NULL
+    fecha_fin DATETIME NOT NULL,
+    certificado_img VARCHAR(255) DEFAULT NULL
 );
 
 -- Crear tabla de página web de eventos
@@ -39,6 +40,8 @@ CREATE TABLE expositores (
     descripcion TEXT NOT NULL,
     imagen_url VARCHAR(255) NULL
 );
+
+
 
 -- Relación entre eventos y expositores
 CREATE TABLE evento_expositores (
@@ -73,6 +76,14 @@ CREATE TABLE inscripciones (
     FOREIGN KEY (id_evento) REFERENCES eventos(id_evento) ON DELETE CASCADE
 );
 
+-- Certificados para usuarios inscritos en eventos
+CREATE TABLE certificados (
+    id_certificado INT AUTO_INCREMENT PRIMARY KEY,
+    id_inscripcion INT NOT NULL,
+    nro_certificado VARCHAR(50) UNIQUE NOT NULL,
+    FOREIGN KEY (id_inscripcion) REFERENCES inscripciones(id_inscripcion) ON DELETE CASCADE
+);
+
 -- Inscripción de usuarios en cronograma de eventos
 CREATE TABLE inscripcion_actividades (
     id_inscripcion_actividad INT AUTO_INCREMENT PRIMARY KEY,
@@ -83,16 +94,7 @@ CREATE TABLE inscripcion_actividades (
     FOREIGN KEY (id_actividad) REFERENCES cronograma_eventos(id_actividad) ON DELETE CASCADE
 );
 
--- Certificados para usuarios inscritos en eventos
-CREATE TABLE certificados (
-    id_certificado INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT NOT NULL,
-    id_evento INT NOT NULL,
-    nro_certificado VARCHAR(50) UNIQUE NOT NULL,
-    fecha_emision DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-    FOREIGN KEY (id_evento) REFERENCES eventos(id_evento) ON DELETE CASCADE
-);
+
 
 -- Habilitación de formularios por actividad
 CREATE TABLE habilitacion_formularios (
