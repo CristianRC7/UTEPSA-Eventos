@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, StatusBar, FlatList, ActivityIndicator } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { View, Text, StyleSheet, SafeAreaView, StatusBar, FlatList, TouchableOpacity } from 'react-native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import ScheduleHeader from '../components/schedule/ScheduleHeader';
 import { getSession } from '../utils/sessionStorage';
 import { BASE_URL } from '../utils/Config';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import LoadingPulseCardAnimation from '../components/LoadingPulseCardAnimation';
 
 type RouteParams = {
   id_evento: number;
@@ -15,6 +17,7 @@ const MyInscription: React.FC = () => {
   const { id_evento } = (route.params as RouteParams) || {};
   const [inscripciones, setInscripciones] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const fetchInscripciones = async () => {
@@ -37,28 +40,118 @@ const MyInscription: React.FC = () => {
     fetchInscripciones();
   }, [id_evento]);
 
+  // Recargar al volver a la pantalla
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchInscripciones = async () => {
+        setLoading(true);
+        const session = await getSession();
+        if (!session?.id_usuario || !id_evento) {
+          setLoading(false);
+          return;
+        }
+        try {
+          const response = await fetch(`${BASE_URL}/GetUserInscriptions.php?id_usuario=${session.id_usuario}&id_evento=${id_evento}`);
+          const data = await response.json();
+          if (data.success) {
+            setInscripciones(data.inscripciones);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+        setLoading(false);
+      };
+      fetchInscripciones();
+    }, [id_evento])
+  );
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    const session = await getSession();
+    if (!session?.id_usuario || !id_evento) {
+      setRefreshing(false);
+      return;
+    }
+    try {
+      const response = await fetch(`${BASE_URL}/GetUserInscriptions.php?id_usuario=${session.id_usuario}&id_evento=${id_evento}`);
+      const data = await response.json();
+      if (data.success) {
+        setInscripciones(data.inscripciones);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    setRefreshing(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <ScheduleHeader title="Mis Inscripciones" onBack={() => navigation.goBack()} />
       <View style={styles.content}>
         {loading ? (
-          <ActivityIndicator size="large" color="#000" />
-        ) : inscripciones.length === 0 ? (
-          <Text style={styles.placeholderText}>No tienes inscripciones.</Text>
+          <LoadingPulseCardAnimation />
         ) : (
           <FlatList
             data={inscripciones}
             keyExtractor={(item) => item.id_inscripcion_actividad.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.item}>
-                <Text style={styles.title}>{item.titulo}</Text>
-                <Text>{item.descripcion}</Text>
-                <Text>Fecha: {item.fecha} {item.hora}</Text>
-                <Text>Ubicación: {item.ubicacion}</Text>
-                <Text>Evento: {item.evento}</Text>
-              </View>
-            )}
+            renderItem={({ item }) => {
+              const now = new Date();
+              const habilitacionInicio = item.habilitacion_inicio ? new Date(item.habilitacion_inicio) : null;
+              const habilitacionFin = item.habilitacion_fin ? new Date(item.habilitacion_fin) : null;
+              const respondido = !!item.respondido;
+              let encuestaStatus = null;
+              if (habilitacionInicio && now < habilitacionInicio) {
+                encuestaStatus = (
+                  <Text style={styles.encuestaInfo}>
+                    El formulario se habilitará el {habilitacionInicio.toLocaleString()}
+                  </Text>
+                );
+              } else if (habilitacionInicio && habilitacionFin && now >= habilitacionInicio && now <= habilitacionFin) {
+                if (!respondido) {
+                  encuestaStatus = (
+                    <View style={styles.encuestaBtnContainer}>
+                      <Text style={styles.encuestaInfo}>Encuesta disponible</Text>
+                      <View style={styles.encuestaBtnRow}>
+                        <TouchableOpacity
+                          style={styles.encuestaBtn}
+                          onPress={() => navigation.navigate('EventSurvey', {
+                            id_actividad: item.id_actividad,
+                            titulo: item.titulo
+                          })}
+                        >
+                          <Icon name="assignment" size={20} color="#fff" style={{ marginRight: 8 }} />
+                          <Text style={styles.encuestaBtnText}>Responder encuesta</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  );
+                } else {
+                  encuestaStatus = (
+                    <Text style={styles.encuestaRespondida}>Ya respondiste la encuesta</Text>
+                  );
+                }
+              } else if (respondido) {
+                encuestaStatus = (
+                  <Text style={styles.encuestaRespondida}>Ya respondiste la encuesta</Text>
+                );
+              }
+              return (
+                <View style={styles.item}>
+                  <Text style={styles.title}>{item.titulo}</Text>
+                  <Text>{item.descripcion}</Text>
+                  <Text>Fecha: {item.fecha} {item.hora}</Text>
+                  <Text>Ubicación: {item.ubicacion}</Text>
+                  <Text>Evento: {item.evento}</Text>
+                  {encuestaStatus}
+                </View>
+              );
+            }}
+            ListEmptyComponent={
+              <Text style={styles.placeholderText}>No tienes inscripciones.</Text>
+            }
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
           />
         )}
       </View>
@@ -93,6 +186,47 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 4,
+  },
+  encuestaInfo: {
+    color: '#222',
+    marginTop: 8,
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  encuestaBtnContainer: {
+    marginTop: 12,
+    alignItems: 'flex-start',
+  },
+  encuestaBtnRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  encuestaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#111',
+    paddingVertical: 10,
+    paddingHorizontal: 28,
+    borderRadius: 24,
+    marginTop: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  encuestaBtnText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+    letterSpacing: 0.5,
+    textAlign: 'center',
+  },
+  encuestaRespondida: {
+    color: '#28a745',
+    marginTop: 8,
+    fontWeight: 'bold',
+    fontSize: 15,
   },
 });
 

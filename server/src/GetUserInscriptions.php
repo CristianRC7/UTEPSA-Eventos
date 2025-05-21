@@ -13,17 +13,19 @@ require_once '../conexion.php';
 
 class UserInscriptions {
     private $conn;
-    private $table_name = "inscripcion_actividades";
-
     public function __construct($db) {
         $this->conn = $db;
     }
 
     public function getInscriptions($id_usuario, $id_evento) {
-        $query = "SELECT ia.id_inscripcion_actividad, ce.titulo, ce.descripcion, ce.fecha, ce.hora, ce.ubicacion, e.titulo as evento
+        $query = "SELECT ia.id_inscripcion_actividad, ce.id_actividad, ce.titulo, ce.descripcion, ce.fecha, ce.hora, ce.ubicacion, e.titulo as evento,
+                        hf.fecha_inicio as habilitacion_inicio, hf.fecha_fin as habilitacion_fin,
+                        f.id_formulario as respondido
                   FROM inscripcion_actividades ia
                   JOIN cronograma_eventos ce ON ia.id_actividad = ce.id_actividad
                   JOIN eventos e ON ce.id_evento = e.id_evento
+                  LEFT JOIN habilitacion_formularios hf ON ce.id_actividad = hf.id_actividad
+                  LEFT JOIN formularios f ON f.id_usuario = ia.id_usuario AND f.id_actividad = ce.id_actividad
                   WHERE ia.id_usuario = :id_usuario AND e.id_evento = :id_evento";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id_usuario", $id_usuario);

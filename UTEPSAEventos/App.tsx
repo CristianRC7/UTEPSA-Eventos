@@ -13,6 +13,7 @@ import MyInscription from './src/pages/MyInscription';
 import MyFormsEvent from './src/pages/MyFormsEvent';
 import RegistrationPoints from './src/pages/RegistrationPoints';
 import MyCertificateScreen from './src/pages/MyCertificateScreen';
+import EventSurvey from './src/pages/EventSurvey';
 import { getSession } from './src/utils/sessionStorage';
 import BottomNavigator from './src/components/BottomNavigator';
 
@@ -100,6 +101,7 @@ function App(): React.JSX.Element {
           <Stack.Screen name="MyFormsEvent" component={MyFormsEvent} />
           <Stack.Screen name="RegistrationPoints" component={RegistrationPoints} />
           <Stack.Screen name="MyCertificateScreen" component={MyCertificateScreen} />
+          <Stack.Screen name="EventSurvey" component={EventSurvey} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
