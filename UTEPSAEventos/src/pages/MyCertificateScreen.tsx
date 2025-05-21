@@ -46,13 +46,23 @@ const MyCertificateScreen = ({ navigation }: any) => {
   }, []);
 
   const renderItem = ({ item }: { item: Certificado }) => (
-    <View style={styles.certCard}>
+    <TouchableOpacity
+      style={styles.certCard}
+      onPress={async () => {
+        const session = await getSession();
+        if (!session?.id_usuario) return;
+        const url = `${BASE_URL}/GetUserCertificates.php?download_certificado=${item.id_certificado}&id_usuario=${session.id_usuario}`;
+        // Abrir en navegador para descargar
+        // @ts-ignore
+        import('react-native').then(({ Linking }) => Linking.openURL(url));
+      }}
+    >
       <Icon name="picture-as-pdf" size={32} color="#D32F2F" style={{ marginRight: 16 }} />
       <View style={{ flex: 1 }}>
         <Text style={styles.eventName}>{item.nombre_evento}</Text>
         <Text style={styles.certNumber}>Nro: {item.nro_certificado}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
