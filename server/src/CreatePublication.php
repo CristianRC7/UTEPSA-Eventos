@@ -42,19 +42,65 @@ class Publication {
         // Guardar imágenes
         $img_urls = [];
         foreach ($imagenes as $img) {
-            if (!isset($img['tmp_name']) || !is_uploaded_file($img['tmp_name'])) continue;
+            // Log para depuración
+            error_log("Procesando imagen: " . print_r($img, true));
             $ext = pathinfo($img['name'], PATHINFO_EXTENSION);
             $file_name = uniqid('pub_', true) . "." . $ext;
             $dest_path = $this->img_dir . $file_name;
-            if (move_uploaded_file($img['tmp_name'], $dest_path)) {
-                $img_url = "publication_img/" . $file_name;
-                $img_urls[] = $img_url;
-                // Insertar en imagenes_publicacion
-                $query_img = "INSERT INTO {$this->table_imagen} (id_publicacion, imagen_url) VALUES (:id_publicacion, :imagen_url)";
-                $stmt_img = $this->conn->prepare($query_img);
-                $stmt_img->bindParam(":id_publicacion", $id_publicacion);
-                $stmt_img->bindParam(":imagen_url", $img_url);
-                $stmt_img->execute();
+
+            // Si tiene tmp_name y es un archivo subido
+            if (isset($img['tmp_name']) && is_uploaded_file($img['tmp_name'])) {
+                if (move_uploaded_file($img['tmp_name'], $dest_path)) {
+                    $img_url = "publication_img/" . $file_name;
+                    $img_urls[] = $img_url;
+                    // Insertar en imagenes_publicacion
+                    $query_img = "INSERT INTO {$this->table_imagen} (id_publicacion, imagen_url) VALUES (:id_publicacion, :imagen_url)";
+                    $stmt_img = $this->conn->prepare($query_img);
+                    $stmt_img->bindParam(":id_publicacion", $id_publicacion);
+                    $stmt_img->bindParam(":imagen_url", $img_url);
+                    $stmt_img->execute();
+                } else {
+                    error_log("No se pudo mover el archivo subido: " . $img['name']);
+                }
+            } else if (isset($img['tmp_name']) && file_exists($img['tmp_name'])) {
+                // Si tmp_name existe pero no es un archivo subido (caso raro)
+                if (copy($img['tmp_name'], $dest_path)) {
+                    $img_url = "publication_img/" . $file_name;
+                    $img_urls[] = $img_url;
+                    $query_img = "INSERT INTO {$this->table_imagen} (id_publicacion, imagen_url) VALUES (:id_publicacion, :imagen_url)";
+                    $stmt_img = $this->conn->prepare($query_img);
+                    $stmt_img->bindParam(":id_publicacion", $id_publicacion);
+                    $stmt_img->bindParam(":imagen_url", $img_url);
+                    $stmt_img->execute();
+                } else {
+                    error_log("No se pudo copiar el archivo: " . $img['name']);
+                }
+            } else if (isset($img['name']) && isset($img['type']) && isset($img['size'])) {
+                // Intentar obtener el contenido del archivo si no hay tmp_name
+                if (isset($img['content'])) {
+                    $file_content = $img['content'];
+                } else if (isset($img['data'])) {
+                    $file_content = $img['data'];
+                } else {
+                    $file_content = null;
+                }
+                if ($file_content) {
+                    if (file_put_contents($dest_path, $file_content)) {
+                        $img_url = "publication_img/" . $file_name;
+                        $img_urls[] = $img_url;
+                        $query_img = "INSERT INTO {$this->table_imagen} (id_publicacion, imagen_url) VALUES (:id_publicacion, :imagen_url)";
+                        $stmt_img = $this->conn->prepare($query_img);
+                        $stmt_img->bindParam(":id_publicacion", $id_publicacion);
+                        $stmt_img->bindParam(":imagen_url", $img_url);
+                        $stmt_img->execute();
+                    } else {
+                        error_log("No se pudo guardar el contenido de la imagen: " . $img['name']);
+                    }
+                } else {
+                    error_log("No se encontró contenido para la imagen: " . $img['name']);
+                }
+            } else {
+                error_log("Formato de imagen no soportado: " . print_r($img, true));
             }
         }
         return [ 'success' => true, 'message' => 'Publicación enviada correctamente.', 'imagenes' => $img_urls ];
