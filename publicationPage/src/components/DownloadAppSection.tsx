@@ -73,7 +73,7 @@ const DownloadAppSection: React.FC = () => (
             <h3 className="text-xl font-bold text-gray-900 mb-6">Descarga la aplicación</h3>
             <div className="space-y-4">
               <a
-                href="#"
+                href="https://play.google.com/store/apps/details?id=com.companyname.AppUtepsa"
                 target="_blank"
                 rel="noreferrer noopener"
                 className="inline-block transform hover:scale-105 transition-transform duration-200 cursor-pointer"
@@ -85,7 +85,7 @@ const DownloadAppSection: React.FC = () => (
                 />
               </a>
               <a
-                href="#"
+                href="https://apps.apple.com/bo/app/utepsa-app/id1490329250"
                 target="_blank"
                 rel="noreferrer noopener"
                 className="inline-block transform hover:scale-105 transition-transform duration-200 cursor-pointer"
