@@ -120,6 +120,7 @@ $imagenes = $_FILES['imagenes'] ?? null;
 $imagenes_array = [];
 if ($imagenes) {
     if (is_array($imagenes['name'])) {
+        // Si es un array de imágenes
         for ($i = 0; $i < count($imagenes['name']); $i++) {
             $imagenes_array[] = [
                 'name' => $imagenes['name'][$i],
@@ -130,7 +131,14 @@ if ($imagenes) {
             ];
         }
     } else {
-        $imagenes_array[] = $imagenes;
+        // Si es una sola imagen
+        $imagenes_array[] = [
+            'name' => $imagenes['name'],
+            'type' => $imagenes['type'],
+            'tmp_name' => $imagenes['tmp_name'],
+            'error' => $imagenes['error'],
+            'size' => $imagenes['size'],
+        ];
     }
 }
 

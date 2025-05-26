@@ -35,6 +35,7 @@ const MyPublication = () => {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [eventLoading, setEventLoading] = useState(false);
 
   const fetchPublications = useCallback(async () => {
     if (!refreshing) setLoading(true);
@@ -60,6 +61,7 @@ const MyPublication = () => {
   }, [fetchPublications]);
 
   const fetchEvents = async () => {
+    setEventLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/Events.php`);
       const data = await response.json();
@@ -71,6 +73,7 @@ const MyPublication = () => {
     } catch (error) {
       setEventList([]);
     }
+    setEventLoading(false);
   };
 
   const handleEdit = (pub: any) => {
@@ -218,6 +221,7 @@ const MyPublication = () => {
           onClose={()=>setShowEventSelector(false)}
           title="Selecciona un evento"
           height={400}
+          loading={eventLoading}
         >
           <FlatList
             data={eventList}
@@ -225,9 +229,8 @@ const MyPublication = () => {
             renderItem={({item})=>(
               <TouchableOpacity
                 style={[
-                  styles.eventItem,
-                  editEventId===item.id_evento && styles.eventItemSelected,
-                  {backgroundColor: editEventId===item.id_evento ? '#000' : '#FFF'}
+                  styles.filterOption,
+                  editEventId===item.id_evento && styles.selectedFilterOption
                 ]}
                 onPress={()=>{
                   setEditEventId(item.id_evento);
@@ -235,11 +238,10 @@ const MyPublication = () => {
                   setShowEventSelector(false);
                 }}
               >
-                <Icon name="event" size={20} color={editEventId===item.id_evento?"#FFF":"#555"} style={styles.eventIcon}/>
+                <Icon name="event" size={20} color={editEventId===item.id_evento?"#FFF":"#111"} style={styles.eventIcon}/>
                 <Text style={[
-                  styles.eventText,
-                  editEventId===item.id_evento && styles.eventTextSelected,
-                  {color: editEventId===item.id_evento ? '#FFF' : '#333'}
+                  styles.filterText,
+                  editEventId===item.id_evento && styles.selectedFilterText
                 ]}>{item.titulo}</Text>
                 {editEventId===item.id_evento && <Icon name="check" size={20} color="#FFF" style={styles.checkIcon}/>} 
               </TouchableOpacity>
@@ -255,11 +257,11 @@ const MyPublication = () => {
             <Text style={styles.modalTitle}>¿Eliminar publicación?</Text>
             <Text style={{color:'#666', marginBottom:20}}>Esta acción eliminará la publicación, sus imágenes y sus likes. ¿Estás seguro?</Text>
             <View style={{flexDirection:'row', justifyContent:'flex-end'}}>
-              <TouchableOpacity style={[styles.deleteBtn, {marginRight:8}]} onPress={()=>handleDelete(deletingId!)} disabled={actionLoading}>
-                {actionLoading ? <ActivityIndicator color="#FFF" size="small" /> : <Text style={styles.deleteBtnText}>Eliminar</Text>}
+              <TouchableOpacity style={[styles.deleteBtnConfirm, {marginRight:8}]} onPress={()=>handleDelete(deletingId!)} disabled={actionLoading}>
+                {actionLoading ? <ActivityIndicator color="#FFF" size="small" /> : <Text style={styles.deleteBtnConfirmText}>Eliminar</Text>}
               </TouchableOpacity>
-              <TouchableOpacity style={styles.deleteBtn} onPress={()=>setDeletingId(null)}>
-                <Text style={styles.deleteBtnText}>Cancelar</Text>
+              <TouchableOpacity style={styles.cancelBtn} onPress={()=>setDeletingId(null)}>
+                <Text style={styles.cancelBtnText}>Cancelar</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -271,28 +273,28 @@ const MyPublication = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#EFEFEF' },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#EFEFEF', backgroundColor: '#FFF' },
   backButton: { padding: 8 },
-  headerTitle: { fontSize: 18, fontWeight: '600', color: '#333' },
+  headerTitle: { fontSize: 18, fontWeight: '600', color: '#111' },
   rightPlaceholder: { width: 40 },
   card: { backgroundColor: '#FFF', borderRadius: 12, marginBottom: 16, borderWidth: 1, borderColor: '#EFEFEF', padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   cardTitle: { fontSize: 16, fontWeight: '700', color: '#333' },
   imgPreviewBox: { alignItems: 'center', marginRight: 12 },
-  imgPreview: { width: 60, height: 60, borderRadius: 8, backgroundColor: '#F0EAFF', alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
-  imgLabel: { fontSize: 12, color: '#666' },
+  imgPreview: { width: 60, height: 60, borderRadius: 8, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
+  imgLabel: { fontSize: 12, color: '#999' },
   cardDesc: { fontSize: 14, color: '#666', marginBottom: 8 },
   cardDate: { fontSize: 12, color: '#999', marginBottom: 8 },
   cardActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  editBtnBlack: { backgroundColor: '#000', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center' },
+  editBtnBlack: { backgroundColor: '#111', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center' },
   editBtnText: { color: '#FFF', fontWeight: '600', marginLeft: 4 },
-  deleteBtn: { backgroundColor: '#F44336', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center' },
+  deleteBtn: { backgroundColor: '#cf152d', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center' },
   deleteBtnText: { color: '#FFF', fontWeight: '600', marginLeft: 4 },
   likesBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F5F5F5', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
-  likesText: { color: '#F44336', fontWeight: '700', marginLeft: 4 },
+  likesText: { color: '#cf152d', fontWeight: '700', marginLeft: 4 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalContent: { backgroundColor: '#FFF', borderRadius: 16, padding: 20, width: '85%', maxWidth: 400 },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: '#333', marginBottom: 16 },
+  modalTitle: { fontSize: 18, fontWeight: '700', color: '#cf152d', marginBottom: 16 },
   selectContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 8, paddingHorizontal: 12, marginBottom: 16, backgroundColor: '#F5F5F5', height: 48 },
   selectText: { flex: 1, fontSize: 16, color: '#333' },
   selectPlaceholder: { color: '#999' },
@@ -307,6 +309,30 @@ const styles = StyleSheet.create({
   checkIcon: { marginLeft: 8 },
   eventsList: { padding: 16 },
   imgReal: { width: 60, height: 60, borderRadius: 8, backgroundColor: '#EEE' },
+  filterOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  selectedFilterOption: {
+    backgroundColor: '#cf152d',
+  },
+  filterText: {
+    fontSize: 16,
+    color: '#111',
+    marginLeft: 12,
+  },
+  selectedFilterText: {
+    color: '#FFF',
+    fontWeight: '500',
+  },
+  deleteBtnConfirm: { backgroundColor: '#cf152d', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center' },
+  deleteBtnConfirmText: { color: '#FFF', fontWeight: '600', marginLeft: 4 },
+  cancelBtn: { backgroundColor: '#FFF', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 16, borderWidth: 1, borderColor: '#cf152d', flexDirection: 'row', alignItems: 'center' },
+  cancelBtnText: { color: '#cf152d', fontWeight: '600', marginLeft: 4 },
 });
 
 export default MyPublication;

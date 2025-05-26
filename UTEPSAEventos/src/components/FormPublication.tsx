@@ -12,11 +12,12 @@ import {
   Alert,
   ActivityIndicator,
   FlatList,
+  PermissionsAndroid,
+  Linking,
 } from "react-native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import { useNavigation } from "@react-navigation/native"
 import ImagePicker from "react-native-image-crop-picker"
-import { PermissionsAndroid } from "react-native"
 import { getSession } from "../utils/sessionStorage"
 import { BASE_URL } from "../utils/Config"
 import BottomSheet from "./BottomSheet"
@@ -33,6 +34,7 @@ const FormPublication = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [showEventSelector, setShowEventSelector] = useState(false)
   const [eventList, setEventList] = useState<any[]>([])
+  const [eventLoading, setEventLoading] = useState(false);
 
   useEffect(() => {
     if (showEventSelector) {
@@ -41,6 +43,7 @@ const FormPublication = () => {
   }, [showEventSelector])
 
   const fetchEvents = async () => {
+    setEventLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/Events.php`)
       const data = await response.json()
@@ -52,43 +55,95 @@ const FormPublication = () => {
     } catch (error) {
       setEventList([])
     }
+    setEventLoading(false);
   }
 
-  // Request permission for accessing gallery on Android
+  // Solicitar permiso para galería en Android
   const requestGalleryPermission = async () => {
     if (Platform.OS === "android") {
       try {
-        const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES, {
-          title: "Permiso para acceder a la galería",
-          message: "Necesitamos acceso a tu galería para que puedas seleccionar fotos.",
-          buttonNeutral: "Preguntar después",
-          buttonNegative: "Cancelar",
-          buttonPositive: "Aceptar",
-        })
-        return granted === PermissionsAndroid.RESULTS.GRANTED
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+          {
+            title: "Permiso para acceder a la galería",
+            message: "Necesitamos acceso a tu galería para que puedas seleccionar fotos.",
+            buttonNeutral: "Preguntar después",
+            buttonNegative: "Cancelar",
+            buttonPositive: "Aceptar",
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          return true;
+        } else if (
+          granted === PermissionsAndroid.RESULTS.DENIED ||
+          granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+        ) {
+          Alert.alert(
+            "Permiso denegado",
+            "No podemos acceder a tu galería. Por favor, habilita el permiso en la configuración.",
+            [
+              { text: "Cancelar", style: "cancel" },
+              { text: "Ir a ajustes", onPress: () => Linking.openSettings() }
+            ]
+          );
+        }
+        return false;
       } catch (err) {
-        console.warn(err)
-        return false
+        console.warn(err);
+        return false;
       }
     }
-    return true // iOS will handle permissions differently
-  }
+    return true; // iOS maneja permisos diferente
+  };
 
-  // Select images from gallery
+  // Solicitar permiso para cámara en Android
+  const requestCameraPermission = async () => {
+    if (Platform.OS === "android") {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: "Permiso para usar la cámara",
+            message: "Necesitamos acceso a tu cámara para tomar fotos.",
+            buttonNeutral: "Preguntar después",
+            buttonNegative: "Cancelar",
+            buttonPositive: "Aceptar",
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          return true;
+        } else if (
+          granted === PermissionsAndroid.RESULTS.DENIED ||
+          granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+        ) {
+          Alert.alert(
+            "Permiso denegado",
+            "No podemos acceder a tu cámara. Por favor, habilita el permiso en la configuración.",
+            [
+              { text: "Cancelar", style: "cancel" },
+              { text: "Ir a ajustes", onPress: () => Linking.openSettings() }
+            ]
+          );
+        }
+        return false;
+      } catch (err) {
+        console.warn(err);
+        return false;
+      }
+    }
+    return true; // iOS maneja permisos diferente
+  };
+
+  // Seleccionar imágenes de la galería
   const selectFromGallery = async () => {
     if (selectedImages.length >= MAX_IMAGES) {
-      Alert.alert("Límite alcanzado", `Solo puedes seleccionar hasta ${MAX_IMAGES} imágenes.`)
-      return
+      Alert.alert("Límite alcanzado", `Solo puedes seleccionar hasta ${MAX_IMAGES} imágenes.`);
+      return;
     }
 
-    const hasPermission = await requestGalleryPermission()
+    const hasPermission = await requestGalleryPermission();
     if (!hasPermission) {
-      Alert.alert(
-        "Permiso denegado",
-        "No podemos acceder a tu galería. Por favor, habilita el permiso en la configuración.",
-        [{ text: "Entendido" }],
-      )
-      return
+      return;
     }
 
     try {
@@ -127,11 +182,16 @@ const FormPublication = () => {
     }
   }
 
-  // Take a photo using camera
+  // Tomar una foto usando la cámara
   const takePhoto = async () => {
     if (selectedImages.length >= MAX_IMAGES) {
-      Alert.alert("Límite alcanzado", `Solo puedes seleccionar hasta ${MAX_IMAGES} imágenes.`)
-      return
+      Alert.alert("Límite alcanzado", `Solo puedes seleccionar hasta ${MAX_IMAGES} imágenes.`);
+      return;
+    }
+
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission) {
+      return;
     }
 
     try {
@@ -348,6 +408,7 @@ const FormPublication = () => {
         onClose={() => setShowEventSelector(false)}
         title="Selecciona un evento"
         height={400}
+        loading={eventLoading}
       >
         <FlatList
           data={eventList}
@@ -355,22 +416,20 @@ const FormPublication = () => {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[
-                styles.eventItem,
-                selectedEventId === item.id_evento && styles.eventItemSelected,
-                { backgroundColor: selectedEventId === item.id_evento ? '#000' : '#FFF' }
+                styles.filterOption,
+                selectedEventId === item.id_evento && styles.selectedFilterOption
               ]}
               onPress={() => handleSelectEvent(item.id_evento, item.titulo)}
             >
               <Icon
                 name="event"
                 size={20}
-                color={selectedEventId === item.id_evento ? "#FFF" : "#555"}
+                color={selectedEventId === item.id_evento ? "#FFF" : "#111"}
                 style={styles.eventIcon}
               />
               <Text style={[
-                styles.eventText,
-                selectedEventId === item.id_evento && styles.eventTextSelected,
-                { color: selectedEventId === item.id_evento ? '#FFF' : '#333' }
+                styles.filterText,
+                selectedEventId === item.id_evento && styles.selectedFilterText
               ]}>
                 {item.titulo}
               </Text>
@@ -568,7 +627,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   submitButton: {
-    backgroundColor: "#333",
+    backgroundColor: "#cf152d",
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: "center",
@@ -614,28 +673,28 @@ const styles = StyleSheet.create({
   eventsList: {
     padding: 16,
   },
-  eventItem: {
-    flexDirection: "row",
-    alignItems: "center",
+  filterOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
     marginBottom: 8,
-    backgroundColor: "#F5F5F5",
   },
-  eventItemSelected: {
-    backgroundColor: "#333",
+  selectedFilterOption: {
+    backgroundColor: '#cf152d',
+  },
+  filterText: {
+    fontSize: 16,
+    color: '#111',
+    marginLeft: 12,
+  },
+  selectedFilterText: {
+    color: '#FFF',
+    fontWeight: '500',
   },
   eventIcon: {
     marginRight: 12,
-  },
-  eventText: {
-    flex: 1,
-    fontSize: 16,
-    color: "#333",
-  },
-  eventTextSelected: {
-    color: "#FFFFFF",
   },
   checkIcon: {
     marginLeft: 8,
@@ -643,4 +702,3 @@ const styles = StyleSheet.create({
 })
 
 export default FormPublication;
-

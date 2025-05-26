@@ -1,5 +1,5 @@
 import React, { ReactNode, useRef, useEffect } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, TouchableWithoutFeedback } from 'react-native';
+import { Modal, View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 
 interface BottomSheetProps {
   visible: boolean;
@@ -7,11 +7,12 @@ interface BottomSheetProps {
   title?: string;
   children: ReactNode;
   height?: number; // Altura opcional
+  loading?: boolean; // Nuevo: estado de carga opcional
 }
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-const BottomSheet: React.FC<BottomSheetProps> = ({ visible, onClose, title, children, height = 350 }) => {
+const BottomSheet: React.FC<BottomSheetProps> = ({ visible, onClose, title, children, height = 350, loading = false }) => {
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const [modalVisible, setModalVisible] = React.useState(visible);
 
@@ -55,7 +56,15 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ visible, onClose, title, chil
             <Text style={styles.closeText}>✕</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.content}>{children}</View>
+        <View style={styles.content}>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#cf152d" />
+            </View>
+          ) : (
+            children
+          )}
+        </View>
       </Animated.View>
     </Modal>
   );
@@ -64,7 +73,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ visible, onClose, title, chil
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.4)', 
     position: 'absolute',
     width: '100%',
     height: '100%',
@@ -83,6 +92,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
+    borderTopWidth: 3,
+    borderTopColor: '#cf152d',
   },
   header: {
     flexDirection: 'row',
@@ -92,23 +103,33 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: '#E5E7EB',
+    backgroundColor: '#FFF',
   },
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#111',
   },
   closeBtn: {
     padding: 4,
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
   },
   closeText: {
     fontSize: 22,
-    color: '#888',
+    color: '#cf152d',
+    fontWeight: 'bold',
   },
   content: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#FFF',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

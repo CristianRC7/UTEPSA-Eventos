@@ -16,6 +16,8 @@ import MyCertificateScreen from './src/pages/MyCertificateScreen';
 import EventSurvey from './src/pages/EventSurvey';
 import { getSession } from './src/utils/sessionStorage';
 import BottomNavigator from './src/components/BottomNavigator';
+import SplashScreen from './src/pages/SplashScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Global function for handling back button press
 const handleBackPress = () => {
@@ -40,10 +42,17 @@ const Stack = createNativeStackNavigator();
 function App(): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [userSession, setUserSession] = useState<any>(null);
+  const [showSplash, setShowSplash] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Check for existing session
+    // Check for existing session and splash
     const checkSession = async () => {
+      try {
+        const splash = await AsyncStorage.getItem('splash_shown');
+        setShowSplash(!splash);
+      } catch (e) {
+        setShowSplash(true);
+      }
       const session = await getSession();
       if (session) {
         setUserSession(session);
@@ -59,7 +68,7 @@ function App(): React.JSX.Element {
     return () => backHandler.remove();
   }, []);
 
-  if (isLoading) {
+  if (isLoading || showSplash === null) {
     return (
       <SafeAreaProvider>
         <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
@@ -67,12 +76,12 @@ function App(): React.JSX.Element {
     );
   }
 
- return (
+  return (
     <SafeAreaProvider>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName={userSession ? "Home" : "Login"}
+          initialRouteName={showSplash ? "Splash" : (userSession ? "Home" : "Login")}
           screenOptions={{
             headerShown: false,
             contentStyle: {
@@ -81,6 +90,7 @@ function App(): React.JSX.Element {
             animation: 'fade_from_bottom',
           }}
         >
+          <Stack.Screen name="Splash" component={SplashScreen} options={{ gestureEnabled: false }} />
           <Stack.Screen
             name="Login"
             component={Login}

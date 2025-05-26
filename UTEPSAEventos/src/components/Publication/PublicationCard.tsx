@@ -79,14 +79,22 @@ const PublicationCard = ({ publication, onShare }: PublicationCardProps) => {
 
   const handleShare = async () => {
     try {
+      // Construir la URL de la página de compartido
+      const params = new URLSearchParams({
+        images: (publication.imageUrls || [publication.imageUrl]).join(','),
+        user: publication.userName,
+        event: publication.eventName,
+        desc: publication.publicationDescription || ''
+      });
+      const shareUrl = `https://utepsa-eventos.vercel.app/sharedPublication?${params.toString()}`;
       await Share.open({
-        title: "Compartir evento",
-        message: `¡Mira este evento: ${publication.eventName}!`,
-        url: publication.imageUrl,
-      })
-      onShare()
+        title: "Compartir publicación",
+        message: `¡Mira esta publicación del evento: ${publication.eventName}!`,
+        url: shareUrl,
+      });
+      onShare();
     } catch (error) {
-      console.log("Error al compartir:", error)
+      console.log("Error al compartir:", error);
     }
   }
 

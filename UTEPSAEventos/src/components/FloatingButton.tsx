@@ -23,9 +23,9 @@ interface FloatingButtonProps {
 const FloatingButton = ({
   onPress,
   iconName = 'add',
-  backgroundColor = '#000',
+  backgroundColor = '#cf152d',
   size = 60,
-  iconColor = '#FFFFFF',
+  iconColor = '#fff',
   iconSize = 30,
 }: FloatingButtonProps) => {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -105,7 +105,7 @@ const FloatingButton = ({
                 style={styles.menuItem}
                 onPress={handlePublishPhotos}
               >
-                <Icon name="photo-camera" size={24} color="#333" />
+                <Icon name="photo-camera" size={24} color="#cf152d" />
                 <Text style={styles.menuText}>Publicar Fotos</Text>
               </TouchableOpacity>
               
@@ -115,7 +115,7 @@ const FloatingButton = ({
                 style={styles.menuItem}
                 onPress={handleMyPublications}
               >
-                <Icon name="photo-library" size={24} color="#333" />
+                <Icon name="photo-library" size={24} color="#cf152d" />
                 <Text style={styles.menuText}>Mis Publicaciones</Text>
               </TouchableOpacity>
             </View>
@@ -130,11 +130,6 @@ const styles = StyleSheet.create({
   button: {
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    elevation: 6,
   },
   modalOverlay: {
     flex: 1,
@@ -149,27 +144,25 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 8,
     minWidth: 200,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    borderWidth: 1.5,
+    borderColor: '#cf152d',
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 14,
     borderRadius: 8,
+    backgroundColor: '#fff',
   },
   menuText: {
     marginLeft: 12,
     fontSize: 16,
-    color: '#333',
+    color: '#000',
     fontWeight: '500',
   },
   menuDivider: {
-    height: 1,
-    backgroundColor: '#EFEFEF',
+    height: 2,
+    backgroundColor: '#cf152d22',
     marginHorizontal: 8,
   },
 });

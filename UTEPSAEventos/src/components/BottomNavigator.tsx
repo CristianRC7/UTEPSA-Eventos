@@ -13,17 +13,17 @@ interface BottomNavigatorProps {
 }
 
 // Main TabNavigator Component
-const BottomNavigator: React.FC<BottomNavigatorProps> = ({ route, navigation }) => {
+const BottomNavigator: React.FC<BottomNavigatorProps> = ({ route, navigation: _navigation }) => {
   const { userData } = route.params || {}
 
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
+        tabBarIcon: ({ focused: _focused, color, size }) => {
           let iconName = ""
 
           if (route.name === "Inicio") {
-            iconName = "event" 
+            iconName = "home" 
           } else if (route.name === "Publicaciones") {
             iconName = "article" 
           } else if (route.name === "Perfil") {
@@ -32,7 +32,7 @@ const BottomNavigator: React.FC<BottomNavigatorProps> = ({ route, navigation }) 
 
           return <Icon name={iconName} size={size} color={color} />
         },
-        tabBarActiveTintColor: "#000",
+        tabBarActiveTintColor: "#cf152d",
         tabBarInactiveTintColor: "#999",
         tabBarStyle: {
           paddingVertical: 5,
@@ -55,5 +55,4 @@ const BottomNavigator: React.FC<BottomNavigatorProps> = ({ route, navigation }) 
   )
 }
 
-export default BottomNavigator
-
+export default BottomNavigator;

@@ -77,8 +77,8 @@ const PublicationScreen = () => {
     setRefreshing(false);
   };
 
-  const handleShare = (id: number) => {
-    Alert.alert('Compartir', `Has compartido la publicación ${id}`);
+  const handleShare = (userName: string) => {
+    Alert.alert('Compartir', `Has compartido la publicación de: ${userName}`);
   };
 
   const applyFilter = (data: any[], option: string) => {
@@ -104,7 +104,7 @@ const PublicationScreen = () => {
   const renderItem = ({ item }: any) => (
     <PublicationCard
       publication={item}
-      onShare={() => handleShare(item.id)}
+      onShare={() => handleShare(item.userName)}
     />
   );
 
@@ -193,13 +193,13 @@ const PublicationScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF',
   },
   loadingText: {
     marginTop: 16,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF',
   },
   headerTop: {
     flexDirection: 'row',
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#333',
+    color: '#cf152d',
   },
   filterButton: {
     padding: 8,
@@ -231,7 +231,8 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
   },
   filterButtonActive: {
-    backgroundColor: '#000',
+    backgroundColor: '#cf152d',
+    borderColor: '#cf152d',
   },
   headerSubtitle: {
     fontSize: 16,
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#cf152d',
     marginBottom: 8,
     textAlign: 'center',
   },
@@ -279,11 +280,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   selectedFilterOption: {
-    backgroundColor: '#000',
+    backgroundColor: '#cf152d',
   },
   filterText: {
     fontSize: 16,
-    color: '#000',
+    color: '#111',
     marginLeft: 12,
   },
   selectedFilterText: {

@@ -7,16 +7,15 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
-  Animated,
-  Dimensions,
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { saveSession, getSession } from '../utils/sessionStorage';
 import { BASE_URL } from '../utils/Config';
-
-const { width } = Dimensions.get('window');
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { Animated as RNAnimated } from 'react-native';
 
 const Login = ({ navigation }: any) => {
   const [username, setUsername] = useState('');
@@ -26,11 +25,11 @@ const Login = ({ navigation }: any) => {
   const [showPassword, setShowPassword] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
 
-  // Animations
-  const fadeAnim = useState(new Animated.Value(0))[0];
-  const moveAnim = useState(new Animated.Value(50))[0];
-  const scaleAnim = useState(new Animated.Value(0.9))[0];
-  const buttonAnim = useState(new Animated.Value(0))[0];
+  // Animación solo para el botón (usando Animated de react-native)
+  const buttonAnim = useState(new RNAnimated.Value(0))[0];
+
+  // Animación de entrada para todo el contenido
+  const formAnim = useSharedValue(0);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -48,25 +47,6 @@ const Login = ({ navigation }: any) => {
 
     checkForExistingSession();
 
-    // Start animations when component mounts
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(moveAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
     // Keyboard listeners
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -81,21 +61,23 @@ const Login = ({ navigation }: any) => {
       }
     );
 
+    formAnim.value = withTiming(1, { duration: 900 });
+
     return () => {
       keyboardDidShowListener.remove();
       keyboardDidHideListener.remove();
     };
-  }, [fadeAnim, moveAnim, navigation, scaleAnim]);
+  }, [navigation, formAnim]);
 
   // Button animation on press
   const animateButton = () => {
-    Animated.sequence([
-      Animated.timing(buttonAnim, {
+    RNAnimated.sequence([
+      RNAnimated.timing(buttonAnim, {
         toValue: 1,
         duration: 150,
         useNativeDriver: true,
       }),
-      Animated.timing(buttonAnim, {
+      RNAnimated.timing(buttonAnim, {
         toValue: 0,
         duration: 150,
         useNativeDriver: true,
@@ -158,15 +140,22 @@ const Login = ({ navigation }: any) => {
     );
   };
 
-  const titleScale = scaleAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.8, 1],
-  });
+  const handleResetSplash = async () => {
+    await AsyncStorage.removeItem('splash_shown');
+    await AsyncStorage.removeItem('userSession'); // si tu sesión se guarda así
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Splash' }],
+    });
+  };
 
-  const buttonScale = buttonAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 0.95],
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: formAnim.value,
+    transform: [
+      { translateY: (1 - formAnim.value) * 30 },
+      { scale: formAnim.value ? 1 : 0.95 },
+    ],
+  }));
 
   if (checkingSession) {
     return (
@@ -177,31 +166,22 @@ const Login = ({ navigation }: any) => {
     );
   }
 
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Animated.View
-          style={[
-            styles.formContainer,
-            {
-              opacity: fadeAnim,
-              transform: [
-                { translateY: moveAnim },
-                { scale: scaleAnim }
-              ]
-            }
-          ]}
-        >
-          <Animated.View style={{ 
-            transform: [{ scale: titleScale }],
+        {/* Botón de desarrollo para resetear splash */}
+        <TouchableOpacity onPress={handleResetSplash} style={{ marginBottom: 10, alignSelf: 'flex-end', backgroundColor: '#eee', padding: 8, borderRadius: 8 }}>
+          <Text style={{ color: '#cf152d', fontWeight: 'bold' }}>Reset Splash (DEV)</Text>
+        </TouchableOpacity>
+        <Animated.View style={[styles.formContainer, animatedStyle]}>
+          <View style={{ 
             marginBottom: 40,
             alignItems: 'center',
           }}>
-            <Text style={styles.chip}>UTEPSA</Text>
-            <Text style={styles.title}>Eventos</Text>
+            <Animated.Text style={[styles.utepsaTitle, animatedStyle]}>UTEPSA</Animated.Text>
+            <Animated.Text style={[styles.eventosTitle, animatedStyle]}>Eventos</Animated.Text>
             <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
-          </Animated.View>
+          </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Usuario</Text>
@@ -251,7 +231,6 @@ const Login = ({ navigation }: any) => {
             <Animated.View 
               style={[
                 styles.loginButton,
-                { transform: [{ scale: buttonScale }] }
               ]}
             >
               {loading ? (
@@ -286,24 +265,29 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     padding: 20,
   },
-  chip: {
-    alignSelf: 'center',
-    backgroundColor: '#f0f0f3',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 25,
-    marginBottom: 8,
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#333',
+  utepsaTitle: {
+    fontSize: 44,
+    fontWeight: '900',
+    color: '#cf152d',
+    letterSpacing: 2,
+    textShadowColor: '#00000022',
+    textShadowOffset: { width: 1, height: 2 },
+    textShadowRadius: 4,
+    textAlign: 'center',
   },
-  title: {
-    fontSize: 36,
+  eventosTitle: {
+    fontSize: 28,
     fontWeight: '700',
     color: '#000',
     marginBottom: 8,
     letterSpacing: -0.5,
     textAlign: 'center',
+  },
+  chip: {
+    display: 'none',
+  },
+  title: {
+    display: 'none',
   },
   subtitle: {
     fontSize: 16,
@@ -345,26 +329,33 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   loginButton: {
-    backgroundColor: '#000',
+    backgroundColor: '#cf152d',
     height: 55,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
+    shadowColor: '#cf152d',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   loginButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     letterSpacing: 0.3,
+    textTransform: 'uppercase',
   },
   forgotPasswordContainer: {
     marginTop: 20,
     alignItems: 'center',
   },
   forgotPasswordText: {
-    color: '#666',
+    color: '#cf152d',
     fontSize: 14,
+    fontWeight: '600',
   },
 });
 

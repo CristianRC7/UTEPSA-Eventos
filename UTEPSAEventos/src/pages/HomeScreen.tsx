@@ -133,7 +133,7 @@ const HomeScreen = ({ route }: any) => {
         }
       ]}>
         <Text style={styles.headerTitle}>Bienvenido</Text>
-        <Text style={styles.headerSubtitle}>
+        <Text style={styles.headerUserName}>
           {userData?.nombre} {userData?.apellidos}
         </Text>
       </Animated.View>
@@ -213,9 +213,15 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     letterSpacing: -0.5,
   },
+  headerUserName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#cf152d',
+    marginBottom: 4,
+    letterSpacing: 0.2,
+  },
   headerSubtitle: {
-    fontSize: 16,
-    color: '#666',
+    display: 'none', // Oculto el anterior
   },
   searchContainer: {
     flexDirection: 'row',
@@ -224,31 +230,34 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 50,
-    borderWidth: 1,
-    borderColor: '#E1E1E1',
+    borderWidth: 1.5,
+    borderColor: '#cf152d',
     borderRadius: 12,
     paddingHorizontal: 15,
     fontSize: 16,
-    backgroundColor: '#F9F9F9',
+    backgroundColor: '#fff',
     color: '#000',
     marginRight: 10,
   },
   searchButton: {
-    backgroundColor: '#000',
+    backgroundColor: '#cf152d',
     height: 50,
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 0,
   },
   searchButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#000',
     marginBottom: 15,
     letterSpacing: -0.3,
@@ -268,7 +277,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#333',
     marginBottom: 8,
     textAlign: 'center',

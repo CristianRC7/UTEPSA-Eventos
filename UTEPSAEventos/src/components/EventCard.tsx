@@ -39,22 +39,25 @@ const EventCard = ({ event, onPress, formatDate }: EventCardProps) => {
 
 const styles = StyleSheet.create({
   eventCard: {
-    backgroundColor: '#F9F9F9',
+    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 20,
     marginBottom: 15,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: '#EFEFEF',
+    borderLeftWidth: 8,
+    borderLeftColor: '#cf152d',
   },
   eventTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: 19,
+    fontWeight: '800',
+    color: '#000',
     marginBottom: 8,
+    letterSpacing: 0.2,
   },
   eventDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#333',
     lineHeight: 22,
     marginBottom: 10,
   },
@@ -64,13 +67,14 @@ const styles = StyleSheet.create({
   },
   eventDateLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '700',
+    color: '#cf152d',
     marginRight: 5,
   },
   eventDate: {
     fontSize: 14,
-    color: '#666',
+    color: '#000',
+    fontWeight: '500',
   },
 });
 
