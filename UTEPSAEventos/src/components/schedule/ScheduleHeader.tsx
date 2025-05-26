@@ -11,7 +11,7 @@ const ScheduleHeader: React.FC<ScheduleHeaderProps> = ({ title, onBack }) => {
   return (
     <View style={styles.header}>
       <TouchableOpacity style={styles.backButton} onPress={onBack}>
-        <Icon name="arrow-back" size={24} color="#000" />
+        <Icon name="arrow-back" size={24} color="#fff" />
       </TouchableOpacity>
       <Text style={styles.headerTitle}>{title}</Text>
       <View style={styles.placeholder} />
@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
+    backgroundColor: '#cf152d',
   },
   backButton: {
     padding: 8,
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#000',
+    color: '#fff',
   },
   placeholder: {
     width: 24,

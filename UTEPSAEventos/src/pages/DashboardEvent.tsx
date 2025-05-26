@@ -85,13 +85,13 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={handleBack}
         >
-          <Icon name="arrow-back" size={24} color="#000" />
+          <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalles del Evento</Text>
         <View style={{ width: 24 }} />
@@ -167,6 +167,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
+    backgroundColor: '#cf152d',
   },
   backButton: {
     padding: 8,
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#000',
+    color: '#fff',
   },
   contentContainer: {
     padding: 20,

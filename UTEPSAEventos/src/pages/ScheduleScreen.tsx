@@ -109,7 +109,7 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
       <ScheduleHeader title="Cronograma" onBack={handleBack} />
 
       {loading ? (

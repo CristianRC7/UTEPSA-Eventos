@@ -10,11 +10,13 @@ import {
   FlatList,
   Alert,
   RefreshControl,
+  StatusBar,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { BASE_URL } from '../utils/Config';
 import EventCard from '../components/EventCard';
 import LoadingPulseCardAnimation from '../components/LoadingPulseCardAnimation';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Home Tab Screen Component
 const HomeScreen = ({ route }: any) => {
@@ -125,41 +127,43 @@ const HomeScreen = ({ route }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
       <Animated.View style={[
         styles.headerSection,
         {
           opacity: fadeAnim,
-          transform: [{ translateY: moveAnim }]
-        }
+          transform: [{ translateY: moveAnim }],
+        },
       ]}>
         <Text style={styles.headerTitle}>Bienvenido</Text>
         <Text style={styles.headerUserName}>
           {userData?.nombre} {userData?.apellidos}
         </Text>
+        <View style={styles.searchWrapper}>
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Buscar eventos..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              onSubmitEditing={handleSearch}
+              returnKeyType="search"
+              placeholderTextColor="#888"
+            />
+            <TouchableOpacity style={styles.searchIconContainer} onPress={handleSearch}>
+              <Icon name="search" size={26} color="#cf152d" />
+            </TouchableOpacity>
+          </View>
+        </View>
       </Animated.View>
 
-      <Animated.View style={{
-        opacity: fadeAnim,
-        transform: [{ translateY: moveAnim }],
-        paddingHorizontal: 20,
-      }}>
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar eventos..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            onSubmitEditing={handleSearch}
-            returnKeyType="search"
-            placeholderTextColor="#888"
-          />
-          <TouchableOpacity 
-            style={styles.searchButton}
-            onPress={handleSearch}
-          >
-            <Text style={styles.searchButtonText}>Buscar</Text>
-          </TouchableOpacity>
-        </View>
+      <Animated.View
+        style={{
+          opacity: fadeAnim,
+          transform: [{ translateY: moveAnim }],
+          paddingHorizontal: 20,
+        }}
+      >
         <Text style={styles.sectionTitle}>Próximos Eventos</Text>
       </Animated.View>
 
@@ -171,7 +175,7 @@ const HomeScreen = ({ route }: any) => {
         <FlatList
           data={events}
           renderItem={({ item }) => (
-            <EventCard 
+            <EventCard
               event={item}
               onPress={handleEventPress}
               formatDate={formatDate}
@@ -196,84 +200,87 @@ const HomeScreen = ({ route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#fff',
   },
   headerSection: {
-    padding: 20,
-    paddingBottom: 10,
-  },
-  listContentContainer: {
+    paddingTop: 16,
+    paddingBottom: 32,
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    backgroundColor: '#cf152d',
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    marginBottom: 18,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
   },
   headerTitle: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#000',
-    marginBottom: 8,
+    color: '#fff',
+    marginBottom: 4,
     letterSpacing: -0.5,
   },
   headerUserName: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#cf152d',
-    marginBottom: 4,
+    color: '#fff',
     letterSpacing: 0.2,
+    marginBottom: 12,
   },
-  headerSubtitle: {
-    display: 'none', // Oculto el anterior
+  searchWrapper: {
+    paddingTop: 6,
+    paddingBottom: 2,
   },
   searchContainer: {
     flexDirection: 'row',
-    marginVertical: 20,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: '#e0e0e0',
+    paddingHorizontal: 10,
+    height: 52,
+    marginBottom: 0,
+    marginTop: 0,
   },
   searchInput: {
     flex: 1,
-    height: 50,
-    borderWidth: 1.5,
-    borderColor: '#cf152d',
-    borderRadius: 12,
-    paddingHorizontal: 15,
     fontSize: 16,
-    backgroundColor: '#fff',
     color: '#000',
-    marginRight: 10,
+    backgroundColor: 'transparent',
+    paddingVertical: 0,
+    paddingHorizontal: 8,
   },
-  searchButton: {
-    backgroundColor: '#cf152d',
-    height: 50,
-    paddingHorizontal: 20,
-    borderRadius: 12,
+  searchIconContainer: {
+    padding: 6,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 0,
-  },
-  searchButtonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
     color: '#000',
-    marginBottom: 15,
+    marginBottom: 18,
     letterSpacing: -0.3,
+    marginTop: 0,
   },
-  eventsList: {
-    marginBottom: 20,
+  listContentContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+    paddingTop: 10,
   },
   emptyContainer: {
-    padding: 20,
+    padding: 24,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#F9F9F9',
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#EFEFEF',
-    marginTop: 20,
+    marginTop: 30,
   },
   emptyText: {
     fontSize: 18,

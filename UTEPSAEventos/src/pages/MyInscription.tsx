@@ -86,7 +86,7 @@ const MyInscription: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
       <ScheduleHeader title="Mis Inscripciones" onBack={() => navigation.goBack()} />
       <View style={styles.content}>
         {loading ? (
@@ -204,16 +204,11 @@ const styles = StyleSheet.create({
   encuestaBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#111',
+    backgroundColor: '#cf152d',
     paddingVertical: 10,
     paddingHorizontal: 28,
     borderRadius: 24,
     marginTop: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.18,
-    shadowRadius: 4,
-    elevation: 3,
   },
   encuestaBtnText: {
     color: '#fff',

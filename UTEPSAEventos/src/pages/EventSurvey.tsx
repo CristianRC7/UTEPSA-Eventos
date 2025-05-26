@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   submitBtn: {
-    backgroundColor: '#111',
+    backgroundColor: '#cf152d',
     borderRadius: 10,
     paddingVertical: 14,
     alignItems: 'center',
@@ -142,4 +142,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EventSurvey; 
+export default EventSurvey;

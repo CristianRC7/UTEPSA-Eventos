@@ -11,7 +11,7 @@ const SpeakerHeader: React.FC<SpeakerHeaderProps> = ({ title, onBack }) => {
   return (
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Icon name="arrow-back" size={24} color="#000" />
+          <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{title}</Text>
         <View style={styles.spacer} />
@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#F3F4F6",
+    backgroundColor: "#cf152d",
   },
   backButton: {
     padding: 8,
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#000",
+    color: "#fff",
   },
   spacer: {
     width: 40,

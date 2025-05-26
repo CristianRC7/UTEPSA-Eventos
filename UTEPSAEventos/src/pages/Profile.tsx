@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Alert } from 'react-native';
 import { clearSession, changePassword } from '../utils/sessionStorage';
 import ModalForm from '../components/ModalForm';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Profile = ({ route, navigation }: any) => {
   const userData = route.params?.userData;
@@ -45,40 +46,33 @@ const Profile = ({ route, navigation }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.profileHeader}>
-          <Text style={styles.headerTitle}>Mi Perfil</Text>
+        <View style={styles.profileCard}>
+          <View style={styles.avatarContainer}>
+            <Icon name="person" size={64} color="#fff" style={styles.avatarIcon} />
+          </View>
+          <Text style={styles.profileName}>{getFullName()}</Text>
+          <Text style={styles.profileUser}>@{userData?.usuario}</Text>
         </View>
 
-        <View style={styles.profileInfo}>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Nombre:</Text>
-            <Text style={styles.infoValue}>{getFullName()}</Text>
-          </View>
+        <View style={styles.optionsList}>
+          <TouchableOpacity style={styles.optionItem} onPress={() => setShowPasswordModal(true)}>
+            <View style={[styles.optionIcon, { backgroundColor: '#cf152d' }]}> 
+              <Icon name="lock" size={24} color="#fff" />
+            </View>
+            <Text style={styles.optionText}>Cambiar contraseña</Text>
+            <Icon name="chevron-right" size={24} color="#bbb" style={styles.optionChevron} />
+          </TouchableOpacity>
 
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Usuario:</Text>
-            <Text style={styles.infoValue}>{userData?.usuario}</Text>
-          </View>
+          <TouchableOpacity style={styles.optionItem} onPress={() => navigation.navigate('MyCertificateScreen')}>
+            <View style={[styles.optionIcon, { backgroundColor: '#4F46E5' }]}> 
+              <Icon name="school" size={24} color="#fff" />
+            </View>
+            <Text style={styles.optionText}>Ver mis certificados</Text>
+            <Icon name="chevron-right" size={24} color="#bbb" style={styles.optionChevron} />
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => setShowPasswordModal(true)}
-        >
-          <Text style={styles.actionButtonText}>Cambiar contraseña</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('MyCertificateScreen')}
-        >
-          <Text style={styles.actionButtonText}>Ver mis certificados</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={handleLogout}
-        >
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
         </TouchableOpacity>
 
@@ -108,67 +102,95 @@ const Profile = ({ route, navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F6F7FB',
   },
   scrollContainer: {
-    padding: 20,
+    padding: 0,
+    alignItems: 'center',
+    paddingBottom: 30,
   },
-  profileHeader: {
-    marginBottom: 30,
-  },
-  headerTitle: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#000',
-    marginBottom: 8,
-    letterSpacing: -0.5,
-  },
-  profileInfo: {
-    backgroundColor: '#F9F9F9',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 30,
-    borderWidth: 1,
-    borderColor: '#EFEFEF',
-  },
-  infoItem: {
-    marginBottom: 15,
-  },
-  infoLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  infoValue: {
-    fontSize: 16,
-    color: '#555',
-  },
-  actionButton: {
+  profileCard: {
     backgroundColor: '#cf152d',
-    height: 50,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    alignItems: 'center',
+    paddingVertical: 32,
+    paddingHorizontal: 24,
+    marginTop: 0,
+    marginBottom: 30,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  avatarContainer: {
+    backgroundColor: '#fff',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  avatarIcon: {
+    color: '#cf152d',
+  },
+  profileName: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  profileUser: {
+    fontSize: 15,
+    color: '#fff',
+    marginBottom: 0,
+    textAlign: 'center',
+  },
+  optionsList: {
+    width: '90%',
+    alignSelf: 'center',
+    backgroundColor: 'transparent',
+    marginBottom: 30,
+  },
+  optionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 18,
+    marginBottom: 16,
+  },
+  optionIcon: {
+    width: 40,
+    height: 40,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15,
-    borderWidth: 0,
+    marginRight: 16,
   },
-  actionButtonText: {
-    color: '#fff',
+  optionText: {
     fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 0.2,
-    textTransform: 'uppercase',
+    color: '#222',
+    fontWeight: '600',
+    flex: 1,
+  },
+  optionChevron: {
+    marginLeft: 8,
   },
   logoutButton: {
     backgroundColor: '#fff',
     height: 55,
-    borderRadius: 12,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
     borderWidth: 2,
     borderColor: '#cf152d',
+    width: '90%',
+    alignSelf: 'center',
   },
   logoutButtonText: {
     color: '#cf152d',
