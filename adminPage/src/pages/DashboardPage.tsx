@@ -1,3 +1,4 @@
+import SideBar from '../components/sideBar';
 import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
@@ -13,6 +14,7 @@ const DashboardPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+      <SideBar />
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-lg text-center">
         <h1 className="text-2xl font-bold mb-4 text-[#cf152d]">Bienvenido, Administrador</h1>
         <p className="mb-8 text-gray-600">Esta es la página de Dashboard. Aquí podrás gestionar el sistema próximamente.</p>
