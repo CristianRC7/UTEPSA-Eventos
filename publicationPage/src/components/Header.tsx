@@ -1,4 +1,5 @@
 import React from "react"
+import logo from "../assets/Campus-Virtual-logo-P.png"
 
 interface HeaderProps {
   onLogoClick?: () => void
@@ -10,11 +11,11 @@ const Header: React.FC<HeaderProps> = ({ onLogoClick }) => (
       <div className="flex items-center justify-between h-20">
         <div className="flex items-center space-x-4">
           <div
-            className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center cursor-pointer"
+            className="w-12 h-12 bg-white border-2 border-red-600 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden"
             onClick={onLogoClick}
             title="Ir al inicio"
           >
-            <span className="text-white font-bold text-xl">U</span>
+            <img src={logo} alt="Logo UTEPSA" className="w-10 h-10 object-contain" />
           </div>
           <div
             className="cursor-pointer"
