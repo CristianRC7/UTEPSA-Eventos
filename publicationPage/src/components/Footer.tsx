@@ -1,5 +1,5 @@
 import React from "react"
-import logo from "../assets/Campus-Virtual-logo-P.png"
+import logo from "../assets/logo.png"
 
 const Footer: React.FC = () => (
   <footer className="bg-gray-900 text-white">
@@ -19,4 +19,4 @@ const Footer: React.FC = () => (
   </footer>
 )
 
-export default Footer 
+export default Footer

@@ -1,5 +1,5 @@
 import React from "react"
-import logo from "../assets/Campus-Virtual-logo-P.png"
+import logo from "../assets/logo.png"
 
 interface HeaderProps {
   onLogoClick?: () => void
@@ -31,4 +31,4 @@ const Header: React.FC<HeaderProps> = ({ onLogoClick }) => (
   </header>
 )
 
-export default Header 
+export default Header
