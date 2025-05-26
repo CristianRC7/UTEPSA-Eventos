@@ -69,33 +69,36 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   dayTab: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#fff',
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 12,
     height: 70,
-    width: '30%', // Aproximadamente 3 por fila con espacio entre ellos
+    width: '30%',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#e0e0e0',
   },
   dayTabSelected: {
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#cf152d',
+    borderColor: '#cf152d',
   },
   dayTabText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#4B5563',
+    color: '#222',
   },
   dayTabTextSelected: {
-    color: '#FFFFFF',
+    color: '#fff',
   },
   dayTabDate: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#666',
     marginTop: 4,
   },
   dayTabDateSelected: {
-    color: '#E0E7FF',
+    color: '#fff',
   },
 });
 

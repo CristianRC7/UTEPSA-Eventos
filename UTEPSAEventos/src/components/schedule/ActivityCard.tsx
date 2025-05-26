@@ -17,9 +17,12 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, onPress }) => {
     }
   };
 
+  const isInscrito = activity.inscrito;
+  const isHabilitada = activity.inscripcion_habilitada;
+
   return (
     <TouchableOpacity 
-      style={styles.activityCard}
+      style={[styles.activityCard, (isInscrito || isHabilitada) && styles.activityCardInscrito]}
       onPress={onPress}
       activeOpacity={activity.inscripcion_habilitada ? 0.7 : 1}
     >
@@ -37,12 +40,12 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, onPress }) => {
         </View>
         {activity.inscrito ? (
           <View style={styles.inscriptionBadge}>
-            <Icon name="check-circle" size={14} color="#10B981" />
-            <Text style={[styles.inscriptionBadgeText, { color: '#10B981' }]}>Inscrito</Text>
+            <Icon name="check-circle" size={14} color="#cf152d" />
+            <Text style={[styles.inscriptionBadgeText, { color: '#cf152d' }]}>Inscrito</Text>
           </View>
         ) : activity.inscripcion_habilitada && (
           <View style={styles.inscriptionBadge}>
-            <Icon name="event-available" size={14} color="#4F46E5" />
+            <Icon name="event-available" size={14} color="#cf152d" />
             <Text style={styles.inscriptionBadgeText}>Inscripción habilitada</Text>
           </View>
         )}
@@ -53,18 +56,18 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, onPress }) => {
 
 const styles = StyleSheet.create({
   activityCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#fff',
     borderRadius: 12,
     marginBottom: 16,
     padding: 16,
     flexDirection: 'row',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
     borderWidth: 1,
     borderColor: '#F3F4F6',
+    borderLeftWidth: 8,
+    borderLeftColor: '#fff',
+  },
+  activityCardInscrito: {
+    borderLeftColor: '#cf152d',
   },
   activityTimeContainer: {
     backgroundColor: '#F9FAFB',
@@ -78,7 +81,7 @@ const styles = StyleSheet.create({
   activityTime: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#4F46E5',
+    color: '#cf152d',
   },
   activityContentContainer: {
     flex: 1,
@@ -111,7 +114,7 @@ const styles = StyleSheet.create({
   },
   inscriptionBadgeText: {
     fontSize: 12,
-    color: '#4F46E5',
+    color: '#cf152d',
     marginLeft: 4,
     fontWeight: '500',
   },

@@ -62,16 +62,32 @@ const FormPublication = () => {
   const requestGalleryPermission = async () => {
     if (Platform.OS === "android") {
       try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-          {
-            title: "Permiso para acceder a la galería",
-            message: "Necesitamos acceso a tu galería para que puedas seleccionar fotos.",
-            buttonNeutral: "Preguntar después",
-            buttonNegative: "Cancelar",
-            buttonPositive: "Aceptar",
-          }
-        );
+        let granted = null;
+        if (Platform.Version >= 33) {
+          // Android 13+
+          granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+            {
+              title: "Permiso para acceder a la galería",
+              message: "Necesitamos acceso a tu galería para que puedas seleccionar fotos.",
+              buttonNeutral: "Preguntar después",
+              buttonNegative: "Cancelar",
+              buttonPositive: "Aceptar",
+            }
+          );
+        } else {
+          // Android 12 o menor
+          granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+            {
+              title: "Permiso para acceder a la galería",
+              message: "Necesitamos acceso a tu galería para que puedas seleccionar fotos.",
+              buttonNeutral: "Preguntar después",
+              buttonNegative: "Cancelar",
+              buttonPositive: "Aceptar",
+            }
+          );
+        }
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           return true;
         } else if (
@@ -230,21 +246,21 @@ const FormPublication = () => {
 
   // Simulate form submission
   const handleSubmit = async () => {
-    if (selectedImages.length === 0) {
-      Alert.alert("Error", "Por favor selecciona al menos una imagen")
-      return
+    if (selectedImages.length < 2) {
+      Alert.alert("Error", "Por favor selecciona al menos dos imágenes");
+      return;
     }
     if (!selectedEventId) {
-      Alert.alert("Error", "Por favor selecciona un evento")
-      return
+      Alert.alert("Error", "Por favor selecciona un evento");
+      return;
     }
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const userData = await getSession()
+      const userData = await getSession();
       if (!userData || !userData.id_usuario) {
-        Alert.alert('Error', 'No se pudo obtener el usuario.')
-        setIsLoading(false)
-        return
+        Alert.alert('Error', 'No se pudo obtener el usuario.');
+        setIsLoading(false);
+        return;
       }
       const formData = new FormData()
       formData.append('id_usuario', userData.id_usuario)
@@ -284,7 +300,7 @@ const FormPublication = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-          <Icon name="arrow-back" size={24} color="#333" />
+          <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Publicar Fotos</Text>
         <View style={styles.rightPlaceholder} />
@@ -347,6 +363,10 @@ const FormPublication = () => {
                 </View>
               </View>
             )}
+
+            <Text style={styles.requirementText}>
+              Debes seleccionar al menos 2 imágenes para poder publicar.
+            </Text>
           </View>
         </View>
 
@@ -386,10 +406,10 @@ const FormPublication = () => {
         <TouchableOpacity
           style={[
             styles.submitButton,
-            (selectedImages.length === 0 || !eventName.trim() || isLoading || caption.length > MAX_DESCRIPTION_LENGTH) && styles.disabledButton,
+            (selectedImages.length < 2 || !eventName.trim() || isLoading || caption.length > MAX_DESCRIPTION_LENGTH) && styles.disabledButton,
           ]}
           onPress={handleSubmit}
-          disabled={selectedImages.length === 0 || !eventName.trim() || isLoading || caption.length > MAX_DESCRIPTION_LENGTH}
+          disabled={selectedImages.length < 2 || !eventName.trim() || isLoading || caption.length > MAX_DESCRIPTION_LENGTH}
         >
           {isLoading ? (
             <ActivityIndicator color="#FFF" size="small" />
@@ -456,7 +476,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#E0E0E0",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#cf152d",
   },
   backButton: {
     padding: 8,
@@ -464,7 +484,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#333",
+    color: "#fff",
   },
   rightPlaceholder: {
     width: 40,
@@ -698,6 +718,14 @@ const styles = StyleSheet.create({
   },
   checkIcon: {
     marginLeft: 8,
+  },
+  requirementText: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 8,
+    marginBottom: 0,
+    textAlign: 'left',
+    paddingLeft: 4,
   },
 })
 

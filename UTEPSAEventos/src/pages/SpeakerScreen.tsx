@@ -78,11 +78,10 @@ const SpeakerScreen: React.FC<SpeakerScreenProps> = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      
-      <SpeakerHeader 
-        title="Expositores" 
-        onBack={handleBack} 
+      <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
+      <SpeakerHeader
+        title="Expositores"
+        onBack={handleBack}
       />
 
       {loading ? (
