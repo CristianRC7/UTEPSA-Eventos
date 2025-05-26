@@ -1,30 +1,55 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import './App.css'
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { createContext, useContext, useState, ReactNode } from 'react';
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
 
-function isAdmin() {
-  const user = localStorage.getItem('user');
-  try {
-    const parsed = user ? JSON.parse(user) : null;
-    return parsed && parsed.rol === 'admin';
-  } catch {
-    return false;
+// Contexto de autenticación
+interface AuthContextType {
+  user: any;
+  login: (user: any) => void;
+  logout: () => void;
+}
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => useContext(AuthContext);
+
+function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<any>(null);
+  const login = (user: any) => setUser(user);
+  const logout = () => setUser(null);
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+function ProtectedRoute({ children }: { children: ReactNode }) {
+  const { user } = useAuth()!;
+  const location = useLocation();
+  if (!user || user.rol !== 'administrador') {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
+  return <>{children}</>;
 }
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/dashboard"
-          element={isAdmin() ? <Dashboard /> : <Navigate to="/login" replace />}
-        />
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          } />
+          <Route path="*" element={<Navigate to="/login" />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
-export default App;
+export default App
