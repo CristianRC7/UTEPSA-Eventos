@@ -290,4 +290,5 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ open, onClose, evento }
   );
 };
 
+
 export default EditEventModal; 

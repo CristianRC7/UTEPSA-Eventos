@@ -16,6 +16,7 @@ interface CreateEventModalProps {
   };
 }
 
+
 const CreateEventModal: React.FC<CreateEventModalProps> = ({ open, onClose, initialData }) => {
   const [titulo, setTitulo] = useState(initialData?.titulo || '');
   const [descripcion, setDescripcion] = useState(initialData?.descripcion || '');
