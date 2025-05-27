@@ -61,7 +61,7 @@ const Profile = ({ route, navigation }: any) => {
             </View>
             <Text style={styles.optionText}>Cambiar contraseña</Text>
             <Icon name="chevron-right" size={24} color="#bbb" style={styles.optionChevron} />
-          </TouchableOpacity>
+        </TouchableOpacity>
 
           <TouchableOpacity style={styles.optionItem} onPress={() => navigation.navigate('MyCertificateScreen')}>
             <View style={[styles.optionIcon, { backgroundColor: '#4F46E5' }]}> 
@@ -69,7 +69,7 @@ const Profile = ({ route, navigation }: any) => {
             </View>
             <Text style={styles.optionText}>Ver mis certificados</Text>
             <Icon name="chevron-right" size={24} color="#bbb" style={styles.optionChevron} />
-          </TouchableOpacity>
+        </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

@@ -36,7 +36,7 @@ class EventPanel {
         $stmt->execute([$id_evento]);
         $inscritos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         // Actividades del evento con cantidad de inscritos y si la inscripción está habilitada
-        $stmt = $this->conn->prepare('SELECT a.id_actividad, a.titulo, a.inscripcion_habilitada, (SELECT COUNT(*) FROM inscripcion_actividades ia WHERE ia.id_actividad = a.id_actividad) as inscritos FROM cronograma_eventos a WHERE a.id_evento = ?');
+        $stmt = $this->conn->prepare('SELECT a.id_actividad, a.titulo, a.descripcion, a.fecha, a.hora, a.ubicacion, a.inscripcion_habilitada, (SELECT COUNT(*) FROM inscripcion_actividades ia WHERE ia.id_actividad = a.id_actividad) as inscritos FROM cronograma_eventos a WHERE a.id_evento = ?');
         $stmt->execute([$id_evento]);
         $actividades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode([

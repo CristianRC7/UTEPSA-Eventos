@@ -125,6 +125,75 @@ class Events {
             echo json_encode(['success' => false, 'message' => 'Error al eliminar evento']);
         }
     }
+
+    // --- NUEVO: CRUD de actividades del cronograma ---
+    public function crearActividad($data) {
+        if (!isset($data['id_evento'], $data['titulo'], $data['descripcion'], $data['fecha'], $data['hora'], $data['ubicacion'], $data['inscripcion_habilitada'])) {
+            echo json_encode(['success' => false, 'message' => 'Faltan datos requeridos']);
+            return;
+        }
+        $stmt = $this->conn->prepare('INSERT INTO cronograma_eventos (id_evento, titulo, descripcion, fecha, hora, ubicacion, inscripcion_habilitada) VALUES (?, ?, ?, ?, ?, ?, ?)');
+        $ok = $stmt->execute([
+            $data['id_evento'],
+            $data['titulo'],
+            $data['descripcion'],
+            $data['fecha'],
+            $data['hora'],
+            $data['ubicacion'],
+            (int)$data['inscripcion_habilitada']
+        ]);
+        if ($ok) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al crear actividad']);
+        }
+    }
+    public function editarActividad($data) {
+        if (!isset($data['id_actividad'], $data['titulo'], $data['descripcion'], $data['fecha'], $data['hora'], $data['ubicacion'], $data['inscripcion_habilitada'])) {
+            echo json_encode(['success' => false, 'message' => 'Faltan datos requeridos']);
+            return;
+        }
+        $stmt = $this->conn->prepare('UPDATE cronograma_eventos SET titulo=?, descripcion=?, fecha=?, hora=?, ubicacion=?, inscripcion_habilitada=? WHERE id_actividad=?');
+        $ok = $stmt->execute([
+            $data['titulo'],
+            $data['descripcion'],
+            $data['fecha'],
+            $data['hora'],
+            $data['ubicacion'],
+            (int)$data['inscripcion_habilitada'],
+            $data['id_actividad']
+        ]);
+        if ($ok) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al editar actividad']);
+        }
+    }
+
+    public function eliminarActividad($data) {
+        $id_actividad = $data['id_actividad'] ?? null;
+        if (!$id_actividad) {
+            echo json_encode(['success' => false, 'message' => 'Falta id_actividad']);
+            return;
+        }
+        // Eliminar inscripciones a la actividad
+        $stmt = $this->conn->prepare('DELETE FROM inscripcion_actividades WHERE id_actividad = ?');
+        $stmt->execute([$id_actividad]);
+        // Eliminar formularios asociados a la actividad
+        $stmt = $this->conn->prepare('DELETE FROM formularios WHERE id_actividad = ?');
+        $stmt->execute([$id_actividad]);
+        // Eliminar habilitaciones de formularios
+        $stmt = $this->conn->prepare('DELETE FROM habilitacion_formularios WHERE id_actividad = ?');
+        $stmt->execute([$id_actividad]);
+        // Finalmente, eliminar la actividad
+        $stmt = $this->conn->prepare('DELETE FROM cronograma_eventos WHERE id_actividad = ?');
+        $ok = $stmt->execute([$id_actividad]);
+        if ($ok) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al eliminar actividad']);
+        }
+    }
 }
 
 $events = new Events();
@@ -137,8 +206,8 @@ if ($method === 'POST') {
         $events->uploadCertificado($_FILES['certificado'], $nombreArchivo);
         exit;
     }
-    // Eliminar certificado
     $data = json_decode(file_get_contents('php://input'), true);
+    // Eliminar certificado
     if (isset($data['accion']) && $data['accion'] === 'eliminar_certificado' && isset($data['id_evento'])) {
         $events->deleteCertificado($data['id_evento']);
         exit;
@@ -148,17 +217,37 @@ if ($method === 'POST') {
         $events->delete($data['id_evento']);
         exit;
     }
+    // Crear actividad
+    if (isset($data['accion']) && $data['accion'] === 'crear_actividad') {
+        $events->crearActividad($data);
+        exit;
+    }
+    // Eliminar actividad
+    if (isset($data['accion']) && $data['accion'] === 'eliminar_actividad') {
+        $events->eliminarActividad($data);
+        exit;
+    }
     // Crear evento
     $events->create($data);
     exit;
 }
 if ($method === 'PUT') {
     $data = json_decode(file_get_contents('php://input'), true);
+    // Editar actividad
+    if (isset($data['accion']) && $data['accion'] === 'editar_actividad') {
+        $events->editarActividad($data);
+        exit;
+    }
     $events->update($data);
     exit;
 }
 if ($method === 'DELETE') {
     $data = json_decode(file_get_contents('php://input'), true);
+    // Eliminar actividad
+    if (isset($data['accion']) && $data['accion'] === 'eliminar_actividad') {
+        $events->eliminarActividad($data);
+        exit;
+    }
     if (isset($data['id_evento'])) {
         $events->delete($data['id_evento']);
         exit;

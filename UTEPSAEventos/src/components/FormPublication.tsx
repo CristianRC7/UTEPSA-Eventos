@@ -66,15 +66,15 @@ const FormPublication = () => {
         if (Platform.Version >= 33) {
           // Android 13+
           granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-            {
-              title: "Permiso para acceder a la galería",
-              message: "Necesitamos acceso a tu galería para que puedas seleccionar fotos.",
-              buttonNeutral: "Preguntar después",
-              buttonNegative: "Cancelar",
-              buttonPositive: "Aceptar",
-            }
-          );
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+          {
+            title: "Permiso para acceder a la galería",
+            message: "Necesitamos acceso a tu galería para que puedas seleccionar fotos.",
+            buttonNeutral: "Preguntar después",
+            buttonNegative: "Cancelar",
+            buttonPositive: "Aceptar",
+          }
+        );
         } else {
           // Android 12 o menor
           granted = await PermissionsAndroid.request(

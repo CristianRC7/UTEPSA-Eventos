@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { BASE_URL } from '../utils/Config';
-import { Settings, BadgeCheck, X as XIcon } from 'lucide-react';
+import { Settings, BadgeCheck, X as XIcon, MoreVertical } from 'lucide-react';
 import EditEventModal from './dashboard/EditEventModal';
+import { useNavigate } from 'react-router-dom';
 
 interface Evento {
   id_evento: number;
@@ -23,6 +24,9 @@ const Cards = ({ onCardClick }: CardsProps) => {
   const [modalCert, setModalCert] = useState<string | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [eventoEditar, setEventoEditar] = useState<Evento | null>(null);
+  const navigate = useNavigate();
+  const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const fetchEventos = async () => {
     setLoading(true);
@@ -40,6 +44,16 @@ const Cards = ({ onCardClick }: CardsProps) => {
 
   useEffect(() => {
     fetchEventos();
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpenId(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const eventosFiltrados = eventos.filter(ev =>
@@ -86,11 +100,23 @@ const Cards = ({ onCardClick }: CardsProps) => {
           >
             <button
               className="absolute top-4 right-4 text-gray-400 hover:text-[#cf152d] z-10 cursor-pointer bg-white rounded-full p-1 shadow group-hover:scale-110 transition"
-              onClick={e => { e.stopPropagation(); handleEditClick(evento); }}
-              title="Configuración"
+              onClick={e => { e.stopPropagation(); setMenuOpenId(evento.id_evento); }}
+              title="Opciones"
             >
               <Settings size={22} />
             </button>
+            {menuOpenId === evento.id_evento && (
+              <div ref={menuRef} className="absolute top-12 right-4 bg-white border rounded shadow-lg z-20 w-44 animate-fade-in">
+                <button
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={e => { e.stopPropagation(); setMenuOpenId(null); handleEditClick(evento); }}
+                >Editar evento</button>
+                <button
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={e => { e.stopPropagation(); setMenuOpenId(null); navigate(`/dashboard/evento/${evento.id_evento}/cronograma`); }}
+                >Ver cronograma</button>
+              </div>
+            )}
             {evento.certificado_img && (
               <button
                 className="absolute top-4 left-4 text-green-600 hover:text-green-800 z-10 cursor-pointer bg-white rounded-full p-1 shadow group-hover:scale-110 transition"

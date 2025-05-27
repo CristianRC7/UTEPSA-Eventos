@@ -140,19 +140,19 @@ const HomeScreen = ({ route }: any) => {
           {userData?.nombre} {userData?.apellidos}
         </Text>
         <View style={styles.searchWrapper}>
-          <View style={styles.searchContainer}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Buscar eventos..."
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onSubmitEditing={handleSearch}
-              returnKeyType="search"
-              placeholderTextColor="#888"
-            />
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar eventos..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onSubmitEditing={handleSearch}
+            returnKeyType="search"
+            placeholderTextColor="#888"
+          />
             <TouchableOpacity style={styles.searchIconContainer} onPress={handleSearch}>
               <Icon name="search" size={26} color="#cf152d" />
-            </TouchableOpacity>
+          </TouchableOpacity>
           </View>
         </View>
       </Animated.View>
@@ -175,7 +175,7 @@ const HomeScreen = ({ route }: any) => {
         <FlatList
           data={events}
           renderItem={({ item }) => (
-            <EventCard
+            <EventCard 
               event={item}
               onPress={handleEventPress}
               formatDate={formatDate}
