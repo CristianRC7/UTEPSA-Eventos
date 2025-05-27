@@ -21,9 +21,10 @@ const SpeakerList: React.FC<SpeakerListProps> = ({
     <FlatList
       data={speakers}
       renderItem={({ item }) => (
-        <SpeakerCard 
-          speaker={item} 
-          onPress={onSelectSpeaker} 
+        <SpeakerCard
+          key={item.id_expositor}
+          speaker={item}
+          onPress={onSelectSpeaker}
         />
       )}
       keyExtractor={(item) => item.id_expositor.toString()}

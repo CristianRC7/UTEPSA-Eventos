@@ -25,18 +25,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#F3F4F6",
     backgroundColor: "#cf152d",
   },
   backButton: {
     padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: "700",
     color: "#fff",
+    textAlignVertical: 'center',
   },
   spacer: {
     width: 40,

@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
-  Animated,
   TextInput,
   FlatList,
   Alert,
@@ -26,9 +25,6 @@ const HomeScreen = ({ route }: any) => {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-
-  const fadeAnim = React.useRef(new Animated.Value(0)).current;
-  const moveAnim = React.useRef(new Animated.Value(30)).current;
 
   // Format date to "day/month/year - Hour:Minute" format
   const formatDate = (dateStr: string) => {
@@ -51,22 +47,6 @@ const HomeScreen = ({ route }: any) => {
       return dateStr; // Return original string if formatting fails
     }
   };
-
-  // Animation effect on component mount
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(moveAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, moveAnim]);
 
   // Fetch events when screen is focused
   useFocusEffect(
@@ -128,13 +108,7 @@ const HomeScreen = ({ route }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
-      <Animated.View style={[
-        styles.headerSection,
-        {
-          opacity: fadeAnim,
-          transform: [{ translateY: moveAnim }],
-        },
-      ]}>
+      <View style={styles.headerSection}>
         <Text style={styles.headerTitle}>Bienvenido</Text>
         <Text style={styles.headerUserName}>
           {userData?.nombre} {userData?.apellidos}
@@ -155,17 +129,7 @@ const HomeScreen = ({ route }: any) => {
           </TouchableOpacity>
           </View>
         </View>
-      </Animated.View>
-
-      <Animated.View
-        style={{
-          opacity: fadeAnim,
-          transform: [{ translateY: moveAnim }],
-          paddingHorizontal: 20,
-        }}
-      >
-        <Text style={styles.sectionTitle}>Próximos Eventos</Text>
-      </Animated.View>
+      </View>
 
       {loading ? (
         <View style={{ flex: 1 }}>

@@ -18,6 +18,7 @@ import { getSession } from './src/utils/sessionStorage';
 import BottomNavigator from './src/components/BottomNavigator';
 import SplashScreen from './src/pages/SplashScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SpeakerDetailPage from './src/components/Speaker/SpeakerDetailPage';
 
 
 // Global function for handling back button press
@@ -107,6 +108,7 @@ function App(): React.JSX.Element {
           <Stack.Screen name="FormPublication" component={FormPublication} />
           <Stack.Screen name="DashboardEvent" component={DashboardEvent} />
           <Stack.Screen name="SpeakerScreen" component={SpeakerScreen} />
+          <Stack.Screen name="SpeakerDetailPage" component={SpeakerDetailPage} />
           <Stack.Screen name="ScheduleScreen" component={ScheduleScreen} />
           <Stack.Screen name="MyInscription" component={MyInscription} />
           <Stack.Screen name="MyFormsEvent" component={MyFormsEvent} />

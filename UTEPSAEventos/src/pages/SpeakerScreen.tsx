@@ -13,7 +13,6 @@ import { BASE_URL } from '../utils/Config';
 import { Speaker } from '../types/SpeakerTypes';
 import SpeakerHeader from '../components/Speaker/SpeakerHeader';
 import SpeakerList from '../components/Speaker/SpeakerList';
-import SpeakerDetailModal from '../components/Speaker/SpeakerDetailModal';
 
 interface SpeakerScreenProps {
   route: {
@@ -29,8 +28,6 @@ const SpeakerScreen: React.FC<SpeakerScreenProps> = ({ route }) => {
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
 
   const fetchSpeakers = useCallback(async () => {
     try {
@@ -68,12 +65,7 @@ const SpeakerScreen: React.FC<SpeakerScreenProps> = ({ route }) => {
   };
 
   const handleSelectSpeaker = (speaker: Speaker) => {
-    setSelectedSpeaker(speaker);
-    setModalVisible(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalVisible(false);
+    navigation.navigate('SpeakerDetailPage', { speaker });
   };
 
   return (
@@ -97,12 +89,6 @@ const SpeakerScreen: React.FC<SpeakerScreenProps> = ({ route }) => {
           onSelectSpeaker={handleSelectSpeaker}
         />
       )}
-
-      <SpeakerDetailModal
-        visible={modalVisible}
-        speaker={selectedSpeaker}
-        onClose={handleCloseModal}
-      />
     </SafeAreaView>
   );
 };
