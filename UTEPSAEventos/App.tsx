@@ -19,6 +19,7 @@ import BottomNavigator from './src/components/BottomNavigator';
 import SplashScreen from './src/pages/SplashScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
 // Global function for handling back button press
 const handleBackPress = () => {
   Alert.alert(
