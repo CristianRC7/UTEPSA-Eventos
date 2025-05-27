@@ -1,5 +1,7 @@
-import React from 'react';
-import { Modal, View, TouchableOpacity, Text, ScrollView, Dimensions, Image, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { Modal, View, TouchableOpacity, Text, ScrollView, Dimensions, StyleSheet } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
+import { Image } from 'react-native';
 
 interface PublicationModalProps {
   visible: boolean;
@@ -9,6 +11,36 @@ interface PublicationModalProps {
 }
 
 const PublicationModal: React.FC<PublicationModalProps> = ({ visible, imageUrl, onClose, BASE_URL }) => {
+  // Animaciones
+  const scale = useSharedValue(0.85);
+  const opacity = useSharedValue(0);
+  const borderRadius = useSharedValue(30);
+
+  useEffect(() => {
+    if (visible) {
+      scale.value = 0.85;
+      opacity.value = 0;
+      borderRadius.value = 30;
+      // Animación más suave y natural
+      scale.value = withTiming(1, { duration: 600, easing: Easing.bezier(0.22, 1, 0.36, 1) });
+      borderRadius.value = withTiming(10, { duration: 600, easing: Easing.bezier(0.22, 1, 0.36, 1) });
+      // Opacidad con leve retraso para mayor suavidad
+      setTimeout(() => {
+        opacity.value = withTiming(1, { duration: 400, easing: Easing.bezier(0.22, 1, 0.36, 1) });
+      }, 80);
+    } else {
+      scale.value = 0.85;
+      opacity.value = 0;
+      borderRadius.value = 30;
+    }
+  }, [visible, opacity, scale, borderRadius]);
+
+  const animatedImageStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+    borderRadius: borderRadius.value,
+  }));
+
   return (
     <Modal
       visible={visible}
@@ -32,11 +64,13 @@ const PublicationModal: React.FC<PublicationModalProps> = ({ visible, imageUrl, 
             centerContent={true}
           >
             {imageUrl && (
-              <Image
-                source={{ uri: `${BASE_URL}/${imageUrl}` }}
-                style={styles.modalImage}
-                resizeMode="contain"
-              />
+              <Animated.View style={[styles.animatedImageContainer, animatedImageStyle]}>
+                <Image
+                  source={{ uri: `${BASE_URL}/${imageUrl}` }}
+                  style={styles.modalImage}
+                  resizeMode="contain"
+                />
+              </Animated.View>
             )}
           </ScrollView>
         </View>
@@ -71,6 +105,10 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  animatedImageContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modalImage: {
     width: Dimensions.get('window').width * 0.95,
