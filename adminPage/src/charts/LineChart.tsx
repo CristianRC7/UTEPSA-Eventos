@@ -1,6 +1,4 @@
-import React from 'react';
 import ReactECharts from 'echarts-for-react';
-
 interface LineChartProps {
   eventos: { nombre: string; inscritos: number }[];
 }

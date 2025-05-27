@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { BASE_URL } from '../utils/Config';
-import { Settings, BadgeCheck, X as XIcon, MoreVertical } from 'lucide-react';
+import { Settings, BadgeCheck, X as XIcon} from 'lucide-react';
 import EditEventModal from './dashboard/EditEventModal';
 import { useNavigate } from 'react-router-dom';
 
