@@ -4,6 +4,7 @@ import { createContext, useContext, useState, type ReactNode } from 'react';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import EventPanelPage from './pages/EventPanelPage';
+import UsersPage from './pages/Users';
 
 // Contexto de autenticación
 interface AuthContextType {
@@ -49,6 +50,11 @@ function App() {
           <Route path="/dashboard/evento/:id" element={
             <ProtectedRoute>
               <EventPanelPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/usuarios" element={
+            <ProtectedRoute>
+              <UsersPage />
             </ProtectedRoute>
           } />
           <Route path="*" element={<Navigate to="/login" />} />
