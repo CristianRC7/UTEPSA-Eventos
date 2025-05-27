@@ -1,8 +1,9 @@
 import './App.css'
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import EventPanelPage from './pages/EventPanelPage';
 
 // Contexto de autenticación
 interface AuthContextType {
@@ -43,6 +44,11 @@ function App() {
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/evento/:id" element={
+            <ProtectedRoute>
+              <EventPanelPage />
             </ProtectedRoute>
           } />
           <Route path="*" element={<Navigate to="/login" />} />

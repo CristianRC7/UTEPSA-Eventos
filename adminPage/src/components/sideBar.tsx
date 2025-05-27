@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LayoutDashboard, LogOut } from 'lucide-react';
+import { Menu, X, LayoutDashboard, LogOut, Users } from 'lucide-react';
 import { useAuth } from '../App';
 
 const SideBar = () => {
@@ -55,6 +55,14 @@ const SideBar = () => {
             >
               <LayoutDashboard size={20} />
               Dashboard
+            </Link>
+            <Link
+              to="/dashboard/usuarios"
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors cursor-pointer ${location.pathname === '/dashboard/usuarios' ? 'bg-[#cf152d] text-white' : 'text-gray-700 hover:bg-gray-100'}`}
+              onClick={() => setOpen(false)}
+            >
+              <Users size={20} />
+              Usuarios
             </Link>
           </div>
           <div className="p-4 border-t mt-auto">
