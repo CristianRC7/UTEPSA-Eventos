@@ -1,22 +1,43 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { BASE_URL } from '../../utils/Config';
 
 interface CreateEventModalProps {
   open: boolean;
   onClose: (recargar?: boolean) => void;
+  initialData?: {
+    id_evento?: number;
+    titulo?: string;
+    descripcion?: string;
+    fecha_inicio?: string;
+    fecha_fin?: string;
+    certificado_img?: string;
+    url_web?: string;
+  };
 }
 
-const CreateEventModal: React.FC<CreateEventModalProps> = ({ open, onClose }) => {
-  const [titulo, setTitulo] = useState('');
-  const [descripcion, setDescripcion] = useState('');
-  const [fechaInicio, setFechaInicio] = useState('');
-  const [fechaFin, setFechaFin] = useState('');
-  const [conCertificado, setConCertificado] = useState(false);
+const CreateEventModal: React.FC<CreateEventModalProps> = ({ open, onClose, initialData }) => {
+  const [titulo, setTitulo] = useState(initialData?.titulo || '');
+  const [descripcion, setDescripcion] = useState(initialData?.descripcion || '');
+  const [fechaInicio, setFechaInicio] = useState(initialData?.fecha_inicio || '');
+  const [fechaFin, setFechaFin] = useState(initialData?.fecha_fin || '');
+  const [conCertificado, setConCertificado] = useState(!!initialData?.certificado_img);
   const [certificadoFile, setCertificadoFile] = useState<File | null>(null);
+  const [urlWeb, setUrlWeb] = useState(initialData?.url_web || '');
+  const [conWeb, setConWeb] = useState(!!initialData?.url_web);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setTitulo(initialData?.titulo || '');
+    setDescripcion(initialData?.descripcion || '');
+    setFechaInicio(initialData?.fecha_inicio || '');
+    setFechaFin(initialData?.fecha_fin || '');
+    setConCertificado(!!initialData?.certificado_img);
+    setUrlWeb(initialData?.url_web || '');
+    setConWeb(!!initialData?.url_web);
+  }, [initialData, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,23 +65,32 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({ open, onClose }) =>
           return;
         }
       }
-      // Crear evento
+      // Crear o editar evento
+      const body: any = {
+        titulo,
+        descripcion,
+        fecha_inicio: fechaInicio,
+        fecha_fin: fechaFin,
+        certificado_img: certificado_img || (conCertificado ? initialData?.certificado_img : undefined)
+      };
+      if (conWeb && urlWeb) {
+        body.url_web = urlWeb;
+      } else {
+        body.url_web = '';
+      }
+      if (initialData?.id_evento) {
+        body.id_evento = initialData.id_evento;
+      }
       const res = await fetch(`${BASE_URL}admin/Events.php`, {
-        method: 'POST',
+        method: initialData?.id_evento ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          titulo,
-          descripcion,
-          fecha_inicio: fechaInicio,
-          fecha_fin: fechaFin,
-          certificado_img: certificado_img || undefined
-        })
+        body: JSON.stringify(body)
       });
       const data = await res.json();
       if (data.success) {
         onClose(true);
       } else {
-        setError(data.message || 'Error al crear evento');
+        setError(data.message || 'Error al guardar evento');
       }
     } catch {
       setError('Error de conexión');
@@ -79,7 +109,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({ open, onClose }) =>
         >
           <X size={24} />
         </button>
-        <h3 className="text-lg font-bold text-[#cf152d] mb-4">Crear nuevo evento</h3>
+        <h3 className="text-lg font-bold text-[#cf152d] mb-4">{initialData ? 'Editar evento' : 'Crear nuevo evento'}</h3>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
             type="text"
@@ -129,12 +159,31 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({ open, onClose }) =>
                 ref={fileInputRef}
                 className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-[#cf152d] cursor-pointer w-full"
                 onChange={e => setCertificadoFile(e.target.files?.[0] || null)}
-                required
+                required={!initialData?.certificado_img}
               />
               {certificadoFile && (
                 <div className="text-xs text-gray-500 mt-1">Archivo seleccionado: {certificadoFile.name}</div>
               )}
             </div>
+          )}
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={conWeb}
+              onChange={e => setConWeb(e.target.checked)}
+              className="cursor-pointer"
+            />
+            ¿Evento con página web?
+          </label>
+          {conWeb && (
+            <input
+              type="url"
+              placeholder="Enlace de la página web del evento"
+              className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-[#cf152d] cursor-pointer"
+              value={urlWeb}
+              onChange={e => setUrlWeb(e.target.value)}
+              required={conWeb}
+            />
           )}
           {error && <div className="text-red-500 text-sm text-center">{error}</div>}
           <button
@@ -142,7 +191,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({ open, onClose }) =>
             className="mt-2 px-4 py-2 bg-[#cf152d] text-white rounded hover:bg-[#b01223] transition-colors cursor-pointer disabled:opacity-60"
             disabled={loading}
           >
-            {loading ? 'Creando...' : 'Crear evento'}
+            {loading ? (initialData ? 'Guardando...' : 'Creando...') : (initialData ? 'Guardar cambios' : 'Crear evento')}
           </button>
         </form>
       </div>

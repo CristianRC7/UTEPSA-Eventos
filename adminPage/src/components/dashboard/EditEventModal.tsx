@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, Trash2 } from 'lucide-react';
 import { BASE_URL } from '../../utils/Config';
 
@@ -12,6 +12,7 @@ interface EditEventModalProps {
     fecha_inicio: string;
     fecha_fin: string;
     certificado_img?: string;
+    url_web?: string;
   };
 }
 
@@ -22,10 +23,24 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ open, onClose, evento }
   const [fechaFin, setFechaFin] = useState(evento.fecha_fin.slice(0, 16));
   const [certificadoFile, setCertificadoFile] = useState<File | null>(null);
   const [certificadoActual, setCertificadoActual] = useState(evento.certificado_img || '');
+  const [urlWeb, setUrlWeb] = useState(evento.url_web || '');
+  const [conWeb, setConWeb] = useState(!!evento.url_web);
+  const [webEliminada, setWebEliminada] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setTitulo(evento.titulo);
+    setDescripcion(evento.descripcion);
+    setFechaInicio(evento.fecha_inicio.slice(0, 16));
+    setFechaFin(evento.fecha_fin.slice(0, 16));
+    setCertificadoActual(evento.certificado_img || '');
+    setUrlWeb(evento.url_web || '');
+    setConWeb(!!evento.url_web);
+    setWebEliminada(false);
+  }, [evento, open]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,17 +69,23 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ open, onClose, evento }
         }
       }
       // Actualizar evento
+      const body: any = {
+        id_evento: evento.id_evento,
+        titulo,
+        descripcion,
+        fecha_inicio: fechaInicio,
+        fecha_fin: fechaFin,
+        certificado_img: certificado_img || undefined
+      };
+      if (webEliminada || !conWeb || !urlWeb) {
+        body.url_web = '';
+      } else if (conWeb && urlWeb) {
+        body.url_web = urlWeb;
+      }
       const res = await fetch(`${BASE_URL}admin/Events.php`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id_evento: evento.id_evento,
-          titulo,
-          descripcion,
-          fecha_inicio: fechaInicio,
-          fecha_fin: fechaFin,
-          certificado_img: certificado_img || undefined
-        })
+        body: JSON.stringify(body)
       });
       const data = await res.json();
       if (data.success) {
@@ -188,8 +209,43 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ open, onClose, evento }
               onChange={e => setCertificadoFile(e.target.files?.[0] || null)}
             />
           )}
-          {certificadoFile && (
-            <div className="text-xs text-gray-500 mt-1">Archivo seleccionado: {certificadoFile.name}</div>
+          {/* Página web */}
+          {evento.url_web && !webEliminada ? (
+            <div className="flex items-center gap-2">
+              <span className="text-blue-700 font-semibold">Página web cargada:</span>
+              <a href={evento.url_web} target="_blank" rel="noopener noreferrer" className="underline text-blue-700 hover:text-blue-900 max-w-[120px] truncate" title={evento.url_web}>{evento.url_web}</a>
+              <button
+                type="button"
+                className="text-red-500 hover:text-red-700 ml-2"
+                onClick={() => { setWebEliminada(true); setConWeb(false); setUrlWeb(''); }}
+                disabled={loading}
+                title="Eliminar página web"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          ) : (
+            <>
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={conWeb}
+                  onChange={e => setConWeb(e.target.checked)}
+                  className="cursor-pointer"
+                />
+                ¿Evento con página web?
+              </label>
+              {conWeb && (
+                <input
+                  type="url"
+                  placeholder="Enlace de la página web del evento"
+                  className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-[#cf152d] cursor-pointer"
+                  value={urlWeb}
+                  onChange={e => setUrlWeb(e.target.value)}
+                  required={conWeb}
+                />
+              )}
+            </>
           )}
           {error && <div className="text-red-500 text-sm text-center">{error}</div>}
           <button
