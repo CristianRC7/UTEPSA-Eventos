@@ -21,6 +21,7 @@ const AnimatedTextInput = Animated.createAnimatedComponent(require('react-native
 const HEADER_MAX_HEIGHT = 180;
 const HEADER_MIN_HEIGHT = 74;
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
+const ANIMATION_RANGE = HEADER_SCROLL_DISTANCE * 1.5;
 const SEARCH_MAX_HEIGHT = 52;
 const SEARCH_MIN_HEIGHT = 40;
 const SEARCH_MAX_RADIUS = 16;
@@ -115,37 +116,37 @@ const HomeScreen = ({ route }: any) => {
 
   // Animaciones
   const headerHeight = scrollY.interpolate({
-    inputRange: [0, HEADER_SCROLL_DISTANCE],
+    inputRange: [0, ANIMATION_RANGE],
     outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
     extrapolate: 'clamp',
   });
   const headerPaddingTop = scrollY.interpolate({
-    inputRange: [0, HEADER_SCROLL_DISTANCE],
+    inputRange: [0, ANIMATION_RANGE],
     outputRange: [HEADER_MAX_PADDING_TOP, HEADER_MIN_PADDING_TOP],
     extrapolate: 'clamp',
   });
   const headerPaddingBottom = scrollY.interpolate({
-    inputRange: [0, HEADER_SCROLL_DISTANCE],
+    inputRange: [0, ANIMATION_RANGE],
     outputRange: [HEADER_MAX_PADDING_BOTTOM, HEADER_MIN_PADDING_BOTTOM],
     extrapolate: 'clamp',
   });
   const welcomeOpacity = scrollY.interpolate({
-    inputRange: [0, 24, 48],
+    inputRange: [0, 40, ANIMATION_RANGE],
     outputRange: [1, 0.5, 0],
     extrapolate: 'clamp',
   });
   const searchHeight = scrollY.interpolate({
-    inputRange: [0, HEADER_SCROLL_DISTANCE],
+    inputRange: [0, ANIMATION_RANGE],
     outputRange: [SEARCH_MAX_HEIGHT, SEARCH_MIN_HEIGHT],
     extrapolate: 'clamp',
   });
   const searchRadius = scrollY.interpolate({
-    inputRange: [0, HEADER_SCROLL_DISTANCE],
+    inputRange: [0, ANIMATION_RANGE],
     outputRange: [SEARCH_MAX_RADIUS, SEARCH_MIN_RADIUS],
     extrapolate: 'clamp',
   });
   const searchFontSize = scrollY.interpolate({
-    inputRange: [0, HEADER_SCROLL_DISTANCE],
+    inputRange: [0, ANIMATION_RANGE],
     outputRange: [16, 14],
     extrapolate: 'clamp',
   });
