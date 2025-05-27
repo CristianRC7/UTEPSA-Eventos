@@ -24,7 +24,7 @@ class EventPanel {
             exit;
         }
         // Datos del evento
-        $stmt = $this->conn->prepare('SELECT * FROM eventos WHERE id_evento = ? LIMIT 1');
+        $stmt = $this->conn->prepare('SELECT e.*, w.url_web FROM eventos e LEFT JOIN web_evento w ON e.id_evento = w.id_evento WHERE e.id_evento = ? LIMIT 1');
         $stmt->execute([$id_evento]);
         $evento = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$evento) {

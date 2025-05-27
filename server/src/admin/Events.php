@@ -33,6 +33,12 @@ class Events {
             $certificado_img
         ]);
         if ($ok) {
+            $id_evento = $this->conn->lastInsertId();
+            // Guardar url_web si viene
+            if (!empty($data['url_web'])) {
+                $stmtWeb = $this->conn->prepare('INSERT INTO web_evento (id_evento, url_web) VALUES (?, ?)');
+                $stmtWeb->execute([$id_evento, $data['url_web']]);
+            }
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'message' => 'Error al crear evento']);
@@ -54,6 +60,23 @@ class Events {
             $certificado_img,
             $data['id_evento']
         ]);
+        // Manejar url_web
+        if (isset($data['url_web']) && $data['url_web']) {
+            // Si ya existe, actualizar, si no, insertar
+            $stmtCheck = $this->conn->prepare('SELECT COUNT(*) FROM web_evento WHERE id_evento = ?');
+            $stmtCheck->execute([$data['id_evento']]);
+            if ($stmtCheck->fetchColumn() > 0) {
+                $stmtWeb = $this->conn->prepare('UPDATE web_evento SET url_web = ? WHERE id_evento = ?');
+                $stmtWeb->execute([$data['url_web'], $data['id_evento']]);
+            } else {
+                $stmtWeb = $this->conn->prepare('INSERT INTO web_evento (id_evento, url_web) VALUES (?, ?)');
+                $stmtWeb->execute([$data['id_evento'], $data['url_web']]);
+            }
+        } else if (isset($data['url_web']) && $data['url_web'] === '') {
+            // Si se borra el enlace, eliminar registro
+            $stmtWeb = $this->conn->prepare('DELETE FROM web_evento WHERE id_evento = ?');
+            $stmtWeb->execute([$data['id_evento']]);
+        }
         if ($ok) {
             echo json_encode(['success' => true]);
         } else {

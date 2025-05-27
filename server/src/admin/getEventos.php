@@ -18,7 +18,7 @@ class GetEventos {
         $this->conn = $db->getConnection();
     }
     public function handle() {
-        $stmt = $this->conn->prepare('SELECT * FROM eventos ORDER BY fecha_inicio DESC');
+        $stmt = $this->conn->prepare('SELECT e.*, w.url_web FROM eventos e LEFT JOIN web_evento w ON e.id_evento = w.id_evento ORDER BY fecha_inicio DESC');
         $stmt->execute();
         $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode(['success' => true, 'eventos' => $eventos]);
