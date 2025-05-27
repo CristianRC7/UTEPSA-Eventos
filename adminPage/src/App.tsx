@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import EventPanelPage from './pages/EventPanelPage';
 import UsersPage from './pages/Users';
+import PublicationPage from './pages/PublicationPage';
 
 // Contexto de autenticación
 interface AuthContextType {
@@ -55,6 +56,11 @@ function App() {
           <Route path="/dashboard/usuarios" element={
             <ProtectedRoute>
               <UsersPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/publicaciones" element={
+            <ProtectedRoute>
+              <PublicationPage />
             </ProtectedRoute>
           } />
           <Route path="*" element={<Navigate to="/login" />} />
