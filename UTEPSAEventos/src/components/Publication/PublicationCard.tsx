@@ -5,6 +5,7 @@ import Share from "react-native-share"
 import Carousel from "../Carousel"
 import { BASE_URL } from '../../utils/Config';
 import { getSession } from '../../utils/sessionStorage';
+import PublicationModal from './PublicationModal';
 
 interface Publication {
   id: number
@@ -30,6 +31,8 @@ const PublicationCard = ({ publication, onShare }: PublicationCardProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false)
   const [descLines, setDescLines] = useState(0)
   const scaleAnim = useRef(new Animated.Value(1)).current
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalImage, setModalImage] = useState<string | null>(null)
 
   useEffect(() => {
     setLiked(publication.hasUserLiked || false)
@@ -98,8 +101,20 @@ const PublicationCard = ({ publication, onShare }: PublicationCardProps) => {
     }
   }
 
+  // NUEVO: función para abrir el modal
+  const handleImagePress = (imageUrl: string) => {
+    setModalImage(imageUrl)
+    setModalVisible(true)
+  }
+
   return (
     <View style={styles.container}>
+      <PublicationModal
+        visible={modalVisible}
+        imageUrl={modalImage}
+        onClose={() => setModalVisible(false)}
+        BASE_URL={BASE_URL}
+      />
       <View style={styles.header}>
         <View style={styles.userInfoContainer}>
           <View style={styles.userAvatar}>
@@ -147,6 +162,7 @@ const PublicationCard = ({ publication, onShare }: PublicationCardProps) => {
         autoPlay={images.length > 1}
         showControls={images.length > 1}
         showPagination={images.length > 1}
+        onImagePress={(imageUrl) => handleImagePress(imageUrl)}
       />
 
       <View style={styles.actionsContainer}>

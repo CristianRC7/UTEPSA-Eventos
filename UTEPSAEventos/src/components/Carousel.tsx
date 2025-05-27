@@ -22,6 +22,7 @@ interface CarouselProps {
   autoPlay?: boolean;
   showControls?: boolean;
   showPagination?: boolean;
+  onImagePress?: (imageUrl: string, index: number) => void;
 }
 
 interface ViewableItemsChanged {
@@ -35,6 +36,7 @@ const Carousel = ({
   autoPlay = true,
   showControls = true,
   showPagination = true,
+  onImagePress,
 }: CarouselProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
@@ -114,21 +116,23 @@ const Carousel = ({
     }));
   };
 
-  const renderItem = ({ item }: { item: string }) => (
-    <View style={[styles.imageContainer, { height }]}>
-      {!imagesLoaded[item] && (
-        <LoadingPulse width={SCREEN_WIDTH} height={height} />
-      )}
-      <Image 
-        source={item ? { uri: `${BASE_URL}/${item}` } : undefined}
-        style={[
-          styles.image, 
-          { height, opacity: imagesLoaded[item] ? 1 : 0 }
-        ]} 
-        resizeMode="cover"
-        onLoad={() => handleImageLoad(item)}
-      />
-    </View>
+  const renderItem = ({ item, index }: { item: string, index: number }) => (
+    <TouchableOpacity activeOpacity={0.9} onPress={() => onImagePress && onImagePress(item, index)}>
+      <View style={[styles.imageContainer, { height }]}>
+        {!imagesLoaded[item] && (
+          <LoadingPulse width={SCREEN_WIDTH} height={height} />
+        )}
+        <Image 
+          source={item ? { uri: `${BASE_URL}/${item}` } : undefined}
+          style={[
+            styles.image, 
+            { height, opacity: imagesLoaded[item] ? 1 : 0 }
+          ]} 
+          resizeMode="cover"
+          onLoad={() => handleImageLoad(item)}
+        />
+      </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -145,6 +149,7 @@ const Carousel = ({
         viewabilityConfig={viewabilityConfig}
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })}
         scrollEventThrottle={16}
+        scrollEnabled={false}
       />
 
       {hasMultipleImages && showControls && (
