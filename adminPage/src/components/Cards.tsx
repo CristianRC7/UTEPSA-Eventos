@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BASE_URL } from '../utils/Config';
 import { Settings, BadgeCheck, X as XIcon } from 'lucide-react';
+import EditEventModal from './dashboard/EditEventModal';
 
 interface Evento {
   id_evento: number;
@@ -20,20 +21,24 @@ const Cards = ({ onCardClick }: CardsProps) => {
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState('');
   const [modalCert, setModalCert] = useState<string | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [eventoEditar, setEventoEditar] = useState<Evento | null>(null);
+
+  const fetchEventos = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${BASE_URL}admin/getEventos.php`);
+      const data = await res.json();
+      if (data.success) {
+        setEventos(data.eventos);
+      }
+    } catch {
+      // Manejo de error opcional
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchEventos = async () => {
-      try {
-        const res = await fetch(`${BASE_URL}admin/getEventos.php`);
-        const data = await res.json();
-        if (data.success) {
-          setEventos(data.eventos);
-        }
-      } catch {
-        // Manejo de error opcional
-      }
-      setLoading(false);
-    };
     fetchEventos();
   }, []);
 
@@ -50,6 +55,11 @@ const Cards = ({ onCardClick }: CardsProps) => {
     } else {
       setModalCert(url);
     }
+  };
+
+  const handleEditClick = (evento: Evento) => {
+    setEventoEditar(evento);
+    setEditModalOpen(true);
   };
 
   if (loading) {
@@ -76,7 +86,7 @@ const Cards = ({ onCardClick }: CardsProps) => {
           >
             <button
               className="absolute top-4 right-4 text-gray-400 hover:text-[#cf152d] z-10 cursor-pointer bg-white rounded-full p-1 shadow group-hover:scale-110 transition"
-              onClick={e => { e.stopPropagation(); }}
+              onClick={e => { e.stopPropagation(); handleEditClick(evento); }}
               title="Configuración"
             >
               <Settings size={22} />
@@ -119,6 +129,18 @@ const Cards = ({ onCardClick }: CardsProps) => {
             </button>
           </div>
         </div>
+      )}
+      {/* Modal de edición de evento */}
+      {editModalOpen && eventoEditar && (
+        <EditEventModal
+          open={editModalOpen}
+          onClose={(recargar?: boolean) => {
+            setEditModalOpen(false);
+            setEventoEditar(null);
+            if (recargar) fetchEventos();
+          }}
+          evento={eventoEditar}
+        />
       )}
     </div>
   );
