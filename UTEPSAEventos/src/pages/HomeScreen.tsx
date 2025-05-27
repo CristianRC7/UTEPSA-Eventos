@@ -1,23 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
-  TextInput,
-  FlatList,
   Alert,
   RefreshControl,
   StatusBar,
+  Animated,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { BASE_URL } from '../utils/Config';
 import EventCard from '../components/EventCard';
 import LoadingPulseCardAnimation from '../components/LoadingPulseCardAnimation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+const AnimatedTextInput = Animated.createAnimatedComponent(require('react-native').TextInput);
 
 // Home Tab Screen Component
+const HEADER_MAX_HEIGHT = 180;
+const HEADER_MIN_HEIGHT = 74;
+const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
+const SEARCH_MAX_HEIGHT = 52;
+const SEARCH_MIN_HEIGHT = 40;
+const SEARCH_MAX_RADIUS = 16;
+const SEARCH_MIN_RADIUS = 10;
+const HEADER_MAX_PADDING_TOP = 48;
+const HEADER_MIN_PADDING_TOP = 12;
+const HEADER_MAX_PADDING_BOTTOM = 32;
+const HEADER_MIN_PADDING_BOTTOM = 10;
+
 const HomeScreen = ({ route }: any) => {
   const navigation = useNavigation<any>();
   const userData = route.params?.userData;
@@ -26,34 +38,32 @@ const HomeScreen = ({ route }: any) => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Animación
+  const scrollY = useRef(new Animated.Value(0)).current;
+
   // Format date to "day/month/year - Hour:Minute" format
   const formatDate = (dateStr: string) => {
     try {
       const date = new Date(dateStr);
       if (isNaN(date.getTime())) {
-        // If date parsing fails, try to extract parts manually
         return dateStr;
       }
-
       const day = date.getDate().toString().padStart(2, '0');
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
       const year = date.getFullYear();
       const hours = date.getHours().toString().padStart(2, '0');
       const minutes = date.getMinutes().toString().padStart(2, '0');
-
       return `${day}/${month}/${year} - ${hours}:${minutes}`;
     } catch (error) {
       console.error('Error formatting date:', error);
-      return dateStr; // Return original string if formatting fails
+      return dateStr;
     }
   };
 
-  // Fetch events when screen is focused
   useFocusEffect(
     React.useCallback(() => {
       fetchEvents();
-      return () => {
-      };
+      return () => {};
     }, [])
   );
 
@@ -62,12 +72,10 @@ const HomeScreen = ({ route }: any) => {
     try {
       const response = await fetch(`${BASE_URL}/Events.php?search=${encodeURIComponent(query)}`);
       const data = await response.json();
-
       if (data.success) {
         setEvents(data.events);
       } else {
         setEvents([]);
-        // Don't show alert for empty results
         if (query && data.message !== 'No se encontraron eventos') {
           Alert.alert('Error', data.message);
         }
@@ -105,38 +113,95 @@ const HomeScreen = ({ route }: any) => {
     </View>
   );
 
+  // Animaciones
+  const headerHeight = scrollY.interpolate({
+    inputRange: [0, HEADER_SCROLL_DISTANCE],
+    outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
+    extrapolate: 'clamp',
+  });
+  const headerPaddingTop = scrollY.interpolate({
+    inputRange: [0, HEADER_SCROLL_DISTANCE],
+    outputRange: [HEADER_MAX_PADDING_TOP, HEADER_MIN_PADDING_TOP],
+    extrapolate: 'clamp',
+  });
+  const headerPaddingBottom = scrollY.interpolate({
+    inputRange: [0, HEADER_SCROLL_DISTANCE],
+    outputRange: [HEADER_MAX_PADDING_BOTTOM, HEADER_MIN_PADDING_BOTTOM],
+    extrapolate: 'clamp',
+  });
+  const welcomeOpacity = scrollY.interpolate({
+    inputRange: [0, 24, 48],
+    outputRange: [1, 0.5, 0],
+    extrapolate: 'clamp',
+  });
+  const searchHeight = scrollY.interpolate({
+    inputRange: [0, HEADER_SCROLL_DISTANCE],
+    outputRange: [SEARCH_MAX_HEIGHT, SEARCH_MIN_HEIGHT],
+    extrapolate: 'clamp',
+  });
+  const searchRadius = scrollY.interpolate({
+    inputRange: [0, HEADER_SCROLL_DISTANCE],
+    outputRange: [SEARCH_MAX_RADIUS, SEARCH_MIN_RADIUS],
+    extrapolate: 'clamp',
+  });
+  const searchFontSize = scrollY.interpolate({
+    inputRange: [0, HEADER_SCROLL_DISTANCE],
+    outputRange: [16, 14],
+    extrapolate: 'clamp',
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
-      <View style={styles.headerSection}>
-        <Text style={styles.headerTitle}>Bienvenido</Text>
-        <Text style={styles.headerUserName}>
-          {userData?.nombre} {userData?.apellidos}
-        </Text>
-        <View style={styles.searchWrapper}>
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar eventos..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            onSubmitEditing={handleSearch}
-            returnKeyType="search"
-            placeholderTextColor="#888"
-          />
+      <Animated.View style={[styles.headerSection, {
+        height: headerHeight,
+        paddingTop: headerPaddingTop,
+        paddingBottom: headerPaddingBottom,
+      }]}
+      >
+        <Animated.View style={{ opacity: welcomeOpacity }}>
+          <Text style={styles.headerTitle}>Bienvenido</Text>
+          <Text style={styles.headerUserName}>
+            {userData?.nombre} {userData?.apellidos}
+          </Text>
+        </Animated.View>
+        <Animated.View style={styles.searchWrapper}>
+          <Animated.View style={
+            [styles.searchContainer,
+              {
+                height: searchHeight,
+                borderRadius: searchRadius,
+              }
+            ]
+          }>
+            <AnimatedTextInput
+              style={
+                [styles.searchInput,
+                  {
+                    fontSize: searchFontSize,
+                  }
+                ]
+              }
+              placeholder="Buscar eventos..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              onSubmitEditing={handleSearch}
+              returnKeyType="search"
+              placeholderTextColor="#888"
+            />
             <TouchableOpacity style={styles.searchIconContainer} onPress={handleSearch}>
               <Icon name="search" size={26} color="#cf152d" />
-          </TouchableOpacity>
-          </View>
-        </View>
-      </View>
+            </TouchableOpacity>
+          </Animated.View>
+        </Animated.View>
+      </Animated.View>
 
       {loading ? (
         <View style={{ flex: 1 }}>
           <LoadingPulseCardAnimation />
         </View>
       ) : (
-        <FlatList
+        <Animated.FlatList
           data={events}
           renderItem={({ item }) => (
             <EventCard 
@@ -155,6 +220,12 @@ const HomeScreen = ({ route }: any) => {
               colors={["#000"]}
             />
           }
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+          style={{ flex: 1 }}
         />
       )}
     </SafeAreaView>
@@ -167,8 +238,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   headerSection: {
-    paddingTop: 16,
-    paddingBottom: 32,
+    // height, paddingTop y paddingBottom serán animados
     paddingHorizontal: 20,
     backgroundColor: '#cf152d',
     borderBottomLeftRadius: 24,
@@ -179,12 +249,14 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
+    zIndex: 10,
+    justifyContent: 'flex-end',
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
     color: '#fff',
-    marginBottom: 4,
+    marginBottom: 10,
     letterSpacing: -0.5,
   },
   headerUserName: {
@@ -202,17 +274,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 16,
     borderWidth: 1.5,
     borderColor: '#e0e0e0',
     paddingHorizontal: 10,
-    height: 52,
     marginBottom: 0,
     marginTop: 0,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
     color: '#000',
     backgroundColor: 'transparent',
     paddingVertical: 0,
