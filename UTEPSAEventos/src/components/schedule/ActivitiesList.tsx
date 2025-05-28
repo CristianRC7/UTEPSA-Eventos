@@ -1,57 +1,25 @@
 import React from 'react';
-import { FlatList, StyleSheet, Alert } from 'react-native';
+import { FlatList, StyleSheet } from 'react-native';
 import { ScheduleActivity } from '../../types/ScheduleTypes';
 import ActivityCard from './ActivityCard';
 import EmptyState from './EmptyState';
-import { getSession } from '../../utils/sessionStorage';
-import { BASE_URL } from '../../utils/Config';
 
 interface ActivitiesListProps {
   activities: ScheduleActivity[];
   refreshing: boolean;
   onRefresh: () => void;
+  onInscriptionRequest: (activity: ScheduleActivity) => void;
 }
 
 const ActivitiesList: React.FC<ActivitiesListProps> = ({ 
   activities, 
   refreshing, 
-  onRefresh 
+  onRefresh,
+  onInscriptionRequest
 }) => {
-  const handleActivityPress = async (activity: ScheduleActivity) => {
+  const handleActivityPress = (activity: ScheduleActivity) => {
     if (activity.inscripcion_habilitada) {
-      Alert.alert(
-        "¿Deseas inscribirte a la actividad?",
-        "",
-        [
-          { text: "No", style: "cancel" },
-          { text: "Sí", onPress: async () => {
-              try {
-                const userData = await getSession();
-                if (!userData || !userData.id_usuario) {
-                  Alert.alert('Error', 'No se pudo obtener el usuario.');
-                  return;
-                }
-                const response = await fetch(`${BASE_URL}/InscripcionActividades.php`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    id_usuario: userData.id_usuario,
-                    id_actividad: activity.id_actividad
-                  })
-                });
-                const data = await response.json();
-                if (data.success) {
-                  Alert.alert('¡Inscripción exitosa!', data.message || 'Te has inscrito correctamente.');
-                } else {
-                  Alert.alert('Error', data.message || 'No se pudo inscribir.');
-                }
-              } catch (error) {
-                Alert.alert('Error', 'Ocurrió un error al inscribirse.');
-              }
-            }
-          }
-        ]
-      );
+      onInscriptionRequest(activity);
     }
   };
 

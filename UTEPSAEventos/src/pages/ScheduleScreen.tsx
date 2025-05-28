@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StatusBar, View, Text, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+import { SafeAreaView, StatusBar, Text, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BASE_URL } from '../utils/Config';
 import { getSession } from '../utils/sessionStorage';
@@ -8,6 +8,7 @@ import ScheduleHeader from '../components/schedule/ScheduleHeader';
 import DayTabs from '../components/schedule/DayTabs';
 import ActivitiesList from '../components/schedule/ActivitiesList';
 import EmptyState from '../components/schedule/EmptyState';
+import ModalInscription from '../components/schedule/ModalInscription';
 import { GroupedSchedule, ScheduleActivity } from '../types/ScheduleTypes';
 
 interface ScheduleScreenProps {
@@ -26,6 +27,8 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<ScheduleActivity | null>(null);
 
   const fetchSchedule = async () => {
     try {
@@ -89,7 +92,7 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
 
   useEffect(() => {
     fetchSchedule();
-  }, [eventId]);
+  }, [eventId, fetchSchedule]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -105,6 +108,11 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
 
     const selectedDayData = schedule.find(day => day.dia_numero === selectedDay);
     return selectedDayData ? selectedDayData.actividades : [];
+  };
+
+  const handleInscriptionRequest = (activity: ScheduleActivity) => {
+    setSelectedActivity(activity);
+    setModalVisible(true);
   };
 
   return (
@@ -129,6 +137,7 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
                 activities={getCurrentDayActivities()}
                 refreshing={refreshing}
                 onRefresh={handleRefresh}
+                onInscriptionRequest={handleInscriptionRequest}
               />
             </>
           ) : (
@@ -138,6 +147,16 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
               icon="event-busy"
             />
           )}
+
+          <ModalInscription 
+            visible={modalVisible}
+            activity={selectedActivity}
+            onClose={() => setModalVisible(false)}
+            onSuccess={() => {
+              setModalVisible(false);
+              fetchSchedule();
+            }}
+          />
         </>
       )}
     </SafeAreaView>
