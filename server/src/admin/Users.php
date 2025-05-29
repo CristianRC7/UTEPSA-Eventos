@@ -118,8 +118,8 @@ class Users {
         $stmt = $this->conn->prepare('SELECT id_evento, titulo FROM eventos');
         $stmt->execute();
         $eventos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // Obtener eventos en los que el usuario está inscrito
-        $stmt = $this->conn->prepare('SELECT id_evento FROM inscripciones WHERE id_usuario = ?');
+        // Obtener eventos en los que el usuario está inscrito (con id_inscripcion)
+        $stmt = $this->conn->prepare('SELECT i.id_inscripcion, i.id_evento, c.id_certificado, c.nro_certificado FROM inscripciones i LEFT JOIN certificados c ON i.id_inscripcion = c.id_inscripcion WHERE i.id_usuario = ?');
         $stmt->execute([$id_usuario]);
         $inscritos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode([
@@ -144,6 +144,36 @@ class Users {
         }
         echo json_encode(['success' => true]);
     }
+
+    public function asignarCertificado($id_inscripcion, $nro_certificado) {
+        $stmt = $this->conn->prepare('INSERT INTO certificados (id_inscripcion, nro_certificado) VALUES (?, ?)');
+        $ok = $stmt->execute([$id_inscripcion, $nro_certificado]);
+        if ($ok) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al asignar certificado']);
+        }
+    }
+
+    public function editarCertificado($id_certificado, $nro_certificado) {
+        $stmt = $this->conn->prepare('UPDATE certificados SET nro_certificado = ? WHERE id_certificado = ?');
+        $ok = $stmt->execute([$nro_certificado, $id_certificado]);
+        if ($ok) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al editar certificado']);
+        }
+    }
+
+    public function eliminarCertificado($id_certificado) {
+        $stmt = $this->conn->prepare('DELETE FROM certificados WHERE id_certificado = ?');
+        $ok = $stmt->execute([$id_certificado]);
+        if ($ok) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al eliminar certificado']);
+        }
+    }
 }
 
 $users = new Users();
@@ -160,6 +190,20 @@ if ($method === 'POST') {
     if (isset($data['accion']) && $data['accion'] === 'actualizar_inscripciones') {
         $users->actualizarInscripciones($data['id_usuario'], $data['eventos']);
         exit;
+    }
+    if (isset($data['accion'])) {
+        if ($data['accion'] === 'asignar_certificado') {
+            $users->asignarCertificado($data['id_inscripcion'], $data['nro_certificado']);
+            exit;
+        }
+        if ($data['accion'] === 'editar_certificado') {
+            $users->editarCertificado($data['id_certificado'], $data['nro_certificado']);
+            exit;
+        }
+        if ($data['accion'] === 'eliminar_certificado') {
+            $users->eliminarCertificado($data['id_certificado']);
+            exit;
+        }
     }
 }
 

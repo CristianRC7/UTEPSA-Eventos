@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import SideBar from '../components/sideBar';
 import { BASE_URL } from '../utils/Config';
 import UserModal from '../components/user/Modal';
-import { Pencil, Trash2, Plus, CalendarCheck2 } from 'lucide-react';
+import { Pencil, Trash2, Plus, CalendarCheck2, Award } from 'lucide-react';
 import EventosModal from '../components/user/EventosModal';
+import CertificadoModal from '../components/user/CertificadoModal';
 
 interface Usuario {
   id_usuario: number;
@@ -23,6 +24,11 @@ const UsersPage = () => {
   const [modalModo, setModalModo] = useState<'crear' | 'editar'>('crear');
   const [eventosModalOpen, setEventosModalOpen] = useState(false);
   const [usuarioEventos, setUsuarioEventos] = useState<Usuario | null>(null);
+  const [certModalOpen, setCertModalOpen] = useState(false);
+  const [certUsuario, setCertUsuario] = useState<Usuario | null>(null);
+  const [certInscripciones, setCertInscripciones] = useState<any[]>([]);
+  const [certSelected, setCertSelected] = useState<any>(null);
+  const [certEventos, setCertEventos] = useState<{ id_evento: number; titulo: string }[]>([]);
 
   const fetchUsuarios = async () => {
     setLoading(true);
@@ -91,6 +97,22 @@ const UsersPage = () => {
     setEventosModalOpen(true);
   };
 
+  const handleCertificado = async (usuario: Usuario) => {
+    // Obtener inscripciones del usuario
+    try {
+      const res = await fetch(`${BASE_URL}admin/Users.php?inscripciones_usuario=${usuario.id_usuario}`);
+      const data = await res.json();
+      if (data.success) {
+        setCertUsuario(usuario);
+        setCertInscripciones(data.inscritos);
+        setCertEventos(data.eventos);
+        setCertModalOpen(true);
+      }
+    } catch {
+      alert('Error al obtener inscripciones');
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100">
       <SideBar />
@@ -155,6 +177,13 @@ const UsersPage = () => {
                         >
                           <CalendarCheck2 size={18} />
                         </button>
+                        <button
+                          className="text-purple-600 hover:text-purple-800 cursor-pointer"
+                          title="Asignar/Editar certificado"
+                          onClick={() => handleCertificado(u)}
+                        >
+                          <Award size={18} />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -181,6 +210,15 @@ const UsersPage = () => {
             open={eventosModalOpen}
             onClose={() => setEventosModalOpen(false)}
             usuario={usuarioEventos}
+          />
+        )}
+        {certModalOpen && certUsuario && (
+          <CertificadoModal
+            open={certModalOpen}
+            onClose={() => setCertModalOpen(false)}
+            usuario={certUsuario}
+            inscripciones={certInscripciones}
+            eventos={certEventos}
           />
         )}
       </div>
