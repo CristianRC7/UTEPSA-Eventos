@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import SideBar from '../components/sideBar';
 import { BASE_URL } from '../utils/Config';
 import ActividadModal from '../components/cronograma/ActividadModal';
 import { Pencil, Trash2 } from 'lucide-react';
