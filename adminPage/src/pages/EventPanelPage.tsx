@@ -177,8 +177,20 @@ const EventPanelPage = () => {
         ) : (
           <>
             <h2 className="text-2xl font-bold text-[#cf152d] mb-4">{nombreEvento}</h2>
-            {/* Botón para abrir modal de filtro */}
+            {/* Botón para generar reporte PDF */}
             <div className="flex justify-end mb-4">
+              <button
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors cursor-pointer mr-2"
+                onClick={() => {
+                  if (!id) return;
+                  const url = `${BASE_URL}admin/generateEventReport.php?id_evento=${id}`;
+                  // Abrir en nueva pestaña para descarga directa
+                  window.open(url, '_blank');
+                }}
+              >
+                Generar reporte PDF
+              </button>
+              {/* Botón para abrir modal de filtro */}
               <button
                 className="px-4 py-2 bg-[#cf152d] text-white rounded hover:bg-[#b01223] transition-colors cursor-pointer"
                 onClick={() => setModalOpen(true)}

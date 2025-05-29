@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StatusBar, Text, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { SafeAreaView, StatusBar, ActivityIndicator, StyleSheet, Alert, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BASE_URL } from '../utils/Config';
 import { getSession } from '../utils/sessionStorage';
@@ -15,14 +15,13 @@ interface ScheduleScreenProps {
   route: {
     params: {
       eventId: number;
-      eventTitle: string;
     };
   };
 }
 
 const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
   const navigation = useNavigation();
-  const { eventId, eventTitle } = route.params;
+  const { eventId } = route.params;
   const [schedule, setSchedule] = useState<GroupedSchedule[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -30,7 +29,7 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<ScheduleActivity | null>(null);
 
-  const fetchSchedule = async () => {
+  const fetchSchedule = useCallback(async () => {
     try {
       const userData = await getSession();
       const id_usuario = userData?.id_usuario;
@@ -58,7 +57,7 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [eventId, selectedDay]);
 
   const processScheduleData = (activities: ScheduleActivity[]): GroupedSchedule[] => {
     const dateGroups: { [key: string]: ScheduleActivity[] } = {};
@@ -92,6 +91,7 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
 
   useEffect(() => {
     fetchSchedule();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId, fetchSchedule]);
 
   const handleRefresh = () => {
@@ -124,15 +124,15 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
         <ActivityIndicator size="large" color="#000" style={styles.loader} />
       ) : (
         <>
-          <Text style={styles.eventTitle}>{eventTitle}</Text>
-
           {schedule.length > 0 ? (
             <>
-              <DayTabs 
-                schedule={schedule} 
-                selectedDay={selectedDay} 
-                onSelectDay={setSelectedDay} 
-              />
+              <View style={styles.dayTabsWrapper}>
+                <DayTabs 
+                  schedule={schedule} 
+                  selectedDay={selectedDay} 
+                  onSelectDay={setSelectedDay}
+                />
+              </View>
               <ActivitiesList 
                 activities={getCurrentDayActivities()}
                 refreshing={refreshing}
@@ -168,18 +168,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  eventTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
   loader: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  dayTabs: {
+    marginTop: 12,
+    paddingHorizontal: 20,
+  },
+  dayTabsWrapper: {
+    marginTop: 24,
   },
 });
 
