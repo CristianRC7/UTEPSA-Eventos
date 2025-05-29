@@ -109,6 +109,7 @@ const FormPublication = () => {
         return false;
       }
     }
+    // iOS no necesita lógica adicional, los permisos se gestionan automáticamente con Info.plist
     return true; // iOS maneja permisos diferente
   };
 
@@ -147,6 +148,7 @@ const FormPublication = () => {
         return false;
       }
     }
+    // iOS no necesita lógica adicional, los permisos se gestionan automáticamente con Info.plist
     return true; // iOS maneja permisos diferente
   };
 

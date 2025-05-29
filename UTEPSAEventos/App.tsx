@@ -19,6 +19,7 @@ import BottomNavigator from './src/components/BottomNavigator';
 import SplashScreen from './src/pages/SplashScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SpeakerDetailPage from './src/components/Speaker/SpeakerDetailPage';
+import Orientation from 'react-native-orientation-locker';
 
 
 // Global function for handling back button press
@@ -47,6 +48,7 @@ function App(): React.JSX.Element {
   const [showSplash, setShowSplash] = useState<boolean | null>(null);
 
   useEffect(() => {
+    Orientation.lockToPortrait();
     // Check for existing session and splash
     const checkSession = async () => {
       try {
