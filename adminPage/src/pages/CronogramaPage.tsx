@@ -61,49 +61,65 @@ const CronogramaPage = () => {
   };
 
   const handleSave = async (actividad: Actividad) => {
-    if (modalMode === 'crear') {
-      // Crear actividad
-      const res = await fetch(`${BASE_URL}admin/Events.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          accion: 'crear_actividad',
-          id_evento: id,
-          ...actividad
-        })
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.message || 'Error al crear actividad');
-    } else {
-      // Editar actividad
-      const res = await fetch(`${BASE_URL}admin/Events.php`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          accion: 'editar_actividad',
-          id_evento: id,
-          ...actividad
-        })
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.message || 'Error al editar actividad');
+    try {
+      if (modalMode === 'crear') {
+        // Crear actividad
+        const res = await fetch(`${BASE_URL}admin/Events.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            accion: 'crear_actividad',
+            id_evento: id,
+            ...actividad
+          })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Error al crear actividad');
+      } else {
+        // Editar actividad
+        const res = await fetch(`${BASE_URL}admin/Events.php`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            accion: 'editar_actividad',
+            id_evento: id,
+            ...actividad
+          })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Error al editar actividad');
+      }
+      await fetchActividades();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert('Error de red o del servidor');
+      }
     }
-    await fetchActividades();
   };
 
   const handleEliminar = async (actividad: Actividad) => {
     if (!window.confirm('¿Seguro que deseas eliminar esta actividad? Esta acción no se puede deshacer.')) return;
-    const res = await fetch(`${BASE_URL}admin/Events.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        accion: 'eliminar_actividad',
-        id_actividad: actividad.id_actividad
-      })
-    });
-    const data = await res.json();
-    if (!data.success) alert(data.message || 'Error al eliminar actividad');
-    await fetchActividades();
+    try {
+      const res = await fetch(`${BASE_URL}admin/Events.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accion: 'eliminar_actividad',
+          id_actividad: actividad.id_actividad
+        })
+      });
+      const data = await res.json();
+      if (!data.success) alert(data.message || 'Error al eliminar actividad');
+      await fetchActividades();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert('Error de red o del servidor');
+      }
+    }
   };
 
   const openFormularioModal = async (actividad: Actividad) => {
@@ -129,19 +145,27 @@ const CronogramaPage = () => {
   const handleSaveFormulario = async (formData: { fecha_inicio: string; fecha_fin: string }) => {
     if (!formActividadId) return;
     setFormLoading(true);
-    const res = await fetch(`${BASE_URL}admin/Events.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        accion: 'habilitar_formulario',
-        id_actividad: formActividadId,
-        ...formData
-      })
-    });
-    const data = await res.json();
+    try {
+      const res = await fetch(`${BASE_URL}admin/Events.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accion: 'habilitar_formulario',
+          id_actividad: formActividadId,
+          ...formData
+        })
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message || 'Error al guardar habilitación');
+      await fetchActividades();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert('Error de red o del servidor');
+      }
+    }
     setFormLoading(false);
-    if (!data.success) throw new Error(data.message || 'Error al guardar habilitación');
-    await fetchActividades();
   };
 
   const actividadesFiltradas = actividades.filter(a =>
@@ -150,14 +174,15 @@ const CronogramaPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-gray-100 via-white to-gray-200">
-      <SideBar />
       <div className="w-full max-w-5xl px-4 mt-12 mb-8 rounded-2xl shadow-2xl bg-white/90 border border-gray-200">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-8 pb-4">
           <h2 className="text-3xl font-extrabold text-[#cf152d] tracking-tight">Cronograma del evento</h2>
           <button
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 transition-colors cursor-pointer font-semibold"
-            onClick={() => navigate(-1)}
-          >Volver</button>
+            onClick={() => navigate('/dashboard')}
+            className="px-4 py-2 bg-[#cf152d] text-white rounded hover:bg-[#b01223] transition-colors cursor-pointer font-semibold"
+          >
+            ← Volver al Dashboard
+          </button>
         </div>
         <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
           <input

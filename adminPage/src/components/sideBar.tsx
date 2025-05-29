@@ -72,6 +72,14 @@ const SideBar = () => {
               <ImageIcon size={20} />
               Publicaciones
             </Link>
+            <Link
+              to="/dashboard/expositores"
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors cursor-pointer ${location.pathname === '/dashboard/expositores' ? 'bg-[#cf152d] text-white' : 'text-gray-700 hover:bg-gray-100'}`}
+              onClick={() => setOpen(false)}
+            >
+              <Users size={20} />
+              Expositores
+            </Link>
           </div>
           <div className="p-4 border-t mt-auto">
             <button

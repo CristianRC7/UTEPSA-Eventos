@@ -61,8 +61,16 @@ const EventPanelPage = () => {
           setNombreEvento(data.evento.titulo);
           setInscritos(data.inscritos);
           setActividades(data.actividades);
+        } else {
+          alert(data.message || 'Error al obtener datos del evento');
         }
-      } catch { /* error intencionalmente ignorado */ }
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          alert(err.message);
+        } else {
+          alert('Error de red o del servidor');
+        }
+      }
       setLoading(false);
     };
     fetchData();
@@ -76,8 +84,16 @@ const EventPanelPage = () => {
         const data = await res.json();
         if (data.success) {
           setEventos(data.eventos);
+        } else {
+          alert(data.message || 'Error al obtener eventos');
         }
-      } catch { /* error intencionalmente ignorado */ }
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          alert(err.message);
+        } else {
+          alert('Error de red o del servidor');
+        }
+      }
     };
     fetchEventos();
   }, []);
@@ -96,8 +112,16 @@ const EventPanelPage = () => {
           const data = await res.json();
           if (data.success) {
             results.push({ nombre: data.evento.titulo, inscritos: data.inscritos.length });
+          } else {
+            alert(data.message || 'Error al obtener datos de evento para comparar');
           }
-        } catch { /* error intencionalmente ignorado */ }
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            alert(err.message);
+          } else {
+            alert('Error de red o del servidor');
+          }
+        }
       }
       setDatosComparar(results);
     };
@@ -125,8 +149,16 @@ const EventPanelPage = () => {
         if (data.success) {
           setActividadesHabilitadasValoracion(data.actividades);
           setValoracionesHabilitadas(data.valoraciones || {});
+        } else {
+          alert(data.message || 'Error al obtener valoraciones');
         }
-      } catch { /* error intencionalmente ignorado */ }
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          alert(err.message);
+        } else {
+          alert('Error de red o del servidor');
+        }
+      }
     };
     if (id) fetchHabilitadas();
   }, [id]);
