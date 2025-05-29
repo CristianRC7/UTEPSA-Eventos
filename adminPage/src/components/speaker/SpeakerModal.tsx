@@ -97,8 +97,7 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({ open, onClose, expositor, m
         if (!success) setError(data.message || 'Error al crear expositor');
       } else if (modo === 'editar' && expositor) {
         // Si se eliminó la imagen, o no hay imagen, permitir subir otra
-        let imagen_url = form.imagen_url;
-        let body: any = {
+        const body: Record<string, unknown> = {
           id_expositor: expositor.id_expositor,
           nombre: form.nombre,
           apellido_paterno: form.apellido_paterno,
