@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once '../../conexion.php';
 
-class EventPanel {
+class GetHabilitadasConValoracion {
     private $conn;
     public function __construct() {
         $db = new Database();
@@ -23,23 +23,11 @@ class EventPanel {
             echo json_encode(['success' => false, 'message' => 'Falta id_evento']);
             exit;
         }
-        // Datos del evento
-        $stmt = $this->conn->prepare('SELECT e.*, w.url_web FROM eventos e LEFT JOIN web_evento w ON e.id_evento = w.id_evento WHERE e.id_evento = ? LIMIT 1');
-        $stmt->execute([$id_evento]);
-        $evento = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$evento) {
-            echo json_encode(['success' => false, 'message' => 'Evento no encontrado']);
-            exit;
-        }
-        // Inscritos al evento
-        $stmt = $this->conn->prepare('SELECT u.id_usuario, u.nombre, u.apellido_paterno, u.apellido_materno, u.usuario FROM inscripciones i JOIN usuarios u ON i.id_usuario = u.id_usuario WHERE i.id_evento = ?');
-        $stmt->execute([$id_evento]);
-        $inscritos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // Actividades del evento con cantidad de inscritos y si la inscripción está habilitada
-        $stmt = $this->conn->prepare('SELECT a.id_actividad, a.titulo, a.descripcion, a.fecha, a.hora, a.ubicacion, a.inscripcion_habilitada, (SELECT COUNT(*) FROM inscripcion_actividades ia WHERE ia.id_actividad = a.id_actividad) as inscritos FROM cronograma_eventos a WHERE a.id_evento = ?');
+        // Actividades habilitadas para encuestas
+        $stmt = $this->conn->prepare('SELECT a.id_actividad, a.titulo, a.descripcion, a.fecha, a.hora, a.ubicacion, a.inscripcion_habilitada, (SELECT COUNT(*) FROM inscripcion_actividades ia WHERE ia.id_actividad = a.id_actividad) as inscritos FROM cronograma_eventos a INNER JOIN habilitacion_formularios h ON a.id_actividad = h.id_actividad WHERE a.id_evento = ?');
         $stmt->execute([$id_evento]);
         $actividades = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // Obtener valoraciones de formularios por actividad
+        // Obtener valoraciones de formularios por actividad habilitada
         $valoraciones = [];
         foreach ($actividades as $act) {
             $id_actividad = $act['id_actividad'];
@@ -57,13 +45,11 @@ class EventPanel {
         }
         echo json_encode([
             'success' => true,
-            'evento' => $evento,
-            'inscritos' => $inscritos,
             'actividades' => $actividades,
             'valoraciones' => $valoraciones
         ]);
     }
 }
 
-$panel = new EventPanel();
-$panel->handle(); 
+$handler = new GetHabilitadasConValoracion();
+$handler->handle(); 

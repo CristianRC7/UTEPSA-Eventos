@@ -26,6 +26,12 @@ interface Evento {
   titulo: string;
 }
 
+interface ValoracionActividad {
+  cantidad: number;
+  promedio: number | null;
+  descripciones: string[];
+}
+
 const EventPanelPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -41,6 +47,9 @@ const EventPanelPage = () => {
   // Estado para actividades seleccionadas (por defecto todas las habilitadas)
   const actividadesHabilitadas = actividades.filter(a => a.inscripcion_habilitada);
   const [actividadesSeleccionadas, setActividadesSeleccionadas] = useState<number[]>([]);
+  const [valoracionesHabilitadas, setValoracionesHabilitadas] = useState<Record<number, ValoracionActividad>>({});
+  const [modalComentarios, setModalComentarios] = useState<{ open: boolean; comentarios: string[]; actividad: string | null }>({ open: false, comentarios: [], actividad: null });
+  const [actividadesHabilitadasValoracion, setActividadesHabilitadasValoracion] = useState<Actividad[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,9 +113,23 @@ const EventPanelPage = () => {
   const actividadesFiltradas = actividadesHabilitadas.filter(a => actividadesSeleccionadas.includes(a.id_actividad));
 
   // Stats filtradas
-  const totalInscritos = actividadesFiltradas.reduce((acc, a) => acc + a.inscritos, 0);
   const actividadMasInscritos = actividadesFiltradas.length > 0 ? actividadesFiltradas.reduce((max, a) => a.inscritos > max.inscritos ? a : max, actividadesFiltradas[0]) : null;
   const actividadMenosInscritos = actividadesFiltradas.length > 0 ? actividadesFiltradas.reduce((min, a) => a.inscritos < min.inscritos ? a : min, actividadesFiltradas[0]) : null;
+
+  // Fetch para valoraciones de actividades habilitadas
+  useEffect(() => {
+    const fetchHabilitadas = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}admin/getHabilitadasConValoracion.php?id_evento=${id}`);
+        const data = await res.json();
+        if (data.success) {
+          setActividadesHabilitadasValoracion(data.actividades);
+          setValoracionesHabilitadas(data.valoraciones || {});
+        }
+      } catch { /* error intencionalmente ignorado */ }
+    };
+    if (id) fetchHabilitadas();
+  }, [id]);
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100">
@@ -143,7 +166,7 @@ const EventPanelPage = () => {
             {/* Cards de resumen */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
               <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center">
-                <div className="text-3xl font-bold text-[#cf152d]">{totalInscritos}</div>
+                <div className="text-3xl font-bold text-[#cf152d]">{inscritos.length}</div>
                 <div className="text-gray-600 text-sm">Total inscritos</div>
               </div>
               <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center">
@@ -245,6 +268,77 @@ const EventPanelPage = () => {
                 </table>
               </div>
             </div>
+            {/* Sección de valoraciones */}
+            <div className="bg-white rounded-xl shadow p-6 mb-8">
+              <div className="text-lg font-semibold text-[#cf152d] mb-4">Valoración de actividades</div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="px-4 py-2 text-left">Actividad</th>
+                      <th className="px-4 py-2 text-left">Promedio (%)</th>
+                      <th className="px-4 py-2 text-left">Cantidad de respuestas</th>
+                      <th className="px-4 py-2 text-left">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {actividadesHabilitadasValoracion.length === 0 ? (
+                      <tr><td colSpan={4} className="text-center text-gray-400 py-8">No hay actividades habilitadas para encuestas.</td></tr>
+                    ) : actividadesHabilitadasValoracion.map(a => {
+                      const val = valoracionesHabilitadas[a.id_actividad] || { cantidad: 0, promedio: null, descripciones: [] };
+                      const porcentaje = val.promedio !== null ? ((val.promedio / 5) * 100).toFixed(1) : '-';
+                      return (
+                        <tr key={a.id_actividad} className="border-b">
+                          <td className="px-4 py-2">{a.titulo}</td>
+                          <td className="px-4 py-2">{val.promedio !== null ? `${porcentaje} %` : '-'}</td>
+                          <td className="px-4 py-2">{val.cantidad}</td>
+                          <td className="px-4 py-2">
+                            <button
+                              className="px-3 py-1 bg-[#cf152d] text-white rounded hover:bg-[#b01223] text-xs"
+                              onClick={() => setModalComentarios({ open: true, comentarios: val.descripciones, actividad: a.titulo })}
+                              disabled={val.descripciones.length === 0}
+                            >
+                              Ver encuestas
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {/* Modal de comentarios de encuestas */}
+            {modalComentarios.open && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg relative border border-gray-200">
+                  <button
+                    className="absolute top-2 right-2 text-gray-400 hover:text-[#cf152d] text-xl cursor-pointer"
+                    onClick={() => setModalComentarios({ open: false, comentarios: [], actividad: null })}
+                  >
+                    ×
+                  </button>
+                  <h3 className="text-lg font-bold text-[#cf152d] mb-4">Comentarios recibidos - {modalComentarios.actividad}</h3>
+                  {modalComentarios.comentarios.length > 0 ? (
+                    <ul className="max-h-60 overflow-y-auto list-disc pl-5 space-y-2">
+                      {modalComentarios.comentarios.map((desc, idx) => (
+                        <li key={idx} className="text-gray-700 bg-gray-50 rounded p-2 border border-gray-200">{desc}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="text-gray-400 text-center py-8">No hay comentarios para esta actividad.</div>
+                  )}
+                  <div className="flex justify-end mt-4">
+                    <button
+                      className="px-4 py-2 bg-[#cf152d] text-white rounded hover:bg-[#b01223] cursor-pointer"
+                      onClick={() => setModalComentarios({ open: false, comentarios: [], actividad: null })}
+                    >
+                      Cerrar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>

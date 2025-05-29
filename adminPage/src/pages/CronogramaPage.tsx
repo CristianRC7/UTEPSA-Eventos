@@ -4,6 +4,7 @@ import SideBar from '../components/sideBar';
 import { BASE_URL } from '../utils/Config';
 import ActividadModal from '../components/cronograma/ActividadModal';
 import { Pencil, Trash2 } from 'lucide-react';
+import FormularioModal from '../components/cronograma/FormularioModal';
 
 interface Actividad {
   id_actividad?: number;
@@ -24,6 +25,10 @@ const CronogramaPage = () => {
   const [editData, setEditData] = useState<Actividad | null>(null);
   const [modalMode, setModalMode] = useState<'crear' | 'editar'>('crear');
   const navigate = useNavigate();
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [formActividadId, setFormActividadId] = useState<number | null>(null);
+  const [formInitData, setFormInitData] = useState<{ fecha_inicio: string; fecha_fin: string } | undefined>(undefined);
+  const [formLoading, setFormLoading] = useState(false);
 
   const fetchActividades = async () => {
     setLoading(true);
@@ -98,6 +103,44 @@ const CronogramaPage = () => {
     });
     const data = await res.json();
     if (!data.success) alert(data.message || 'Error al eliminar actividad');
+    await fetchActividades();
+  };
+
+  const openFormularioModal = async (actividad: Actividad) => {
+    setFormActividadId(actividad.id_actividad!);
+    setFormLoading(true);
+    setFormInitData(undefined);
+    setFormModalOpen(true);
+    try {
+      const res = await fetch(`${BASE_URL}admin/Events.php?accion=get_habilitacion_formulario&id_actividad=${actividad.id_actividad}`);
+      const data = await res.json();
+      if (data.success && data.habilitacion) {
+        setFormInitData({
+          fecha_inicio: data.habilitacion.fecha_inicio,
+          fecha_fin: data.habilitacion.fecha_fin
+        });
+      }
+    } catch {
+      // Opcional: puedes mostrar un error si lo deseas
+    }
+    setFormLoading(false);
+  };
+
+  const handleSaveFormulario = async (formData: { fecha_inicio: string; fecha_fin: string }) => {
+    if (!formActividadId) return;
+    setFormLoading(true);
+    const res = await fetch(`${BASE_URL}admin/Events.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        accion: 'habilitar_formulario',
+        id_actividad: formActividadId,
+        ...formData
+      })
+    });
+    const data = await res.json();
+    setFormLoading(false);
+    if (!data.success) throw new Error(data.message || 'Error al guardar habilitación');
     await fetchActividades();
   };
 
@@ -179,6 +222,13 @@ const CronogramaPage = () => {
                       >
                         <Trash2 size={18} />
                       </button>
+                      <button
+                        className="text-green-600 hover:text-green-800 p-1 rounded cursor-pointer ml-2"
+                        title="Habilitar/Editar encuesta"
+                        onClick={() => openFormularioModal(act)}
+                      >
+                        📝
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -192,6 +242,13 @@ const CronogramaPage = () => {
           onSave={handleSave}
           initialData={editData || undefined}
           modo={modalMode}
+        />
+        <FormularioModal
+          open={formModalOpen}
+          onClose={() => setFormModalOpen(false)}
+          onSave={handleSaveFormulario}
+          initialData={formInitData}
+          loading={formLoading}
         />
       </div>
     </div>

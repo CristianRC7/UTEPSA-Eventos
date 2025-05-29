@@ -94,8 +94,6 @@ CREATE TABLE inscripcion_actividades (
     FOREIGN KEY (id_actividad) REFERENCES cronograma_eventos(id_actividad) ON DELETE CASCADE
 );
 
-
-
 -- Habilitación de formularios por actividad
 CREATE TABLE habilitacion_formularios (
     id_habilitacion INT AUTO_INCREMENT PRIMARY KEY,

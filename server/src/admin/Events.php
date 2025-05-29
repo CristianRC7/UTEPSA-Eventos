@@ -217,6 +217,50 @@ class Events {
             echo json_encode(['success' => false, 'message' => 'Error al eliminar actividad']);
         }
     }
+
+    // --- NUEVO: Habilitación de formularios por actividad ---
+    public function setHabilitacionFormulario($data) {
+        if (!isset($data['id_actividad'], $data['fecha_inicio'], $data['fecha_fin'])) {
+            echo json_encode(['success' => false, 'message' => 'Faltan datos requeridos']);
+            return;
+        }
+        // Verificar si ya existe habilitación para la actividad
+        $stmt = $this->conn->prepare('SELECT COUNT(*) FROM habilitacion_formularios WHERE id_actividad = ?');
+        $stmt->execute([$data['id_actividad']]);
+        if ($stmt->fetchColumn() > 0) {
+            // Actualizar
+            $stmtUp = $this->conn->prepare('UPDATE habilitacion_formularios SET fecha_inicio=?, fecha_fin=? WHERE id_actividad=?');
+            $ok = $stmtUp->execute([
+                $data['fecha_inicio'],
+                $data['fecha_fin'],
+                $data['id_actividad']
+            ]);
+        } else {
+            // Insertar
+            $stmtIn = $this->conn->prepare('INSERT INTO habilitacion_formularios (id_actividad, fecha_inicio, fecha_fin) VALUES (?, ?, ?)');
+            $ok = $stmtIn->execute([
+                $data['id_actividad'],
+                $data['fecha_inicio'],
+                $data['fecha_fin']
+            ]);
+        }
+        if ($ok) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al guardar habilitación']);
+        }
+    }
+
+    public function getHabilitacionFormulario($id_actividad) {
+        $stmt = $this->conn->prepare('SELECT * FROM habilitacion_formularios WHERE id_actividad = ? LIMIT 1');
+        $stmt->execute([$id_actividad]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            echo json_encode(['success' => true, 'habilitacion' => $row]);
+        } else {
+            echo json_encode(['success' => true, 'habilitacion' => null]);
+        }
+    }
 }
 
 $events = new Events();
@@ -250,6 +294,11 @@ if ($method === 'POST') {
         $events->eliminarActividad($data);
         exit;
     }
+    // Habilitar formulario para actividad
+    if (isset($data['accion']) && $data['accion'] === 'habilitar_formulario') {
+        $events->setHabilitacionFormulario($data);
+        exit;
+    }
     // Crear evento
     $events->create($data);
     exit;
@@ -273,6 +322,12 @@ if ($method === 'DELETE') {
     }
     if (isset($data['id_evento'])) {
         $events->delete($data['id_evento']);
+        exit;
+    }
+}
+if ($method === 'GET') {
+    if (isset($_GET['accion']) && $_GET['accion'] === 'get_habilitacion_formulario' && isset($_GET['id_actividad'])) {
+        $events->getHabilitacionFormulario($_GET['id_actividad']);
         exit;
     }
 }
