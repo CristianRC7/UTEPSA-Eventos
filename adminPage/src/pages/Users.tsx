@@ -26,8 +26,13 @@ const UsersPage = () => {
   const [usuarioEventos, setUsuarioEventos] = useState<Usuario | null>(null);
   const [certModalOpen, setCertModalOpen] = useState(false);
   const [certUsuario, setCertUsuario] = useState<Usuario | null>(null);
-  const [certInscripciones, setCertInscripciones] = useState<any[]>([]);
-  const [certSelected, setCertSelected] = useState<any>(null);
+  interface Inscripcion {
+    id_inscripcion: number;
+    id_evento: number;
+    // Agrega aquí otros campos relevantes según la estructura real de inscripciones
+    [key: string]: unknown;
+  }
+  const [certInscripciones, setCertInscripciones] = useState<Inscripcion[]>([]);
   const [certEventos, setCertEventos] = useState<{ id_evento: number; titulo: string }[]>([]);
 
   const fetchUsuarios = async () => {
