@@ -113,11 +113,11 @@ const PublicationScreen = () => {
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <Text style={styles.headerTitle}>Publicaciones</Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.filterButton, filterModalVisible && styles.filterButtonActive]}
             onPress={() => setFilterModalVisible(true)}
           >
-            <Icon name="filter-list" size={24} color={filterModalVisible ? "#FFF" : "#000"} />
+            <Icon name={filterModalVisible ? 'filter-list-off' : 'filter-list'} size={24} color={filterModalVisible ? '#FFF' : '#000'} />
           </TouchableOpacity>
         </View>
         <Text style={styles.headerSubtitle}>
@@ -294,4 +294,3 @@ const styles = StyleSheet.create({
 });
 
 export default PublicationScreen;
-

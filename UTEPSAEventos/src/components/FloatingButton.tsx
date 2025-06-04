@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  TouchableOpacity, 
-  StyleSheet, 
-  Animated, 
-  View, 
+import {
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+  View,
   Text,
   Modal,
   TouchableWithoutFeedback
@@ -22,7 +22,7 @@ interface FloatingButtonProps {
 
 const FloatingButton = ({
   onPress,
-  iconName = 'add',
+  iconName = 'menu',
   backgroundColor = '#cf152d',
   size = 60,
   iconColor = '#fff',
@@ -31,7 +31,7 @@ const FloatingButton = ({
   const [menuVisible, setMenuVisible] = useState(false);
   const navigation = useNavigation();
   const scaleAnimation = React.useRef(new Animated.Value(1)).current;
-  
+
   const handlePressIn = () => {
     Animated.timing(scaleAnimation, {
       toValue: 0.9,
@@ -39,7 +39,7 @@ const FloatingButton = ({
       useNativeDriver: true,
     }).start();
   };
-  
+
   const handlePressOut = () => {
     Animated.timing(scaleAnimation, {
       toValue: 1,
@@ -88,7 +88,7 @@ const FloatingButton = ({
             },
           ]}
         >
-          <Icon name={iconName} size={iconSize} color={iconColor} />
+          <Icon name={menuVisible ? 'menu-open' : iconName} size={iconSize} color={iconColor} />
         </Animated.View>
       </TouchableOpacity>
 
@@ -101,17 +101,17 @@ const FloatingButton = ({
         <TouchableWithoutFeedback onPress={() => setMenuVisible(false)}>
           <View style={styles.modalOverlay}>
             <View style={styles.menuContainer}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.menuItem}
                 onPress={handlePublishPhotos}
               >
                 <Icon name="photo-camera" size={24} color="#cf152d" />
                 <Text style={styles.menuText}>Publicar Fotos</Text>
               </TouchableOpacity>
-              
+
               <View style={styles.menuDivider} />
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 style={styles.menuItem}
                 onPress={handleMyPublications}
               >
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
     paddingRight: 25,
-    paddingBottom: 100,
+    paddingBottom: 160,
   },
   menuContainer: {
     backgroundColor: '#FFF',
