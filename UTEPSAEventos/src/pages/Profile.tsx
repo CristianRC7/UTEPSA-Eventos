@@ -56,20 +56,28 @@ const Profile = ({ route, navigation }: any) => {
 
         <View style={styles.optionsList}>
           <TouchableOpacity style={styles.optionItem} onPress={() => setShowPasswordModal(true)}>
-            <View style={[styles.optionIcon, { backgroundColor: '#cf152d' }]}> 
+            <View style={[styles.optionIcon, styles.optionIconLock]}>
               <Icon name="lock" size={24} color="#fff" />
             </View>
             <Text style={styles.optionText}>Cambiar contraseña</Text>
             <Icon name="chevron-right" size={24} color="#bbb" style={styles.optionChevron} />
-        </TouchableOpacity>
+          </TouchableOpacity>
 
           <TouchableOpacity style={styles.optionItem} onPress={() => navigation.navigate('MyCertificateScreen')}>
-            <View style={[styles.optionIcon, { backgroundColor: '#4F46E5' }]}> 
+            <View style={[styles.optionIcon, styles.optionIconSchool]}>
               <Icon name="school" size={24} color="#fff" />
             </View>
             <Text style={styles.optionText}>Ver mis certificados</Text>
             <Icon name="chevron-right" size={24} color="#bbb" style={styles.optionChevron} />
-        </TouchableOpacity>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.optionItem} onPress={() => Alert.alert('Soporte', 'Si necesitas ayuda, contáctate con soporte en el 3er piso, bloque este o al correo soporte.campusvirtual@utepsa.edu')}>
+            <View style={[styles.optionIcon, styles.optionIconHelp]}>
+              <Icon name="help" size={24} color="#fff" />
+            </View>
+            <Text style={styles.optionText}>Soporte</Text>
+            <Icon name="chevron-right" size={24} color="#bbb" style={styles.optionChevron} />
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -170,6 +178,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
+  },
+  optionIconSchool: {
+    backgroundColor: '#4F46E5',
+  },
+  optionIconLock: {
+    backgroundColor: '#cf152d',
+  },
+  optionIconHelp: {
+    backgroundColor: '#8B5CF6',
   },
   optionText: {
     fontSize: 16,

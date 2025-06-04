@@ -31,7 +31,7 @@ interface DashboardEventProps {
 const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
   const navigation = useNavigation<any>();
   const { event } = route.params || {};
-  
+
   // Format date to "day/month/year - Hour:Minute" format
   const formatDate = (dateStr: string) => {
     try {
@@ -50,7 +50,7 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
       return dateStr; // Return original string if formatting fails
     }
   };
-  
+
   const handleButtonPress = (feature: string) => {
     if (feature === 'Expositores') {
       navigation.navigate('SpeakerScreen', { eventId: event.id_evento, eventTitle: event.titulo });
@@ -68,7 +68,7 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
       Alert.alert('Información', `Apartado ${feature} en desarrollo`);
     }
   };
-  
+
   const handleBack = () => {
     navigation.goBack();
   };
@@ -77,10 +77,10 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
   const menuOptions = [
     { name: 'Cronograma', icon: 'event', color: '#4F46E5' },
     { name: 'Expositores', icon: 'people', color: '#10B981' },
-    { name: 'Formulario', icon: 'assignment', color: '#EC4899' },
-    { name: 'Puntos de inscripción', icon: 'place', color: '#3B82F6' },
+    // { name: 'Formulario', icon: 'assignment', color: '#EC4899' },
+    // { name: 'Puntos de inscripción', icon: 'place', color: '#3B82F6' },
     { name: 'Mis inscripciones', icon: 'assignment-turned-in', color: '#F59E0B' },
-    { name: 'Soporte', icon: 'help', color: '#8B5CF6' },
+    // { name: 'Soporte', icon: 'help', color: '#8B5CF6' },
   ];
 
   return (
@@ -94,7 +94,7 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
           <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalles del Evento</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.emptySpace} />
       </View>
       <ScrollView contentContainerStyle={styles.contentContainer}>
       <View style={styles.eventInfoSection}>
@@ -103,7 +103,9 @@ const DashboardEvent: React.FC<DashboardEventProps> = ({ route }) => {
           {event?.pagina_web && (
             <TouchableOpacity
               onPress={() => {
-                if (!event?.pagina_web) return;
+                if (!event?.pagina_web) {
+                  return;
+                }
                 const webUrl = !event.pagina_web.startsWith('http://') && !event.pagina_web.startsWith('https://')
                   ? 'https://' + event.pagina_web
                   : event.pagina_web;
@@ -268,6 +270,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#4B5563',
     textAlign: 'center',
+  },
+  emptySpace: {
+    width: 24,
   },
 });
 
