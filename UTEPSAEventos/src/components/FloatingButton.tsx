@@ -105,7 +105,7 @@ const FloatingButton = ({
                 style={styles.menuItem}
                 onPress={handlePublishPhotos}
               >
-                <Icon name="photo-camera" size={24} color="#cf152d" />
+                <Icon name="add-a-photo" size={24} color="#cf152d" />
                 <Text style={styles.menuText}>Publicar Fotos</Text>
               </TouchableOpacity>
 

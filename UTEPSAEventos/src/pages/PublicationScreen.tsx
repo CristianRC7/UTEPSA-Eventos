@@ -162,7 +162,7 @@ const PublicationScreen = () => {
           style={[styles.filterOption, filterOption === 'all' && styles.selectedFilterOption]}
           onPress={() => handleFilter('all')}
         >
-          <Icon name="view-list" size={20} color={filterOption === 'all' ? "#FFF" : "#000"} />
+          <Icon name="view-list" size={20} color={filterOption === 'all' ? '#FFF' : '#000'} />
           <Text style={[styles.filterText, filterOption === 'all' && styles.selectedFilterText]}>Todas</Text>
         </TouchableOpacity>
 
@@ -170,7 +170,7 @@ const PublicationScreen = () => {
           style={[styles.filterOption, filterOption === 'popular' && styles.selectedFilterOption]}
           onPress={() => handleFilter('popular')}
         >
-          <Icon name="star" size={20} color={filterOption === 'popular' ? "#FFF" : "#000"} />
+          <Icon name="star" size={20} color={filterOption === 'popular' ? '#FFF' : '#000'} />
           <Text style={[styles.filterText, filterOption === 'popular' && styles.selectedFilterText]}>Más populares</Text>
         </TouchableOpacity>
 
@@ -178,7 +178,7 @@ const PublicationScreen = () => {
           style={[styles.filterOption, filterOption === 'liked' && styles.selectedFilterOption]}
           onPress={() => handleFilter('liked')}
         >
-          <Icon name="favorite" size={20} color={filterOption === 'liked' ? "#FFF" : "#000"} />
+          <Icon name="favorite" size={20} color={filterOption === 'liked' ? '#FFF' : '#000'} />
           <Text style={[styles.filterText, filterOption === 'liked' && styles.selectedFilterText]}>Me gustan</Text>
         </TouchableOpacity>
       </BottomSheet>

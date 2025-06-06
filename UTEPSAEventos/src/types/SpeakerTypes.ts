@@ -6,4 +6,3 @@ export interface Speaker {
     descripcion: string;
     imagen_url: string | null;
   }
-  

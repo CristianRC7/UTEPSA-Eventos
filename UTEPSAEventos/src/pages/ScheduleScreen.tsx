@@ -104,7 +104,9 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
   };
 
   const getCurrentDayActivities = () => {
-    if (selectedDay === null || schedule.length === 0) return [];
+    if (selectedDay === null || schedule.length === 0) {
+      return [];
+    }
 
     const selectedDayData = schedule.find(day => day.dia_numero === selectedDay);
     return selectedDayData ? selectedDayData.actividades : [];
@@ -127,9 +129,9 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
           {schedule.length > 0 ? (
             <>
               <View style={styles.dayTabsWrapper}>
-                <DayTabs 
-                  schedule={schedule} 
-                  selectedDay={selectedDay} 
+                <DayTabs
+                  schedule={schedule}
+                  selectedDay={selectedDay}
                   onSelectDay={setSelectedDay}
                 />
               </View>
@@ -141,14 +143,14 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
               />
             </>
           ) : (
-            <EmptyState 
+            <EmptyState
               title="No hay cronograma disponible"
               message="No se han registrado actividades para este evento."
               icon="event-busy"
             />
           )}
 
-          <ModalInscription 
+          <ModalInscription
             visible={modalVisible}
             activity={selectedActivity}
             onClose={() => setModalVisible(false)}

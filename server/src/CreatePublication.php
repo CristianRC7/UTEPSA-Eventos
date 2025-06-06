@@ -103,7 +103,7 @@ class Publication {
                 error_log("Formato de imagen no soportado: " . print_r($img, true));
             }
         }
-        return [ 'success' => true, 'message' => 'Publicación enviada correctamente.', 'imagenes' => $img_urls ];
+        return [ 'success' => true, 'message' => 'Tu publicación ha sido enviada y está en proceso de revisión.', 'imagenes' => $img_urls ];
     }
 }
 

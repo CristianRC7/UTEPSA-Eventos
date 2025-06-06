@@ -32,7 +32,7 @@ const LoadingPulseCardAnimation = () => {
           key={idx}
           style={[
             styles.card,
-            { opacity: pulseAnim }
+            { opacity: pulseAnim },
           ]}
         >
           <View style={styles.titlePulse} />

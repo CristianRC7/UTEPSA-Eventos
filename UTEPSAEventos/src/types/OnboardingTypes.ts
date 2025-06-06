@@ -4,4 +4,4 @@ export interface OnboardingData {
   text: string;
   textColor: string;
   backgroundColor: string;
-} 
+}

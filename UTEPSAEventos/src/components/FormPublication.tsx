@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,26 +14,26 @@ import {
   FlatList,
   PermissionsAndroid,
   Linking,
-} from "react-native"
-import Icon from "react-native-vector-icons/MaterialIcons"
-import { useNavigation } from "@react-navigation/native"
-import ImagePicker from "react-native-image-crop-picker"
-import { getSession } from "../utils/sessionStorage"
-import { BASE_URL } from "../utils/Config"
-import BottomSheet from "./BottomSheet"
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native';
+import ImagePicker from 'react-native-image-crop-picker';
+import { getSession } from '../utils/sessionStorage';
+import { BASE_URL } from '../utils/Config';
+import BottomSheet from './BottomSheet';
 
 const MAX_IMAGES = 5;
 const MAX_DESCRIPTION_LENGTH = 250;
 
 const FormPublication = () => {
-  const navigation = useNavigation()
-  const [selectedImages, setSelectedImages] = useState<any[]>([])
-  const [caption, setCaption] = useState("")
-  const [eventName, setEventName] = useState("")
-  const [selectedEventId, setSelectedEventId] = useState<number | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [showEventSelector, setShowEventSelector] = useState(false)
-  const [eventList, setEventList] = useState<any[]>([])
+  const navigation = useNavigation();
+  const [selectedImages, setSelectedImages] = useState<any[]>([]);
+  const [caption, setCaption] = useState('');
+  const [eventName, setEventName] = useState('');
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showEventSelector, setShowEventSelector] = useState(false);
+  const [eventList, setEventList] = useState<any[]>([]);
   const [eventLoading, setEventLoading] = useState(false);
 
   useEffect(() => {
@@ -46,21 +46,21 @@ const FormPublication = () => {
     setEventLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/Events.php`)
-      const data = await response.json()
+      const data = await response.json();
       if (data.success) {
-        setEventList(data.events)
+        setEventList(data.events);
       } else {
-        setEventList([])
+        setEventList([]);
       }
     } catch (error) {
-      setEventList([])
+      setEventList([]);
     }
     setEventLoading(false);
   }
 
   // Solicitar permiso para galería en Android
   const requestGalleryPermission = async () => {
-    if (Platform.OS === "android") {
+    if (Platform.OS === 'android') {
       try {
         let granted = null;
         if (Platform.Version >= 33) {
@@ -68,11 +68,11 @@ const FormPublication = () => {
           granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
           {
-            title: "Permiso para acceder a la galería",
-            message: "Necesitamos acceso a tu galería para que puedas seleccionar fotos.",
-            buttonNeutral: "Preguntar después",
-            buttonNegative: "Cancelar",
-            buttonPositive: "Aceptar",
+            title: 'Permiso para acceder a la galería',
+            message: 'Necesitamos acceso a tu galería para que puedas seleccionar fotos.',
+            buttonNeutral: 'Preguntar después',
+            buttonNegative: 'Cancelar',
+            buttonPositive: 'Aceptar',
           }
         );
         } else {
@@ -80,11 +80,11 @@ const FormPublication = () => {
           granted = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
             {
-              title: "Permiso para acceder a la galería",
-              message: "Necesitamos acceso a tu galería para que puedas seleccionar fotos.",
-              buttonNeutral: "Preguntar después",
-              buttonNegative: "Cancelar",
-              buttonPositive: "Aceptar",
+              title: 'Permiso para acceder a la galería',
+              message: 'Necesitamos acceso a tu galería para que puedas seleccionar fotos.',
+              buttonNeutral: 'Preguntar después',
+              buttonNegative: 'Cancelar',
+              buttonPositive: 'Aceptar',
             }
           );
         }
@@ -95,11 +95,11 @@ const FormPublication = () => {
           granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
         ) {
           Alert.alert(
-            "Permiso denegado",
-            "No podemos acceder a tu galería. Por favor, habilita el permiso en la configuración.",
+            'Permiso denegado',
+            'No podemos acceder a tu galería. Por favor, habilita el permiso en la configuración.',
             [
-              { text: "Cancelar", style: "cancel" },
-              { text: "Ir a ajustes", onPress: () => Linking.openSettings() }
+              { text: 'Cancelar', style: 'cancel' },
+              { text: 'Ir a ajustes', onPress: () => Linking.openSettings() }
             ]
           );
         }
@@ -115,16 +115,16 @@ const FormPublication = () => {
 
   // Solicitar permiso para cámara en Android
   const requestCameraPermission = async () => {
-    if (Platform.OS === "android") {
+    if (Platform.OS === 'android') {
       try {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.CAMERA,
           {
-            title: "Permiso para usar la cámara",
-            message: "Necesitamos acceso a tu cámara para tomar fotos.",
-            buttonNeutral: "Preguntar después",
-            buttonNegative: "Cancelar",
-            buttonPositive: "Aceptar",
+            title: 'Permiso para usar la cámara',
+            message: 'Necesitamos acceso a tu cámara para tomar fotos.',
+            buttonNeutral: 'Preguntar después',
+            buttonNegative: 'Cancelar',
+            buttonPositive: 'Aceptar',
           }
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
@@ -134,11 +134,11 @@ const FormPublication = () => {
           granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
         ) {
           Alert.alert(
-            "Permiso denegado",
-            "No podemos acceder a tu cámara. Por favor, habilita el permiso en la configuración.",
+            'Permiso denegado',
+            'No podemos acceder a tu cámara. Por favor, habilita el permiso en la configuración.',
             [
-              { text: "Cancelar", style: "cancel" },
-              { text: "Ir a ajustes", onPress: () => Linking.openSettings() }
+              { text: 'Cancelar', style: 'cancel' },
+              { text: 'Ir a ajustes', onPress: () => Linking.openSettings() }
             ]
           );
         }
@@ -155,7 +155,7 @@ const FormPublication = () => {
   // Seleccionar imágenes de la galería
   const selectFromGallery = async () => {
     if (selectedImages.length >= MAX_IMAGES) {
-      Alert.alert("Límite alcanzado", `Solo puedes seleccionar hasta ${MAX_IMAGES} imágenes.`);
+      Alert.alert('Límite alcanzado', `Solo puedes seleccionar hasta ${MAX_IMAGES} imágenes.`);
       return;
     }
 
@@ -169,8 +169,8 @@ const FormPublication = () => {
         width: 1200,
         height: 1200,
         cropping: true,
-        cropperCancelText: "Cancelar",
-        cropperChooseText: "Elegir",
+        cropperCancelText: 'Cancelar',
+        cropperChooseText: 'Elegir',
         compressImageQuality: 0.8,
         multiple: true,
         maxFiles: MAX_IMAGES - selectedImages.length,
@@ -184,18 +184,18 @@ const FormPublication = () => {
         const allowedNewImages = newImages.slice(0, MAX_IMAGES - selectedImages.length)
         setSelectedImages([...selectedImages, ...allowedNewImages])
         Alert.alert(
-          "Límite alcanzado",
+          'Límite alcanzado',
           `Solo se han añadido ${allowedNewImages.length} imágenes para no superar el límite de ${MAX_IMAGES}.`,
         )
       } else {
         setSelectedImages(totalImages)
       }
     } catch (error) {
-      if ((error as any).toString().includes("cancel")) {
+      if ((error as any).toString().includes('cancel')) {
         // User cancelled the operation
       } else {
-        console.log("Error selecting images:", error)
-        Alert.alert("Error", "No se pudieron seleccionar las imágenes")
+        console.log('Error selecting images:', error)
+        Alert.alert('Error', 'No se pudieron seleccionar las imágenes');
       }
     }
   }
@@ -203,7 +203,7 @@ const FormPublication = () => {
   // Tomar una foto usando la cámara
   const takePhoto = async () => {
     if (selectedImages.length >= MAX_IMAGES) {
-      Alert.alert("Límite alcanzado", `Solo puedes seleccionar hasta ${MAX_IMAGES} imágenes.`);
+      Alert.alert('Límite alcanzado', `Solo puedes seleccionar hasta ${MAX_IMAGES} imágenes.`);
       return;
     }
 
@@ -217,17 +217,17 @@ const FormPublication = () => {
         width: 1200,
         height: 1200,
         cropping: true,
-        cropperCancelText: "Cancelar",
-        cropperChooseText: "Elegir",
+        cropperCancelText: 'Cancelar',
+        cropperChooseText: 'Elegir',
         compressImageQuality: 0.8,
       })
       setSelectedImages([...selectedImages, image])
     } catch (error) {
-      if ((error as any).toString().includes("cancel")) {
+      if ((error as any).toString().includes('cancel')) {
         // User cancelled the operation
       } else {
-        console.log("Error taking photo:", error)
-        Alert.alert("Error", "No se pudo tomar la foto")
+        console.log('Error taking photo:', error)
+        Alert.alert('Error', 'No se pudo tomar la foto');
       }
     }
   }
@@ -249,11 +249,11 @@ const FormPublication = () => {
   // Simulate form submission
   const handleSubmit = async () => {
     if (selectedImages.length < 2) {
-      Alert.alert("Error", "Por favor selecciona al menos dos imágenes");
+      Alert.alert('Error', 'Por favor selecciona al menos dos imágenes');
       return;
     }
     if (!selectedEventId) {
-      Alert.alert("Error", "Por favor selecciona un evento");
+      Alert.alert('Error', 'Por favor selecciona un evento');
       return;
     }
     setIsLoading(true);
@@ -284,12 +284,12 @@ const FormPublication = () => {
       })
       const data = await response.json()
       if (data.success) {
-        Alert.alert("Publicación enviada", data.message || "Tu publicación ha sido enviada y está en proceso de revisión.", [{ text: "OK", onPress: () => navigation.goBack() }])
+        Alert.alert('Publicación enviada', data.message || 'Tu publicación ha sido enviada y está en proceso de revisión.', [{ text: 'OK', onPress: () => navigation.goBack() }])
       } else {
-        Alert.alert("Error", data.message || "No se pudo enviar la publicación")
+        Alert.alert('Error', data.message || 'No se pudo enviar la publicación')
       }
     } catch (error) {
-      Alert.alert("Error", "Ocurrió un error al enviar la publicación")
+      Alert.alert('Error', 'Ocurrió un error al enviar la publicación')
     }
     setIsLoading(false)
   }
@@ -377,7 +377,7 @@ const FormPublication = () => {
           <TouchableOpacity style={styles.selectContainer} onPress={() => setShowEventSelector(true)}>
             <Icon name="event" size={20} color="#555" style={styles.inputIcon} />
             <Text style={[styles.selectText, !eventName && styles.selectPlaceholder]}>
-              {eventName || "Selecciona un evento"}
+              {eventName || 'Selecciona un evento'}
             </Text>
             <Icon name="arrow-drop-down" size={24} color="#555" />
           </TouchableOpacity>
@@ -388,7 +388,9 @@ const FormPublication = () => {
               style={styles.textArea}
               value={caption}
               onChangeText={text => {
-                if (text.length <= MAX_DESCRIPTION_LENGTH) setCaption(text);
+                if (text.length <= MAX_DESCRIPTION_LENGTH) {
+                  setCaption(text);
+                }
               }}
               placeholder="Escribe una descripción..."
               placeholderTextColor="#999"
@@ -468,25 +470,25 @@ const FormPublication = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-    backgroundColor: "#cf152d",
+    borderBottomColor: '#E0E0E0',
+    backgroundColor: '#cf152d',
   },
   backButton: {
     padding: 8,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: "600",
-    color: "#fff",
+    fontWeight: '600',
+    color: '#fff',
   },
   rightPlaceholder: {
     width: 40,
@@ -499,127 +501,127 @@ const styles = StyleSheet.create({
   },
   imageSection: {
     padding: 20,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   imagePickerContainer: {
-    width: "100%",
+    width: '100%',
     borderWidth: 2,
-    borderColor: "#E0E0E0",
-    borderStyle: "dashed",
+    borderColor: '#E0E0E0',
+    borderStyle: 'dashed',
     borderRadius: 16,
     padding: 20,
-    alignItems: "center",
-    backgroundColor: "#F5F5F5",
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
   },
   imagePickerButton: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 16,
   },
   imagePickerText: {
     marginTop: 8,
     fontSize: 16,
-    color: "#333",
-    fontWeight: "500",
+    color: '#333',
+    fontWeight: '500',
   },
   divider: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "80%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '80%',
     marginVertical: 16,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: "#E0E0E0",
+    backgroundColor: '#E0E0E0',
   },
   dividerText: {
     paddingHorizontal: 10,
-    color: "#555",
+    color: '#555',
   },
   selectedImagesContainer: {
-    width: "100%",
+    width: '100%',
   },
   imageCount: {
     fontSize: 14,
-    color: "#555",
+    color: '#555',
     marginBottom: 8,
-    textAlign: "right",
+    textAlign: 'right',
   },
   imagesContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   imageItem: {
     marginRight: 10,
-    position: "relative",
+    position: 'relative',
   },
   thumbnailImage: {
     width: 100,
     height: 100,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#E0E0E0",
+    borderColor: '#E0E0E0',
   },
   removeImageButton: {
-    position: "absolute",
+    position: 'absolute',
     top: -8,
     right: -8,
-    backgroundColor: "#333",
+    backgroundColor: '#333',
     borderRadius: 12,
     width: 24,
     height: 24,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   addMoreButton: {
     width: 100,
     height: 100,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#E0E0E0",
-    borderStyle: "dashed",
-    backgroundColor: "#F5F5F5",
-    alignItems: "center",
-    justifyContent: "center",
+    borderColor: '#E0E0E0',
+    borderStyle: 'dashed',
+    backgroundColor: '#F5F5F5',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   formSection: {
     padding: 20,
   },
   inputLabel: {
     fontSize: 16,
-    fontWeight: "500",
-    color: "#333",
+    fontWeight: '500',
+    color: '#333',
     marginBottom: 8,
   },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: "#E0E0E0",
+    borderColor: '#E0E0E0',
     borderRadius: 8,
     paddingHorizontal: 12,
     marginBottom: 16,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: '#F5F5F5',
   },
   selectContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: "#E0E0E0",
+    borderColor: '#E0E0E0',
     borderRadius: 8,
     paddingHorizontal: 12,
     marginBottom: 16,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: '#F5F5F5',
     height: 48,
   },
   selectText: {
     flex: 1,
     fontSize: 16,
-    color: "#333",
+    color: '#333',
   },
   selectPlaceholder: {
-    color: "#999",
+    color: '#999',
   },
   inputIcon: {
     marginRight: 8,
@@ -628,54 +630,54 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     fontSize: 16,
-    color: "#333",
+    color: '#333',
   },
   textAreaContainer: {
     borderWidth: 1,
-    borderColor: "#E0E0E0",
+    borderColor: '#E0E0E0',
     borderRadius: 8,
     padding: 12,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: '#F5F5F5',
   },
   textArea: {
     fontSize: 16,
-    color: "#333",
+    color: '#333',
     minHeight: 100,
   },
   footer: {
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: "#E0E0E0",
-    backgroundColor: "#FFFFFF",
+    borderTopColor: '#E0E0E0',
+    backgroundColor: '#FFFFFF',
   },
   submitButton: {
-    backgroundColor: "#cf152d",
+    backgroundColor: '#cf152d',
     borderRadius: 8,
     paddingVertical: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
   },
   disabledButton: {
-    backgroundColor: "#CCCCCC",
+    backgroundColor: '#CCCCCC',
   },
   submitIcon: {
     marginRight: 8,
   },
   submitText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   imagePickerContainerSmall: {
     marginTop: 16,
     padding: 12,
   },
   imagePickerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    width: "100%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    width: '100%',
   },
   imagePickerButtonSmall: {
     padding: 8,
@@ -685,12 +687,12 @@ const styles = StyleSheet.create({
   },
   dividerVertical: {
     height: 50,
-    alignItems: "center",
+    alignItems: 'center',
   },
   dividerLineVertical: {
     width: 1,
-    height: "100%",
-    backgroundColor: "#E0E0E0",
+    height: '100%',
+    backgroundColor: '#E0E0E0',
   },
   eventsList: {
     padding: 16,
@@ -729,6 +731,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     paddingLeft: 4,
   },
-})
+});
 
 export default FormPublication;

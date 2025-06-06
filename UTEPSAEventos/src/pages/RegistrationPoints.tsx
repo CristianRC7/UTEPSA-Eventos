@@ -35,4 +35,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RegistrationPoints; 
+export default RegistrationPoints;

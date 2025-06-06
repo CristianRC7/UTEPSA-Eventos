@@ -24,4 +24,4 @@ const onboardingData: OnboardingData[] = [
   },
 ];
 
-export default onboardingData; 
+export default onboardingData;
