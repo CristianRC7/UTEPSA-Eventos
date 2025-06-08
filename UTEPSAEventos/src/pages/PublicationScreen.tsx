@@ -17,6 +17,7 @@ import { BASE_URL } from '../utils/Config';
 import BottomSheet from '../components/BottomSheet';
 import LoadingPulseCardAnimation from '../components/LoadingPulseCardAnimation';
 import { useFocusEffect } from '@react-navigation/native';
+import PublicationFilterModal from '../components/Publication/PublicationFilterModal';
 
 const PublicationScreen = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -26,6 +27,12 @@ const PublicationScreen = () => {
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [filterOption, setFilterOption] = useState('all');
   const [filtering, setFiltering] = useState(false);
+  const [eventFilterModalVisible, setEventFilterModalVisible] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [eventList, setEventList] = useState([]);
+  const [eventLoading, setEventLoading] = useState(false);
+  const [eventPage, setEventPage] = useState(1);
+  const [eventTotalPages, setEventTotalPages] = useState(1);
 
   // Función para consultar publicaciones
   const fetchUserAndPublications = async () => {
@@ -81,12 +88,48 @@ const PublicationScreen = () => {
     Alert.alert('Compartir', `Has compartido la publicación de: ${userName}`);
   };
 
-  const applyFilter = (data: any[], option: string) => {
+  // Obtener eventos para el filtro
+  const fetchEvents = async (page = 1, perPage = 3) => {
+    setEventLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/Events.php`);
+      const data = await response.json();
+      if (data.success) {
+        setEventList(data.events);
+        setEventTotalPages(Math.ceil(data.events.length / perPage));
+      } else {
+        setEventList([]);
+        setEventTotalPages(1);
+      }
+    } catch (error) {
+      setEventList([]);
+      setEventTotalPages(1);
+    }
+    setEventLoading(false);
+  };
+
+  const handleEventFilter = () => {
+    setEventFilterModalVisible(true);
+    fetchEvents();
+  };
+
+  const handleSelectEvent = (event: any) => {
+    setSelectedEvent(event);
+    setFilterOption('event');
+    setFilteredPublications(applyFilter(publications, 'event', event));
+    setEventFilterModalVisible(false);
+    setFilterModalVisible(false);
+  };
+
+  const applyFilter = (data: any[], option: string, event: any = null) => {
     switch (option) {
       case 'popular':
         return [...data].sort((a, b) => (b.likes || 0) - (a.likes || 0));
       case 'liked':
-        return data.filter(item => item.hasUserLiked);
+        return data.filter((item: any) => item.hasUserLiked);
+      case 'event':
+        if (!event) return data;
+        return data.filter((item: any) => item.eventName === event.titulo);
       case 'all':
       default:
         return [...data].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -156,7 +199,7 @@ const PublicationScreen = () => {
         visible={filterModalVisible}
         onClose={() => setFilterModalVisible(false)}
         title="Filtrar publicaciones"
-        height={270}
+        height={340}
       >
         <TouchableOpacity
           style={[styles.filterOption, filterOption === 'all' && styles.selectedFilterOption]}
@@ -165,7 +208,6 @@ const PublicationScreen = () => {
           <Icon name="view-list" size={20} color={filterOption === 'all' ? '#FFF' : '#000'} />
           <Text style={[styles.filterText, filterOption === 'all' && styles.selectedFilterText]}>Todas</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={[styles.filterOption, filterOption === 'popular' && styles.selectedFilterOption]}
           onPress={() => handleFilter('popular')}
@@ -173,7 +215,6 @@ const PublicationScreen = () => {
           <Icon name="star" size={20} color={filterOption === 'popular' ? '#FFF' : '#000'} />
           <Text style={[styles.filterText, filterOption === 'popular' && styles.selectedFilterText]}>Más populares</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={[styles.filterOption, filterOption === 'liked' && styles.selectedFilterOption]}
           onPress={() => handleFilter('liked')}
@@ -181,7 +222,29 @@ const PublicationScreen = () => {
           <Icon name="favorite" size={20} color={filterOption === 'liked' ? '#FFF' : '#000'} />
           <Text style={[styles.filterText, filterOption === 'liked' && styles.selectedFilterText]}>Me gustan</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterOption, filterOption === 'event' && styles.selectedFilterOption]}
+          onPress={handleEventFilter}
+        >
+          <Icon name="event" size={20} color={filterOption === 'event' ? '#FFF' : '#000'} />
+          <Text style={[styles.filterText, filterOption === 'event' && styles.selectedFilterText]}>Filtrar por evento</Text>
+          {selectedEvent && (
+            <Text style={{ marginLeft: 8, color: '#ffffff', fontWeight: 'bold' }}>{selectedEvent.titulo}</Text>
+          )}
+        </TouchableOpacity>
       </BottomSheet>
+
+      <PublicationFilterModal
+        visible={eventFilterModalVisible}
+        onClose={() => setEventFilterModalVisible(false)}
+        eventList={eventList}
+        loading={eventLoading}
+        page={eventPage}
+        totalPages={eventTotalPages}
+        onSelect={handleSelectEvent}
+        selectedEvent={selectedEvent}
+        setPage={setEventPage}
+      />
 
       <View style={styles.floatingButtonContainer}>
         <FloatingButton />

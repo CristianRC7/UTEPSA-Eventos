@@ -1,16 +1,17 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import { 
-  View, 
-  FlatList, 
-  Image, 
-  StyleSheet, 
-  Dimensions, 
-  TouchableOpacity, 
-  Animated, 
-  type ViewToken 
-} from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons";
-import LoadingPulse from "./LoadingPulse";
+import { useState, useRef, useEffect, useCallback } from 'react';
+import {
+  View,
+  FlatList,
+  Image,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+  Animated,
+  type ViewToken,
+  ActivityIndicator,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import LoadingPulseCardAnimation from './LoadingPulseCardAnimation';
 import { BASE_URL } from '../utils/Config';
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -44,7 +45,7 @@ const Carousel = ({
   const scrollX = useRef(new Animated.Value(0)).current;
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Solo mostrar controles si hay más de una imagen
+  // Solo mostrar controles si hay mÃ¡s de una imagen
   const hasMultipleImages = images.length > 1;
 
   const startAutoPlay = useCallback(() => {
@@ -120,14 +121,19 @@ const Carousel = ({
     <TouchableOpacity activeOpacity={0.9} onPress={() => onImagePress && onImagePress(item, index)}>
       <View style={[styles.imageContainer, { height }]}>
         {!imagesLoaded[item] && (
-          <LoadingPulse width={SCREEN_WIDTH} height={height} />
+          <>
+            <LoadingPulseCardAnimation />
+            <View style={styles.spinnerContainer}>
+              <ActivityIndicator size="large" color="#cf152d" />
+            </View>
+          </>
         )}
-        <Image 
+        <Image
           source={item ? { uri: `${BASE_URL}/${item}` } : undefined}
           style={[
-            styles.image, 
+            styles.image,
             { height, opacity: imagesLoaded[item] ? 1 : 0 }
-          ]} 
+          ]}
           resizeMode="cover"
           onLoad={() => handleImageLoad(item)}
         />
@@ -181,59 +187,69 @@ const Carousel = ({
 
 const styles = StyleSheet.create({
   container: {
-    position: "relative",
-    width: "100%",
+    position: 'relative',
+    width: '100%',
   },
   imageContainer: {
     width: SCREEN_WIDTH,
-    position: "relative",
+    position: 'relative',
   },
   image: {
     width: SCREEN_WIDTH,
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
   },
   controlsContainer: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 10,
   },
   controlButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   paginationContainer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 16,
-    flexDirection: "row",
-    justifyContent: "center",
-    width: "100%",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
   },
   paginationDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     marginHorizontal: 4,
   },
   paginationDotActive: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     width: 10,
     height: 10,
     borderRadius: 5,
+  },
+  spinnerContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2,
   },
 });
 

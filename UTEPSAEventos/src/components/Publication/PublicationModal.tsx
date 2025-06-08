@@ -54,8 +54,8 @@ const PublicationModal: React.FC<PublicationModalProps> = ({ visible, imageUrl, 
             <Text style={styles.closeButtonText}>✕</Text>
           </TouchableOpacity>
           <ScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollViewContent}
             maximumZoomScale={3}
             minimumZoomScale={1}
             showsHorizontalScrollIndicator={false}
@@ -115,6 +115,14 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').height * 0.7,
     borderRadius: 10,
   },
+  scrollView: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
-export default PublicationModal; 
+export default PublicationModal;
