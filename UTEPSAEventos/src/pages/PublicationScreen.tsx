@@ -89,7 +89,7 @@ const PublicationScreen = () => {
   };
 
   // Obtener eventos para el filtro
-  const fetchEvents = async (page = 1, perPage = 3) => {
+  const fetchEvents = async (perPage = 3) => {
     setEventLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/Events.php`);
@@ -229,7 +229,7 @@ const PublicationScreen = () => {
           <Icon name="event" size={20} color={filterOption === 'event' ? '#FFF' : '#000'} />
           <Text style={[styles.filterText, filterOption === 'event' && styles.selectedFilterText]}>Filtrar por evento</Text>
           {selectedEvent && (
-            <Text style={{ marginLeft: 8, color: '#ffffff', fontWeight: 'bold' }}>{selectedEvent.titulo}</Text>
+            <Text style={styles.selectedEventText}>{selectedEvent.titulo}</Text>
           )}
         </TouchableOpacity>
       </BottomSheet>
@@ -353,6 +353,11 @@ const styles = StyleSheet.create({
   selectedFilterText: {
     color: '#FFF',
     fontWeight: '500',
+  },
+  selectedEventText: {
+    marginLeft: 8,
+    color: '#ffffff',
+    fontWeight: 'bold',
   },
 });
 
