@@ -1,11 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Speaker } from '../../types/SpeakerTypes';
 import { BASE_URL } from '../../utils/Config';
-
-const { width } = Dimensions.get('window');
-const cardWidth = (width - 48) / 2; // 2 columns with padding
 
 interface SpeakerCardProps {
   speaker: Speaker;
@@ -30,27 +27,26 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker, onPress }) => {
       onPress={() => onPress(speaker)} 
       activeOpacity={0.7}
     >
-      <View style={styles.speakerImageContainer}>
-        {speaker.imagen_url ? (
-          <Image 
-            source={getImageUrl(speaker.imagen_url) || undefined} 
-            style={styles.speakerImage} 
-            resizeMode="cover" 
-          />
-        ) : (
-          <View style={styles.placeholderContainer}>
-            <Icon name="person" size={60} color="#CCCCCC" />
-          </View>
-        )}
-      </View>
-      <View style={styles.speakerInfo}>
-        <Text style={styles.speakerName} numberOfLines={2}>
-          {getFullName(speaker)}
-        </Text>
-        <View style={styles.viewProfileContainer}>
-          <Text style={styles.viewProfile}>Ver perfil</Text>
-          <Icon name="arrow-forward" size={14} color="#10B981" style={styles.arrowIcon} />
+      <View style={styles.rowContainer}>
+        <View style={styles.speakerImageContainer}>
+          {speaker.imagen_url ? (
+            <Image 
+              source={getImageUrl(speaker.imagen_url) || undefined} 
+              style={styles.speakerImage} 
+              resizeMode="cover" 
+            />
+          ) : (
+            <View style={styles.placeholderContainer}>
+              <Icon name="person" size={48} color="#CCCCCC" />
+            </View>
+          )}
         </View>
+        <View style={styles.speakerInfo}>
+          <Text style={styles.speakerName} numberOfLines={2}>
+            {getFullName(speaker)}
+          </Text>
+        </View>
+        <Icon name="chevron-right" size={28} color="#cf152d" style={styles.arrowIcon} />
       </View>
     </TouchableOpacity>
   );
@@ -60,53 +56,52 @@ const styles = StyleSheet.create({
   speakerCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
-    width: cardWidth,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginBottom: 20,
     overflow: "hidden",
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 2,
+    borderColor: "#cf152d",
   },
-  speakerImageContainer: {
-    height: cardWidth,
-    backgroundColor: "#F5F5F5",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    overflow: "hidden",
-  },
-  placeholderContainer: {
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F5F5F5",
-  },
-  speakerImage: {
-    width: "100%",
-    height: "100%",
-  },
-  speakerInfo: {
-    padding: 16,
-  },
-  speakerName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 8,
-  },
-  viewProfileContainer: {
+  rowContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
-  viewProfile: {
-    fontSize: 14,
-    color: "#10B981",
-    fontWeight: "500",
+  speakerImageContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: "#F5F5F5",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+    marginRight: 18,
+  },
+  placeholderContainer: {
+    width: 72,
+    height: 72,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
+    borderRadius: 36,
+  },
+  speakerImage: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+  },
+  speakerInfo: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  speakerName: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
   },
   arrowIcon: {
-    marginLeft: 4,
+    marginLeft: 12,
+    color: "#cf152d",
   },
 });
 

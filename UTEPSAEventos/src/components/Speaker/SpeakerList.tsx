@@ -29,11 +29,9 @@ const SpeakerList: React.FC<SpeakerListProps> = ({
       )}
       keyExtractor={(item) => item.id_expositor.toString()}
       contentContainerStyle={styles.speakerList}
-      numColumns={2}
       refreshing={refreshing}
       onRefresh={onRefresh}
       ListEmptyComponent={EmptyState}
-      columnWrapperStyle={styles.columnWrapper}
       showsVerticalScrollIndicator={false}
     />
   );
@@ -42,9 +40,7 @@ const SpeakerList: React.FC<SpeakerListProps> = ({
 const styles = StyleSheet.create({
   speakerList: {
     padding: 16,
-  },
-  columnWrapper: {
-    justifyContent: "space-between",
+    paddingTop: 8,
   },
 });
 
