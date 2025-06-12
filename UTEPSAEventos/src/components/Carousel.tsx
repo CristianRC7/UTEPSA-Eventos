@@ -11,7 +11,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import LoadingPulseCardAnimation from './LoadingPulseCardAnimation';
 import { BASE_URL } from '../utils/Config';
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -121,12 +120,9 @@ const Carousel = ({
     <TouchableOpacity activeOpacity={0.9} onPress={() => onImagePress && onImagePress(item, index)}>
       <View style={[styles.imageContainer, { height }]}>
         {!imagesLoaded[item] && (
-          <>
-            <LoadingPulseCardAnimation />
-            <View style={styles.spinnerContainer}>
-              <ActivityIndicator size="large" color="#cf152d" />
-            </View>
-          </>
+          <View style={styles.spinnerContainer}>
+            <ActivityIndicator size="large" color="#cf152d" />
+          </View>
         )}
         <Image
           source={item ? { uri: `${BASE_URL}/${item}` } : undefined}
