@@ -160,7 +160,7 @@ const Login = ({ navigation }: any) => {
   if (checkingSession) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color="#000" />
+        <ActivityIndicator size="large" color="#cf152d" />
         <Text style={{ marginTop: 20, fontSize: 16, color: '#666' }}>Verificando sesión...</Text>
       </View>
     );

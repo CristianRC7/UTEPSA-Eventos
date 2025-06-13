@@ -71,6 +71,14 @@ const Profile = ({ route, navigation }: any) => {
             <Icon name="chevron-right" size={24} color="#bbb" style={styles.optionChevron} />
           </TouchableOpacity>
 
+          <TouchableOpacity style={styles.optionItem} onPress={() => navigation.navigate('Information')}>
+            <View style={[styles.optionIcon, styles.optionIconInfo]}>
+              <Icon name="info" size={24} color="#fff" />
+            </View>
+            <Text style={styles.optionText}>Información</Text>
+            <Icon name="chevron-right" size={24} color="#bbb" style={styles.optionChevron} />
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.optionItem} onPress={() => Alert.alert('Soporte', 'Si necesitas ayuda, contáctate con CTE en el 3er piso, Bloque Este o al correo soporte.campusvirtual@utepsa.edu')}>
             <View style={[styles.optionIcon, styles.optionIconHelp]}>
               <Icon name="help" size={24} color="#fff" />
@@ -78,11 +86,11 @@ const Profile = ({ route, navigation }: any) => {
             <Text style={styles.optionText}>Soporte</Text>
             <Icon name="chevron-right" size={24} color="#bbb" style={styles.optionChevron} />
           </TouchableOpacity>
-        </View>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Modal para cambiar contraseña */}
         <ModalForm
@@ -188,6 +196,9 @@ const styles = StyleSheet.create({
   optionIconHelp: {
     backgroundColor: '#8B5CF6',
   },
+  optionIconInfo: {
+    backgroundColor: '#10B981',
+  },
   optionText: {
     fontSize: 16,
     color: '#222',
@@ -206,8 +217,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderWidth: 2,
     borderColor: '#cf152d',
-    width: '90%',
-    alignSelf: 'center',
+    width: '100%',
   },
   logoutButtonText: {
     color: '#cf152d',

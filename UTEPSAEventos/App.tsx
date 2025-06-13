@@ -13,6 +13,7 @@ import MyInscription from './src/pages/MyInscription';
 import MyFormsEvent from './src/pages/MyFormsEvent';
 import RegistrationPoints from './src/pages/RegistrationPoints';
 import MyCertificateScreen from './src/pages/MyCertificateScreen';
+import Information from './src/pages/Information';
 import EventSurvey from './src/pages/EventSurvey';
 import { getSession } from './src/utils/sessionStorage';
 import BottomNavigator from './src/components/BottomNavigator';
@@ -75,14 +76,14 @@ function App(): React.JSX.Element {
   if (isLoading || showSplash === null) {
     return (
       <SafeAreaProvider>
-        <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+        <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
       </SafeAreaProvider>
     );
   }
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName={showSplash ? "Splash" : (userSession ? "Home" : "Login")}
@@ -117,6 +118,7 @@ function App(): React.JSX.Element {
           <Stack.Screen name="RegistrationPoints" component={RegistrationPoints} />
           <Stack.Screen name="MyCertificateScreen" component={MyCertificateScreen} />
           <Stack.Screen name="EventSurvey" component={EventSurvey} />
+          <Stack.Screen name="Information" component={Information} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
