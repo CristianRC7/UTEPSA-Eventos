@@ -78,7 +78,7 @@ const SpeakerScreen: React.FC<SpeakerScreenProps> = ({ route }) => {
 
       {loading ? (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color="#cf152d" />
           <Text style={styles.loadingText}>Cargando expositores...</Text>
         </View>
       ) : (

@@ -71,7 +71,7 @@ const Profile = ({ route, navigation }: any) => {
             <Icon name="chevron-right" size={24} color="#bbb" style={styles.optionChevron} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.optionItem} onPress={() => Alert.alert('Soporte', 'Si necesitas ayuda, contáctate con soporte en el 3er piso, bloque este o al correo soporte.campusvirtual@utepsa.edu')}>
+          <TouchableOpacity style={styles.optionItem} onPress={() => Alert.alert('Soporte', 'Si necesitas ayuda, contáctate con CTE en el 3er piso, Bloque Este o al correo soporte.campusvirtual@utepsa.edu')}>
             <View style={[styles.optionIcon, styles.optionIconHelp]}>
               <Icon name="help" size={24} color="#fff" />
             </View>

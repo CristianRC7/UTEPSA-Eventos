@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -35,28 +35,34 @@ const FormPublication = () => {
   const [showEventSelector, setShowEventSelector] = useState(false);
   const [eventList, setEventList] = useState<any[]>([]);
   const [eventLoading, setEventLoading] = useState(false);
+  const [eventPage, setEventPage] = useState(1);
+  const [eventTotalPages, setEventTotalPages] = useState(1);
+  const [perPage] = useState(3);
 
-  useEffect(() => {
-    if (showEventSelector) {
-      fetchEvents()
-    }
-  }, [showEventSelector])
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     setEventLoading(true);
     try {
-      const response = await fetch(`${BASE_URL}/Events.php`)
+      const response = await fetch(`${BASE_URL}/Events.php`);
       const data = await response.json();
       if (data.success) {
         setEventList(data.events);
+        setEventTotalPages(Math.ceil(data.events.length / perPage));
       } else {
         setEventList([]);
+        setEventTotalPages(1);
       }
     } catch (error) {
       setEventList([]);
+      setEventTotalPages(1);
     }
     setEventLoading(false);
-  }
+  }, [perPage]);
+
+  useEffect(() => {
+    if (showEventSelector) {
+      fetchEvents();
+    }
+  }, [showEventSelector, eventPage, fetchEvents]);
 
   // Solicitar permiso para galería en Android
   const requestGalleryPermission = async () => {
@@ -284,7 +290,7 @@ const FormPublication = () => {
       })
       const data = await response.json()
       if (data.success) {
-        Alert.alert('Publicación enviada', data.message || 'Tu publicación ha sido enviada y está en proceso de revisión.', [{ text: 'OK', onPress: () => navigation.goBack() }])
+        Alert.alert('Publicación enviada', 'Tu publicación ha sido enviada y está en proceso de revisión.', [{ text: 'OK', onPress: () => navigation.goBack() }])
       } else {
         Alert.alert('Error', data.message || 'No se pudo enviar la publicación')
       }
@@ -435,7 +441,7 @@ const FormPublication = () => {
         loading={eventLoading}
       >
         <FlatList
-          data={eventList}
+          data={eventList.slice((eventPage - 1) * perPage, eventPage * perPage)}
           keyExtractor={(item) => item.id_evento.toString()}
           renderItem={({ item }) => (
             <TouchableOpacity
@@ -461,6 +467,27 @@ const FormPublication = () => {
             </TouchableOpacity>
           )}
           contentContainerStyle={styles.eventsList}
+          ListFooterComponent={
+            <View style={styles.paginationContainer}>
+              <TouchableOpacity
+                style={[styles.paginationButton, eventPage === 1 && styles.paginationButtonDisabled]}
+                onPress={() => setEventPage(prev => Math.max(prev - 1, 1))}
+                disabled={eventPage === 1}
+              >
+                <Icon name="chevron-left" size={24} color={eventPage === 1 ? "#999" : "#cf152d"} />
+              </TouchableOpacity>
+              <Text style={styles.paginationText}>
+                Página {eventPage} de {eventTotalPages}
+              </Text>
+              <TouchableOpacity
+                style={[styles.paginationButton, eventPage === eventTotalPages && styles.paginationButtonDisabled]}
+                onPress={() => setEventPage(prev => Math.min(prev + 1, eventTotalPages))}
+                disabled={eventPage === eventTotalPages}
+              >
+                <Icon name="chevron-right" size={24} color={eventPage === eventTotalPages ? "#999" : "#cf152d"} />
+              </TouchableOpacity>
+            </View>
+          }
         />
       </BottomSheet>
     </SafeAreaView>
@@ -730,6 +757,28 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     textAlign: 'left',
     paddingLeft: 4,
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+    marginTop: 8,
+  },
+  paginationButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: '#F5F5F5',
+  },
+  paginationButtonDisabled: {
+    backgroundColor: '#F5F5F5',
+  },
+  paginationText: {
+    marginHorizontal: 16,
+    fontSize: 14,
+    color: '#666',
   },
 });
 

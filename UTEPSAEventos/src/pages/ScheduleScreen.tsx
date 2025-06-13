@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { SafeAreaView, StatusBar, ActivityIndicator, StyleSheet, Alert, View } from 'react-native';
+import { SafeAreaView, StatusBar, ActivityIndicator, StyleSheet, Alert, View, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BASE_URL } from '../utils/Config';
 import { getSession } from '../utils/sessionStorage';
@@ -123,7 +123,10 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
       <ScheduleHeader title="Cronograma" onBack={handleBack} />
 
       {loading ? (
-        <ActivityIndicator size="large" color="#000" style={styles.loader} />
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color="#cf152d" />
+          <Text style={styles.loadingText}>Cargando cronograma...</Text>
+        </View>
       ) : (
         <>
           {schedule.length > 0 ? (
@@ -181,6 +184,11 @@ const styles = StyleSheet.create({
   },
   dayTabsWrapper: {
     marginTop: 24,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
