@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, StatusBar, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import ScheduleHeader from '../components/schedule/ScheduleHeader';
+//import ScheduleHeader from '../components/schedule/ScheduleHeader';
+import Header from '../components/Header';
 import { getSession } from '../utils/sessionStorage';
 import { BASE_URL } from '../utils/Config';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -87,7 +88,7 @@ const MyInscription: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
-      <ScheduleHeader title="Mis Inscripciones" onBack={() => navigation.goBack()} />
+      <Header title="Mis Inscripciones" onBack={() => navigation.goBack()} />
       <View style={styles.content}>
         {loading ? (
           <LoadingPulseCardAnimation />

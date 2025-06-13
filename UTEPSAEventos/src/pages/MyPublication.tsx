@@ -10,6 +10,7 @@ import {
   Alert,
   Modal,
   TextInput,
+  StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
@@ -18,6 +19,7 @@ import { BASE_URL } from '../utils/Config';
 import BottomSheet from '../components/BottomSheet';
 import MyPublicationCard from '../components/MyPublication/MyPublicationCard';
 import LoadingPulseCardAnimation from '../components/LoadingPulseCardAnimation';
+import Header from '../components/Header';
 
 const MAX_DESCRIPTION_LENGTH = 250;
 
@@ -151,13 +153,8 @@ const MyPublication = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-          <Icon name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mis Publicaciones</Text>
-        <View style={styles.rightPlaceholder} />
-      </View>
+      <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
+      <Header title="Mis Publicaciones" onBack={handleGoBack} />
       {loading ? (
         <LoadingPulseCardAnimation />
       ) : (

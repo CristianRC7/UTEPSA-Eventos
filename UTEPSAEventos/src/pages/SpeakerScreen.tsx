@@ -11,8 +11,9 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { BASE_URL } from '../utils/Config';
 import { Speaker } from '../types/SpeakerTypes';
-import SpeakerHeader from '../components/Speaker/SpeakerHeader';
+//import SpeakerHeader from '../components/Speaker/SpeakerHeader';
 import SpeakerList from '../components/Speaker/SpeakerList';
+import Header from '../components/Header';
 
 interface SpeakerScreenProps {
   route: {
@@ -71,7 +72,7 @@ const SpeakerScreen: React.FC<SpeakerScreenProps> = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
-      <SpeakerHeader
+      <Header
         title="Expositores"
         onBack={handleBack}
       />

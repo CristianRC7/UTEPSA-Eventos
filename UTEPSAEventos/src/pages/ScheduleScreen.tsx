@@ -3,8 +3,9 @@ import { SafeAreaView, StatusBar, ActivityIndicator, StyleSheet, Alert, View, Te
 import { useNavigation } from '@react-navigation/native';
 import { BASE_URL } from '../utils/Config';
 import { getSession } from '../utils/sessionStorage';
+import Header from '../components/Header';
+//import ScheduleHeader from '../components/schedule/ScheduleHeader';
 
-import ScheduleHeader from '../components/schedule/ScheduleHeader';
 import DayTabs from '../components/schedule/DayTabs';
 import ActivitiesList from '../components/schedule/ActivitiesList';
 import EmptyState from '../components/schedule/EmptyState';
@@ -120,7 +121,7 @@ const ScheduleScreen: React.FC<ScheduleScreenProps> = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
-      <ScheduleHeader title="Cronograma" onBack={handleBack} />
+      <Header title="Cronograma" onBack={handleBack} />
 
       {loading ? (
         <View style={styles.loader}>

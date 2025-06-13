@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, StatusBar, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import ScheduleHeader from '../components/schedule/ScheduleHeader';
+import Header from '../components/Header';
 
 const Information: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -9,7 +9,7 @@ const Information: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
-      <ScheduleHeader title="Información" onBack={() => navigation.goBack()} />
+      <Header title="Información" onBack={() => navigation.goBack()} />
       <View style={styles.content}>
         <Image
           source={require('../images/logo.png')}

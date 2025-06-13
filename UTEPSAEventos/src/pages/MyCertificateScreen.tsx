@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, FlatList, StatusBar } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { getSession } from '../utils/sessionStorage';
 import { BASE_URL } from '../utils/Config';
 import LoadingPulseCardAnimation from '../components/LoadingPulseCardAnimation';
+import Header from '../components/Header';
 
 interface Certificado {
   id_certificado: number;
@@ -67,13 +68,8 @@ const MyCertificateScreen = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mis Certificados</Text>
-        <View style={styles.spacer} />
-      </View>
+      <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
+      <Header title="Mis Certificados" onBack={() => navigation.goBack()} />
       <View style={styles.content}>
         {loading ? (
           <LoadingPulseCardAnimation />

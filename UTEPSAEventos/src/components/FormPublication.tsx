@@ -14,6 +14,7 @@ import {
   FlatList,
   PermissionsAndroid,
   Linking,
+  StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
@@ -21,6 +22,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { getSession } from '../utils/sessionStorage';
 import { BASE_URL } from '../utils/Config';
 import BottomSheet from './BottomSheet';
+import Header from './Header';
 
 const MAX_IMAGES = 5;
 const MAX_DESCRIPTION_LENGTH = 250;
@@ -306,13 +308,8 @@ const FormPublication = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-          <Icon name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Publicar Fotos</Text>
-        <View style={styles.rightPlaceholder} />
-      </View>
+      <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
+      <Header title="Publicar Fotos" onBack={handleGoBack} />
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.imageSection}>
