@@ -168,10 +168,7 @@ const Login = ({ navigation }: any) => {
         </TouchableOpacity>
         */}
         <Animated.View style={[styles.formContainer, animatedStyle]}>
-          <View style={{ 
-            marginBottom: 40,
-            alignItems: 'center',
-          }}>
+          <View style={styles.titleContainer}>
             <Animated.Text style={[styles.utepsaTitle, animatedStyle]}>UTEPSA</Animated.Text>
             <Animated.Text style={[styles.eventosTitle, animatedStyle]}>Eventos</Animated.Text>
             <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
@@ -259,6 +256,10 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     padding: 20,
   },
+  titleContainer: {
+    marginBottom: 40,
+    alignItems: 'center',
+  },
   utepsaTitle: {
     fontSize: 44,
     fontWeight: '900',
@@ -278,9 +279,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   chip: {
-    display: 'none',
-  },
-  title: {
     display: 'none',
   },
   subtitle: {

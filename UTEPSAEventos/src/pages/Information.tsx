@@ -21,7 +21,7 @@ const Information: React.FC = () => {
         </Text>
         <View style={styles.footer}>
           <Text style={styles.copyright}>© Derechos reservados UTEPSA 2025</Text>
-          <Text style={styles.cdrc}>cdrc</Text>
+          <Text style={styles.cdrc}>CTE</Text>
         </View>
       </View>
     </SafeAreaView>

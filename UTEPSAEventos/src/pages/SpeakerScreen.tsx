@@ -1,19 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  View,
   StyleSheet,
   SafeAreaView,
-  ActivityIndicator,
-  Text,
   Alert,
   StatusBar,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { BASE_URL } from '../utils/Config';
 import { Speaker } from '../types/SpeakerTypes';
 //import SpeakerHeader from '../components/Speaker/SpeakerHeader';
 import SpeakerList from '../components/Speaker/SpeakerList';
 import Header from '../components/Header';
+import LoadingPulseCardAnimation from '../components/LoadingPulseCardAnimation';
 
 interface SpeakerScreenProps {
   route: {
@@ -24,7 +22,7 @@ interface SpeakerScreenProps {
 }
 
 const SpeakerScreen: React.FC<SpeakerScreenProps> = ({ route }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<any>>();
   const { eventId } = route.params;
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,10 +76,7 @@ const SpeakerScreen: React.FC<SpeakerScreenProps> = ({ route }) => {
       />
 
       {loading ? (
-        <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#cf152d" />
-          <Text style={styles.loadingText}>Cargando expositores...</Text>
-        </View>
+        <LoadingPulseCardAnimation />
       ) : (
         <SpeakerList
           speakers={speakers}
