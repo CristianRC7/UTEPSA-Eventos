@@ -16,7 +16,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { saveSession, getSession } from '../utils/sessionStorage';
 import { BASE_URL } from '../utils/Config';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, interpolate } from 'react-native-reanimated';
 import { Animated as RNAnimated } from 'react-native';
 
 const Login = ({ navigation }: any) => {
@@ -32,6 +32,8 @@ const Login = ({ navigation }: any) => {
 
   // Animación de entrada para todo el contenido
   const formAnim = useSharedValue(0);
+  const logoAnim = useSharedValue(0);
+  const titleAnim = useSharedValue(0);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -63,13 +65,20 @@ const Login = ({ navigation }: any) => {
       }
     );
 
-    formAnim.value = withTiming(1, { duration: 900 });
+    // Iniciar animaciones secuenciales
+    logoAnim.value = withTiming(1, { duration: 800 });
+    setTimeout(() => {
+      titleAnim.value = withTiming(1, { duration: 600 });
+    }, 200);
+    setTimeout(() => {
+      formAnim.value = withTiming(1, { duration: 600 });
+    }, 400);
 
     return () => {
       keyboardDidShowListener.remove();
       keyboardDidHideListener.remove();
     };
-  }, [navigation, formAnim]);
+  }, [navigation, formAnim, logoAnim, titleAnim]);
 
   // Button animation on press
   const animateButton = () => {
@@ -142,17 +151,32 @@ const Login = ({ navigation }: any) => {
     );
   };
 
-  const animatedStyle = useAnimatedStyle(() => ({
+  const logoAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: logoAnim.value,
+    transform: [
+      { scale: interpolate(logoAnim.value, [0, 1], [0.5, 1]) },
+      { translateY: interpolate(logoAnim.value, [0, 1], [-20, 0]) }
+    ],
+  }));
+
+  const titleAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: titleAnim.value,
+    transform: [
+      { translateY: interpolate(titleAnim.value, [0, 1], [20, 0]) }
+    ],
+  }));
+
+  const formAnimatedStyle = useAnimatedStyle(() => ({
     opacity: formAnim.value,
     transform: [
-      { translateY: (1 - formAnim.value) * 30 },
-      { scale: formAnim.value ? 1 : 0.95 },
+      { translateY: interpolate(formAnim.value, [0, 1], [30, 0]) }
     ],
   }));
 
   if (checkingSession) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
+        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
         <ActivityIndicator size="large" color="#cf152d" />
         <Text style={styles.loadingText}>Verificando sesión...</Text>
       </View>
@@ -168,80 +192,82 @@ const Login = ({ navigation }: any) => {
           <Text style={{ color: '#cf152d', fontWeight: 'bold' }}>Reset Splash (DEV)</Text>
         </TouchableOpacity>
         */}
-        <Animated.View style={[styles.formContainer, animatedStyle]}>
+        <Animated.View style={[styles.formContainer]}>
           <View style={styles.titleContainer}>
-            <Image
-              source={require('../images/logo.png')} 
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <Animated.Text style={[styles.utepsaTitle, animatedStyle]}>UTEPSA</Animated.Text>
-            <Animated.Text style={[styles.eventosTitle, animatedStyle]}>Eventos</Animated.Text>
+            <Animated.View style={[styles.logoContainer, logoAnimatedStyle]}>
+              <Image 
+                source={require('../images/logo.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </Animated.View>
+            <Animated.View style={titleAnimatedStyle}>
+              <Animated.Text style={styles.utepsaTitle}>UTEPSA</Animated.Text>
+              <Animated.Text style={styles.eventosTitle}>Eventos</Animated.Text>
+            </Animated.View>
           </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Usuario</Text>
-            <View style={styles.inputWrapper}>
-              <MaterialIcons name="person" size={20} color="#666" style={styles.inputIcon} />
-              <TextInput
-                style={styles.inputWithIcon}
-                placeholder="Ingrese su usuario"
-                placeholderTextColor="#999"
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Contraseña</Text>
-            <View style={styles.inputWrapper}>
-              <MaterialIcons name="lock" size={20} color="#666" style={styles.inputIcon} />
-              <TextInput
-                style={styles.inputWithIcon}
-                placeholder="Ingrese su contraseña"
-                placeholderTextColor="#999"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-              />
-              <TouchableOpacity
-                style={styles.eyeIconContainer}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <MaterialIcons
-                  name={showPassword ? 'visibility-off' : 'visibility'}
-                  size={20}
-                  color="#666"
+          <Animated.View style={[styles.formContent, formAnimatedStyle]}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Usuario</Text>
+              <View style={styles.inputWrapper}>
+                <MaterialIcons name="person" size={20} color="#666" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.inputWithIcon}
+                  placeholder="Ingrese su usuario"
+                  placeholderTextColor="#999"
+                  value={username}
+                  onChangeText={setUsername}
+                  autoCapitalize="none"
                 />
+              </View>
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Contraseña</Text>
+              <View style={styles.inputWrapper}>
+                <MaterialIcons name="lock" size={20} color="#666" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.inputWithIcon}
+                  placeholder="Ingrese su contraseña"
+                  placeholderTextColor="#999"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                />
+                <TouchableOpacity
+                  style={styles.eyeIconContainer}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <MaterialIcons
+                    name={showPassword ? 'visibility-off' : 'visibility'}
+                    size={20}
+                    color="#666"
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={handleLogin}
+              disabled={loading}
+            >
+              <Animated.View style={[styles.loginButton]}>
+                {loading ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+                )}
+              </Animated.View>
+            </TouchableOpacity>
+
+            <View style={styles.forgotPasswordContainer}>
+              <TouchableOpacity onPress={handleForgotPassword}>
+                <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
               </TouchableOpacity>
             </View>
-          </View>
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            <Animated.View 
-              style={[
-                styles.loginButton,
-              ]}
-            >
-              {loading ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
-              )}
-            </Animated.View>
-          </TouchableOpacity>
-
-          <View style={styles.forgotPasswordContainer}>
-            <TouchableOpacity onPress={handleForgotPassword}>
-              <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
-            </TouchableOpacity>
-          </View>
+          </Animated.View>
         </Animated.View>
       </View>
     </TouchableWithoutFeedback>
@@ -361,6 +387,13 @@ const styles = StyleSheet.create({
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  formContent: {
+    width: '100%',
   },
 });
 
