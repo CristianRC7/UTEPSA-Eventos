@@ -12,7 +12,7 @@ const Footer: React.FC = () => (
           <span className="text-lg font-semibold">UTEPSA</span>
         </div>
         <p className="text-gray-400 text-sm">
-          © 2024 Universidad Tecnológica Privada de Santa Cruz. Todos los derechos reservados.
+          © 2025 Universidad Tecnológica Privada de Santa Cruz. Todos los derechos reservados.
         </p>
       </div>
     </div>
