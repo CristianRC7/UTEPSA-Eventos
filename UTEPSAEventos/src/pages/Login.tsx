@@ -10,13 +10,23 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   StatusBar,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { saveSession, getSession } from '../utils/sessionStorage';
 import { BASE_URL } from '../utils/Config';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { Animated as RNAnimated } from 'react-native';
+//import AsyncStorage from '@react-native-async-storage/async-storage';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  interpolate,
+} from 'react-native-reanimated';
+import Logo from '../images/logo.png';
 
 const Login = ({ navigation }: any) => {
   const [username, setUsername] = useState('');
@@ -26,18 +36,17 @@ const Login = ({ navigation }: any) => {
   const [showPassword, setShowPassword] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
 
-  // Animación solo para el botón (usando Animated de react-native)
-  const buttonAnim = useState(new RNAnimated.Value(0))[0];
-
-  // Animación de entrada para todo el contenido
+  // Animaciones
+  const logoAnim = useSharedValue(0);
   const formAnim = useSharedValue(0);
+  const buttonScale = useSharedValue(1);
+  const contentOffset = useSharedValue(0);
 
   useEffect(() => {
     // Check if user is already logged in
     const checkForExistingSession = async () => {
       const userSession = await getSession();
       if (userSession) {
-        // Redirect to Home if a session exists
         navigation.reset({
           index: 0,
           routes: [{ name: 'Home', params: { userData: userSession } }],
@@ -53,38 +62,26 @@ const Login = ({ navigation }: any) => {
       'keyboardDidShow',
       () => {
         setKeyboardVisible(true);
+        contentOffset.value = withTiming(-150, { duration: 300 });
       }
     );
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
         setKeyboardVisible(false);
+        contentOffset.value = withTiming(0, { duration: 300 });
       }
     );
 
-    formAnim.value = withTiming(1, { duration: 900 });
+    // Iniciar animaciones
+    logoAnim.value = withSpring(1, { damping: 15, stiffness: 150 });
+    formAnim.value = withTiming(1, { duration: 800 });
 
     return () => {
       keyboardDidShowListener.remove();
       keyboardDidHideListener.remove();
     };
-  }, [navigation, formAnim]);
-
-  // Button animation on press
-  const animateButton = () => {
-    RNAnimated.sequence([
-      RNAnimated.timing(buttonAnim, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-      RNAnimated.timing(buttonAnim, {
-        toValue: 0,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
+  }, [navigation, logoAnim, formAnim, contentOffset]);
 
   const handleLogin = async () => {
     if (!username.trim() || !password.trim()) {
@@ -92,7 +89,11 @@ const Login = ({ navigation }: any) => {
       return;
     }
 
-    animateButton();
+    // Animación del botón
+    buttonScale.value = withSpring(0.95, { duration: 100 }, () => {
+      buttonScale.value = withSpring(1, { duration: 100 });
+    });
+
     setLoading(true);
 
     try {
@@ -110,17 +111,13 @@ const Login = ({ navigation }: any) => {
       const data = await response.json();
 
       if (data.success) {
-        // Solo guardar sesión y permitir acceso si el rol es interno o externo
         if (data.rol === 'interno' || data.rol === 'externo') {
-          // Save session data
           await saveSession(data);
-          // Use reset instead of navigate to prevent going back to login
           navigation.reset({
             index: 0,
             routes: [{ name: 'Home', params: { userData: data } }],
           });
         }
-        // Si es administrador, simplemente retornamos sin hacer nada
         return;
       } else {
         Alert.alert('Error', data.message || 'Credenciales inválidas');
@@ -140,106 +137,153 @@ const Login = ({ navigation }: any) => {
       [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
     );
   };
+{/*
+  const handleResetSplash = async () => {
+    await AsyncStorage.removeItem('splash_shown');
+    await AsyncStorage.removeItem('userSession');
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Splash' }],
+    });
+  };
+*/}
+  // Estilos animados
+  const logoAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: logoAnim.value,
+    transform: [
+      { scale: interpolate(logoAnim.value, [0, 1], [0.5, 1]) },
+      { translateY: interpolate(logoAnim.value, [0, 1], [-50, 0]) }
+    ],
+  }));
 
-  const animatedStyle = useAnimatedStyle(() => ({
+  const formAnimatedStyle = useAnimatedStyle(() => ({
     opacity: formAnim.value,
     transform: [
-      { translateY: (1 - formAnim.value) * 30 },
-      { scale: formAnim.value ? 1 : 0.95 },
+      { translateY: interpolate(formAnim.value, [0, 1], [30, 0]) }
     ],
+  }));
+
+  const buttonAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: buttonScale.value }],
+  }));
+
+  const contentAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: contentOffset.value }],
   }));
 
   if (checkingSession) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+      <View style={styles.loadingContainer}>
+        <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
         <ActivityIndicator size="large" color="#cf152d" />
-        <Text style={{ marginTop: 20, fontSize: 16, color: '#666' }}>Verificando sesión...</Text>
       </View>
     );
   }
 
   return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-        {/* Botón de desarrollo para resetear splash (comentado)
-        <TouchableOpacity onPress={handleResetSplash} style={{ marginBottom: 10, alignSelf: 'flex-end', backgroundColor: '#eee', padding: 8, borderRadius: 8 }}>
-          <Text style={{ color: '#cf152d', fontWeight: 'bold' }}>Reset Splash (DEV)</Text>
-        </TouchableOpacity>
-        */}
-        <Animated.View style={[styles.formContainer, animatedStyle]}>
-          <View style={styles.titleContainer}>
-            <Animated.Text style={[styles.utepsaTitle, animatedStyle]}>UTEPSA</Animated.Text>
-            <Animated.Text style={[styles.eventosTitle, animatedStyle]}>Eventos</Animated.Text>
-            <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
-          </View>
+        <StatusBar barStyle="light-content" backgroundColor="#cf152d" />
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Usuario</Text>
-            <View style={styles.inputWrapper}>
-              <MaterialIcons name="person" size={20} color="#666" style={styles.inputIcon} />
-              <TextInput
-                style={styles.inputWithIcon}
-                placeholder="Ingrese su usuario"
-                placeholderTextColor="#999"
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Contraseña</Text>
-            <View style={styles.inputWrapper}>
-              <MaterialIcons name="lock" size={20} color="#666" style={styles.inputIcon} />
-              <TextInput
-                style={styles.inputWithIcon}
-                placeholder="Ingrese su contraseña"
-                placeholderTextColor="#999"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-              />
-              <TouchableOpacity
-                style={styles.eyeIconContainer}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <MaterialIcons
-                  name={showPassword ? "visibility-off" : "visibility"}
-                  size={20}
-                  color="#666"
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            <Animated.View 
-              style={[
-                styles.loginButton,
-              ]}
-            >
-              {loading ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
-              )}
+        <Animated.View style={[styles.contentContainer, contentAnimatedStyle]}>
+          {/* Header con gradiente */}
+          <View style={styles.header}>
+            <Animated.View style={[styles.logoContainer, logoAnimatedStyle]}>
+              <Image source={Logo} style={styles.logo} resizeMode="contain" />
+              <View style={styles.titleContainer}>
+                <Text style={styles.utepsaTitle}>UTEPSA</Text>
+                <Text style={styles.eventosTitle}>Eventos</Text>
+              </View>
             </Animated.View>
-          </TouchableOpacity>
+          </View>
 
-          <View style={styles.forgotPasswordContainer}>
-            <TouchableOpacity onPress={handleForgotPassword}>
+          {/* Formulario */}
+          <Animated.View style={[styles.formContainer, formAnimatedStyle]}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Usuario</Text>
+              <View style={[styles.inputWrapper, username ? styles.inputFocused : null]}>
+                <MaterialIcons name="person-outline" size={22} color="#666" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.inputWithIcon}
+                  placeholder="Ingrese su usuario"
+                  placeholderTextColor="#999"
+                  value={username}
+                  onChangeText={setUsername}
+                  autoCapitalize="none"
+                />
+              </View>
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Contraseña</Text>
+              <View style={[styles.inputWrapper, password ? styles.inputFocused : null]}>
+                <MaterialIcons name="lock-outline" size={22} color="#666" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.inputWithIcon}
+                  placeholder="Ingrese su contraseña"
+                  placeholderTextColor="#999"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                />
+                <TouchableOpacity
+                  style={styles.eyeIconContainer}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <MaterialIcons
+                    name={showPassword ? 'visibility-off' : 'visibility'}
+                    size={22}
+                    color="#666"
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <Animated.View style={buttonAnimatedStyle}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={handleLogin}
+                disabled={loading}
+                style={styles.loginButton}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <>
+                    <MaterialIcons name="login" size={20} color="#FFFFFF" style={styles.buttonIcon} />
+                    <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </Animated.View>
+
+            <TouchableOpacity
+              onPress={handleForgotPassword}
+              style={styles.forgotPasswordContainer}
+            >
               <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </Animated.View>
+
+        {/* Botón de desarrollo (comentado para producción)
+        {typeof __DEV__ !== 'undefined' && __DEV__ && (
+          <TouchableOpacity onPress={handleResetSplash} style={styles.devButton}>
+            <Text style={styles.devButtonText}>Reset Splash (DEV)</Text>
+          </TouchableOpacity>
+        )}*/}
       </View>
     </TouchableWithoutFeedback>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -247,64 +291,105 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  scrollContainer: {
+    flexGrow: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
-  formContainer: {
-    width: '100%',
-    maxWidth: 400,
-    padding: 20,
+  header: {
+    backgroundColor: '#cf152d',
+    paddingTop: 60,
+    paddingBottom: 40,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  logoContainer: {
+    alignItems: 'center',
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    marginBottom: 15,
   },
   titleContainer: {
-    marginBottom: 40,
     alignItems: 'center',
   },
   utepsaTitle: {
-    fontSize: 44,
+    fontSize: 32,
     fontWeight: '900',
-    color: '#cf152d',
-    letterSpacing: 2,
-    textShadowColor: '#00000022',
-    textShadowOffset: { width: 1, height: 2 },
-    textShadowRadius: 4,
+    color: '#FFFFFF',
+    letterSpacing: 3,
     textAlign: 'center',
   },
   eventosTitle: {
+    fontSize: 18,
+    fontWeight: '300',
+    color: '#FFFFFF',
+    letterSpacing: 2,
+    textAlign: 'center',
+    opacity: 0.9,
+  },
+  formContainer: {
+    flex: 1,
+    paddingHorizontal: 30,
+    paddingTop: 40,
+    paddingBottom: 20,
+    minHeight: 400,
+  },
+  welcomeContainer: {
+    marginBottom: 40,
+    alignItems: 'center',
+  },
+  welcomeTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#000',
+    color: '#333',
     marginBottom: 8,
-    letterSpacing: -0.5,
-    textAlign: 'center',
   },
-  chip: {
-    display: 'none',
-  },
-  subtitle: {
+  welcomeSubtitle: {
     fontSize: 16,
     color: '#666',
-    marginBottom: 20,
     textAlign: 'center',
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 25,
   },
   label: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#333',
-    marginBottom: 8,
-    letterSpacing: -0.2,
+    marginBottom: 10,
+    marginLeft: 5,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 55,
-    borderWidth: 1,
-    borderColor: '#E1E1E1',
-    borderRadius: 12,
-    backgroundColor: '#F9F9F9',
+    height: 56,
+    borderWidth: 2,
+    borderColor: '#E8E8E8',
+    borderRadius: 16,
+    backgroundColor: '#FAFAFA',
+    paddingHorizontal: 5,
+  },
+  inputFocused: {
+    borderColor: '#cf152d',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#cf152d',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   inputIcon: {
     paddingHorizontal: 15,
@@ -318,36 +403,69 @@ const styles = StyleSheet.create({
     flex: 1,
     height: '100%',
     fontSize: 16,
-    color: '#000',
+    color: '#333',
+    fontWeight: '500',
   },
   loginButton: {
     backgroundColor: '#cf152d',
-    height: 55,
-    borderRadius: 12,
+    height: 56,
+    borderRadius: 16,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
     shadowColor: '#cf152d',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  buttonIcon: {
+    marginRight: 8,
   },
   loginButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
-    letterSpacing: 0.3,
-    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   forgotPasswordContainer: {
-    marginTop: 20,
+    marginTop: 30,
     alignItems: 'center',
+    paddingVertical: 10,
   },
   forgotPasswordText: {
     color: '#cf152d',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  footer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 12,
+    color: '#999',
+    textAlign: 'center',
+  },
+  devButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    backgroundColor: '#f0f0f0',
+    padding: 8,
+    borderRadius: 8,
+    zIndex: 1000,
+  },
+  devButtonText: {
+    color: '#cf152d',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  contentContainer: {
+    flex: 1,
   },
 });
 
