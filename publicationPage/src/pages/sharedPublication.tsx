@@ -6,7 +6,7 @@ import Header from "../components/Header"
 import Footer from "../components/Footer"
 import EmptyPublication from "../components/EmptyPublication"
 //import DownloadAppSection from "../components/DownloadAppSection"
-import DownloadAppSection from "../components/DownloadAppSection2"
+import DownloadAppSection2 from "../components/DownloadAppSection2"
 import ParticipantInfo from "../components/ParticipantInfo"
 import EventDetails from "../components/EventDetails"
 import ShareSection from "../components/ShareSection"
@@ -73,7 +73,7 @@ export default function SharedPublication() {
           </div>
         </div>
       </main>
-      <DownloadAppSection />
+      <DownloadAppSection2 />
       <Footer />
     </div>
   )
